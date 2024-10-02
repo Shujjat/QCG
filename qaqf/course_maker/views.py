@@ -87,10 +87,12 @@ class CourseCreationWizard(SessionWizardView):
         return initial
 
     def process_step(self, form):
+
         """
         Override the process_step method to save data to the database.
         """
         step = self.steps.current
+        print('step:'+str(step))
         form_data = form.cleaned_data
 
         # Fetch or create a course object from the extra data in storage
@@ -126,18 +128,52 @@ class CourseCreationWizard(SessionWizardView):
             course.course_title = form_data.get('course_title', '')
             course.course_description = form_data.get('course_description', '')
 
-        elif step == 'step3':
-            learning_outcomes_json = form_data.get('learning_outcomes')
-            if learning_outcomes_json:
-                learning_outcomes_list = json.loads(learning_outcomes_json)
 
-                for outcome_data in learning_outcomes_list:
-                    outcome = LearningOutcome.objects.create(
-                        tag=outcome_data['tag'],
-                        outcome=outcome_data['outcome'],
-                        sub_items=outcome_data.get('sub_items', '')
-                    )
-                    course.learning_outcomes.add(outcome)
+        elif step == 'step3':
+            print(form_data)
+            if form_data:
+
+                number_of_outcomes = 4
+
+
+                for i in range(number_of_outcomes):
+                    outcome = {
+                        'tag': form_data.get(f'learning_outcome_{i}_tag'),
+                        'number': form_data.get(f'learning_outcome_{i}_number'),
+                        'outcome': form_data.get(f'learning_outcome_{i}_outcome'),
+                        'course_id':course.id
+                       # 'sub_items': form_data.get(f'learning_outcome_{i}_sub_items').split('\r\n'),
+
+                    }
+                    LearningOutcome.objects.create(**outcome)
+
+                else:
+
+                       pass
+
+
+
+        elif step=='step4':
+            print("in step 4")
+            if form_data:
+                print("if form_data:")
+                for key, value in form_data.items():
+                    print(" for key, value in form_data.items():")
+                    if key.startswith('tag_'):
+                        print(" if key.startswith('tag_'):")
+                        index = key.split('_')[1]
+                        tag = form_data[f'tag_{index}']
+                        number = form_data[f'number_{index}']
+                        outcome_text = form_data[f'outcome_{index}']
+                        sub_items = form_data.get(f'sub_items_{index}', '')
+
+                        # Save each learning outcome to the database
+                        LearningOutcome.objects.create(
+                            course=course,
+                            outcome=outcome_text,
+                            tag=tag,
+                            number=int(number)
+                        )
 
         # Save the course instance
         course.save()
@@ -205,3 +241,6 @@ def regenerate_learning_outcome(request):
             return JsonResponse({'error': 'Invalid index'}, status=400)
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+[{'tag': 'A', 'number': 1, 'outcome': 'Understand the fundamental concepts in [topic]', 'sub_items': ['Define key terms related to [field] and explain their significance', 'Identify and describe the main components or building blocks of [topic]']}, {'tag': 'B', 'number': 1, 'outcome': 'Apply basic principles and theories in [field]', 'sub_items': ['Recognize how [principle/theory 1] applies to real-world scenarios', 'Explain how [principle/theory 2] contributes to a deeper understanding of [topic]']}, {'tag': 'C', 'number': 1, 'outcome': 'Develop problem-solving skills using fundamental concepts', 'sub_items': ['Analyze and break down complex problems into manageable parts', 'Develop and justify a plan to address a basic challenge in [field]']}, {'tag': 'D', 'number': 1, 'outcome': 'Communicate effectively about [topic]', 'sub_items': ['Use technical vocabulary accurately when discussing [topic]', 'Create clear, concise presentations or reports summarizing key ideas']}, {'tag': 'E', 'number': 1, 'outcome': 'Reflect on the significance of fundamental concepts', 'sub_items': ['Recognize the importance of [key concept] in understanding [topic]', 'Justify why a solid foundation in [field] is essential for further learning']}]
