@@ -1,0 +1,88 @@
+{% extends "course_maker/form_wizard.html" %}
+
+{% block content %}
+<h2>Step 3: Learning Outcomes</h2>
+<form method="POST" class="form-horizontal">
+    {% csrf_token %}
+    {{ wizard.management_form }}
+
+    <table class="table table-striped table-hover table-bordered align-middle">
+        <thead class="thead-dark">
+            <tr>
+                <th style="width: 10%;">Tag</th>
+                <th style="width: 10%;">Number</th>
+                <th style="width: 40%;">Outcome</th>
+                <th style="width: 30%;">Sub Items</th>
+                <th style="width: 10%;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for index in wizard.form.learning_outcomes_data %}
+                <tr id="outcome-row-{{ index }}">
+                    <td class="text-center">{{ wizard.form.learning_outcome_{{ index }}_tag }}</td>
+                    <td class="text-center">{{ wizard.form.learning_outcome_{{ index }}_number }}</td>
+                    <td>{{ wizard.form.learning_outcome_{{ index }}_outcome }}</td>
+                    <td>{{ wizard.form.learning_outcome_{{ index }}_sub_items }}</td>
+                    <td class="text-center">
+                        <div class="btn-group" role="group" aria-label="Action Buttons">
+                            <button type="button" class="btn btn-sm btn-primary regenerate-btn" data-index="{{ index }}">
+                                Regenerate
+                            </button>
+                            <button type="button" class="btn btn-sm btn-danger delete-btn" data-index="{{ index }}">
+                                Delete
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="text-right">
+        <input type="submit" value="Next" class="btn btn-success">
+    </div>
+</form>
+
+<script>
+    // Handle regeneration of learning outcomes using AJAX
+    document.querySelectorAll('.regenerate-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const index = this.dataset.index;
+            regenerateOutcome(index);
+        });
+    });
+
+    // Handle deletion of learning outcomes
+    document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const index = this.dataset.index;
+            const row = document.getElementById(`outcome-row-${index}`);
+            row.remove(); // Remove the row from the DOM
+            console.log(`Deleted outcome ${index}`);
+        });
+    });
+
+    // AJAX function to regenerate learning outcomes
+    function regenerateOutcome(index) {
+        $.ajax({
+            url: '{% url "regenerate_learning_outcome" %}',
+            type: 'POST',
+            data: {
+                'index': index,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                // Update the outcome text based on the response
+                const row = document.getElementById(`outcome-row-${index}`);
+                const outcomeCell = row.querySelector('td:nth-child(3)');
+                outcomeCell.textContent = response.new_outcome;
+                console.log(`Regenerated outcome ${index}`);
+            },
+            error: function(error) {
+                console.log("Error:", error);
+            }
+        });
+    }
+</script>
+
+{% endblock %}
