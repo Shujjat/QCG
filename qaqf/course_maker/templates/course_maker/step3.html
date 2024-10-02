@@ -17,12 +17,20 @@
             </tr>
         </thead>
         <tbody>
-            {% for index in wizard.form.learning_outcomes_data %}
+            {% for index, outcome in wizard.form.learning_outcomes_data.items %}
                 <tr id="outcome-row-{{ index }}">
-                    <td class="text-center">{{ wizard.form.learning_outcome_{{ index }}_tag }}</td>
-                    <td class="text-center">{{ wizard.form.learning_outcome_{{ index }}_number }}</td>
-                    <td>{{ wizard.form.learning_outcome_{{ index }}_outcome }}</td>
-                    <td>{{ wizard.form.learning_outcome_{{ index }}_sub_items }}</td>
+                    <td class="text-center">
+                        <input type="text" name="tag_{{ index }}" value="{{ outcome.tag }}" class="form-control">
+                    </td>
+                    <td class="text-center">
+                        <input type="text" name="number_{{ index }}" value="{{ outcome.number }}" class="form-control">
+                    </td>
+                    <td>
+                        <textarea name="outcome_{{ index }}" class="form-control">{{ outcome.outcome }}</textarea>
+                    </td>
+                    <td>
+                        <textarea name="sub_items_{{ index }}" class="form-control">{{ outcome.sub_items }}</textarea>
+                    </td>
                     <td class="text-center">
                         <div class="btn-group" role="group" aria-label="Action Buttons">
                             <button type="button" class="btn btn-sm btn-primary regenerate-btn" data-index="{{ index }}">
@@ -44,45 +52,56 @@
 </form>
 
 <script>
-    // Handle regeneration of learning outcomes using AJAX
-    document.querySelectorAll('.regenerate-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const index = this.dataset.index;
-            regenerateOutcome(index);
-        });
+// Handle regeneration of learning outcomes using AJAX
+document.querySelectorAll('.regenerate-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const index = this.dataset.index;
+        regenerateOutcome(index);
     });
+});
 
-    // Handle deletion of learning outcomes
-    document.querySelectorAll('.delete-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const index = this.dataset.index;
+// Handle deletion of learning outcomes
+document.querySelectorAll('.delete-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const index = this.dataset.index;
+        deleteOutcome(index);
+    });
+});
+
+// AJAX function to regenerate learning outcomes
+function regenerateOutcome(index) {
+    $.ajax({
+        url: '{% url "regenerate_learning_outcome" %}',
+        type: 'POST',
+        data: {
+            'index': index,
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+        },
+        success: function(response) {
+            // Update the outcome text based on the response
             const row = document.getElementById(`outcome-row-${index}`);
-            row.remove(); // Remove the row from the DOM
-            console.log(`Deleted outcome ${index}`);
-        });
-    });
-
-    // AJAX function to regenerate learning outcomes
-    function regenerateOutcome(index) {
-        $.ajax({
-            url: '{% url "regenerate_learning_outcome" %}',
-            type: 'POST',
-            data: {
-                'index': index,
-                'csrfmiddlewaretoken': '{{ csrf_token }}'
-            },
-            success: function(response) {
-                // Update the outcome text based on the response
-                const row = document.getElementById(`outcome-row-${index}`);
-                const outcomeCell = row.querySelector('td:nth-child(3)');
-                outcomeCell.textContent = response.new_outcome;
+            if (row) {
+                const outcomeCell = row.querySelector('textarea[name="outcome_' + index + '"]');
+                if (outcomeCell) {
+                    outcomeCell.value = response.new_outcome;
+                }
                 console.log(`Regenerated outcome ${index}`);
-            },
-            error: function(error) {
-                console.log("Error:", error);
             }
-        });
+        },
+        error: function(error) {
+            console.log("Error:", error);
+        }
+    });
+}
+
+// Function to delete learning outcomes
+function deleteOutcome(index) {
+    const row = document.getElementById(`outcome-row-${index}`);
+    if (row) {
+        row.remove(); // Remove the row from the DOM
+        console.log(`Deleted outcome ${index}`);
     }
+}
 </script>
 
 {% endblock %}

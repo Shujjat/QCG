@@ -1,6 +1,6 @@
 # course_maker/views.py
 import json
-
+from rest_framework.views import APIView
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.http import JsonResponse
@@ -8,9 +8,12 @@ from django.shortcuts import render
 from formtools.wizard.views import SessionWizardView
 from .course_wizard_forms import *
 from rest_framework import generics
+from rest_framework.response import Response
 from .models import Courses, LearningOutcome
-from .serializers import CourseSerializer
-from .ollama_helper import generate_course_title_and_description, generate_learning_outcomes
+from .serializers import CourseSerializer,LearningOutcomeSerializer
+from .ollama_helper import *
+from rest_framework import status
+
 
 # Define the forms for each step
 FORMS = [
@@ -87,10 +90,12 @@ class CourseCreationWizard(SessionWizardView):
         return initial
 
     def process_step(self, form):
+
         """
         Override the process_step method to save data to the database.
         """
         step = self.steps.current
+        print('step:'+str(step))
         form_data = form.cleaned_data
 
         # Fetch or create a course object from the extra data in storage
@@ -126,18 +131,52 @@ class CourseCreationWizard(SessionWizardView):
             course.course_title = form_data.get('course_title', '')
             course.course_description = form_data.get('course_description', '')
 
-        elif step == 'step3':
-            learning_outcomes_json = form_data.get('learning_outcomes')
-            if learning_outcomes_json:
-                learning_outcomes_list = json.loads(learning_outcomes_json)
 
-                for outcome_data in learning_outcomes_list:
-                    outcome = LearningOutcome.objects.create(
-                        tag=outcome_data['tag'],
-                        outcome=outcome_data['outcome'],
-                        sub_items=outcome_data.get('sub_items', '')
-                    )
-                    course.learning_outcomes.add(outcome)
+        elif step == 'step3':
+            print(form_data)
+            if form_data:
+
+                number_of_outcomes = 4
+
+
+                for i in range(number_of_outcomes):
+                    outcome = {
+                        'tag': form_data.get(f'learning_outcome_{i}_tag'),
+                        'number': form_data.get(f'learning_outcome_{i}_number'),
+                        'outcome': form_data.get(f'learning_outcome_{i}_outcome'),
+                        'course_id':course.id
+                       # 'sub_items': form_data.get(f'learning_outcome_{i}_sub_items').split('\r\n'),
+
+                    }
+                    LearningOutcome.objects.create(**outcome)
+
+                else:
+
+                       pass
+
+
+
+        elif step=='step4':
+            print("in step 4")
+            if form_data:
+                print("if form_data:")
+                for key, value in form_data.items():
+                    print(" for key, value in form_data.items():")
+                    if key.startswith('tag_'):
+                        print(" if key.startswith('tag_'):")
+                        index = key.split('_')[1]
+                        tag = form_data[f'tag_{index}']
+                        number = form_data[f'number_{index}']
+                        outcome_text = form_data[f'outcome_{index}']
+                        sub_items = form_data.get(f'sub_items_{index}', '')
+
+                        # Save each learning outcome to the database
+                        LearningOutcome.objects.create(
+                            course=course,
+                            outcome=outcome_text,
+                            tag=tag,
+                            number=int(number)
+                        )
 
         # Save the course instance
         course.save()
@@ -205,3 +244,14 @@ def regenerate_learning_outcome(request):
             return JsonResponse({'error': 'Invalid index'}, status=400)
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+class CourseLearningOutcomesAPIView(APIView):
+    def get(self, request, course_id):
+        try:
+            course = Courses.objects.get(id=course_id)
+            learning_outcomes = course.learning_outcomes.all()
+            serializer = LearningOutcomeSerializer(learning_outcomes, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Courses.DoesNotExist:
+            return Response({'error': 'Course not found'}, status=status.HTTP_404_NOT_FOUND)
