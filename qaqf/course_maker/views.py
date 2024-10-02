@@ -1,6 +1,6 @@
 # course_maker/views.py
 import json
-
+from rest_framework.views import APIView
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.http import JsonResponse
@@ -8,9 +8,12 @@ from django.shortcuts import render
 from formtools.wizard.views import SessionWizardView
 from .course_wizard_forms import *
 from rest_framework import generics
+from rest_framework.response import Response
 from .models import Courses, LearningOutcome
-from .serializers import CourseSerializer
-from .ollama_helper import generate_course_title_and_description, generate_learning_outcomes
+from .serializers import CourseSerializer,LearningOutcomeSerializer
+from .ollama_helper import *
+from rest_framework import status
+
 
 # Define the forms for each step
 FORMS = [
@@ -243,4 +246,12 @@ def regenerate_learning_outcome(request):
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
-[{'tag': 'A', 'number': 1, 'outcome': 'Understand the fundamental concepts in [topic]', 'sub_items': ['Define key terms related to [field] and explain their significance', 'Identify and describe the main components or building blocks of [topic]']}, {'tag': 'B', 'number': 1, 'outcome': 'Apply basic principles and theories in [field]', 'sub_items': ['Recognize how [principle/theory 1] applies to real-world scenarios', 'Explain how [principle/theory 2] contributes to a deeper understanding of [topic]']}, {'tag': 'C', 'number': 1, 'outcome': 'Develop problem-solving skills using fundamental concepts', 'sub_items': ['Analyze and break down complex problems into manageable parts', 'Develop and justify a plan to address a basic challenge in [field]']}, {'tag': 'D', 'number': 1, 'outcome': 'Communicate effectively about [topic]', 'sub_items': ['Use technical vocabulary accurately when discussing [topic]', 'Create clear, concise presentations or reports summarizing key ideas']}, {'tag': 'E', 'number': 1, 'outcome': 'Reflect on the significance of fundamental concepts', 'sub_items': ['Recognize the importance of [key concept] in understanding [topic]', 'Justify why a solid foundation in [field] is essential for further learning']}]
+class CourseLearningOutcomesAPIView(APIView):
+    def get(self, request, course_id):
+        try:
+            course = Courses.objects.get(id=course_id)
+            learning_outcomes = course.learning_outcomes.all()
+            serializer = LearningOutcomeSerializer(learning_outcomes, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Courses.DoesNotExist:
+            return Response({'error': 'Course not found'}, status=status.HTTP_404_NOT_FOUND)
