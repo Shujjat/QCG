@@ -4,7 +4,7 @@ from .models import Courses, LearningOutcome
 class LearningOutcomeSerializer(serializers.ModelSerializer):
     class Meta:
         model = LearningOutcome
-        fields = ['id', 'tag', 'number', 'outcome']#, 'sub_items']
+        fields = ['id', 'tag', 'number', 'outcome', 'sub_items']
 
 
 class CourseSerializer(serializers.ModelSerializer):

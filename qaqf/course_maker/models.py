@@ -68,6 +68,7 @@ class LearningOutcome(models.Model):
     outcome = models.TextField("Learning Outcome")
     tag = models.CharField("Tag", max_length=3)
     number = models.IntegerField()
+    sub_items = models.JSONField(default=list)  # Sub-items, e.g., ['A1', 'A2', ...]
 
 
 class ContentListing(models.Model):
