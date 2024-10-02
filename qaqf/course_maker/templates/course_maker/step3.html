@@ -17,18 +17,18 @@
             </tr>
         </thead>
         <tbody>
-            {% for index in wizard.form.learning_outcomes_data %}
-                <tr id="outcome-row-{{ index }}">
-                    <td class="text-center">{{ wizard.form.learning_outcome_{{ index }}_tag }}</td>
-                    <td class="text-center">{{ wizard.form.learning_outcome_{{ index }}_number }}</td>
-                    <td>{{ wizard.form.learning_outcome_{{ index }}_outcome }}</td>
-                    <td>{{ wizard.form.learning_outcome_{{ index }}_sub_items }}</td>
+            {% for form in wizard.form.learning_outcomes_data %}
+                <tr id="outcome-row-{{ forloop.counter }}">
+                    <td class="text-center">{{ form.tag }}</td>
+                    <td class="text-center">{{ form.number }}</td>
+                    <td>{{ form.outcome }}</td>
+                    <td>{{ form.sub_items }}</td>
                     <td class="text-center">
                         <div class="btn-group" role="group" aria-label="Action Buttons">
-                            <button type="button" class="btn btn-sm btn-primary regenerate-btn" data-index="{{ index }}">
+                            <button type="button" class="btn btn-sm btn-primary regenerate-btn" data-index="{{ forloop.counter }}">
                                 Regenerate
                             </button>
-                            <button type="button" class="btn btn-sm btn-danger delete-btn" data-index="{{ index }}">
+                            <button type="button" class="btn btn-sm btn-danger delete-btn" data-index="{{ forloop.counter }}">
                                 Delete
                             </button>
                         </div>
