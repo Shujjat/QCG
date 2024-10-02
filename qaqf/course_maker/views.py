@@ -144,8 +144,8 @@ class CourseCreationWizard(SessionWizardView):
                         'tag': form_data.get(f'learning_outcome_{i}_tag'),
                         'number': form_data.get(f'learning_outcome_{i}_number'),
                         'outcome': form_data.get(f'learning_outcome_{i}_outcome'),
-                        'course_id':course.id
-                       # 'sub_items': form_data.get(f'learning_outcome_{i}_sub_items').split('\r\n'),
+                        'course_id':course.id,
+                        'sub_items': form_data.get(f'learning_outcome_{i}_sub_items').split('\r\n'),
 
                     }
                     LearningOutcome.objects.create(**outcome)
@@ -157,26 +157,7 @@ class CourseCreationWizard(SessionWizardView):
 
 
         elif step=='step4':
-            print("in step 4")
-            if form_data:
-                print("if form_data:")
-                for key, value in form_data.items():
-                    print(" for key, value in form_data.items():")
-                    if key.startswith('tag_'):
-                        print(" if key.startswith('tag_'):")
-                        index = key.split('_')[1]
-                        tag = form_data[f'tag_{index}']
-                        number = form_data[f'number_{index}']
-                        outcome_text = form_data[f'outcome_{index}']
-                        sub_items = form_data.get(f'sub_items_{index}', '')
-
-                        # Save each learning outcome to the database
-                        LearningOutcome.objects.create(
-                            course=course,
-                            outcome=outcome_text,
-                            tag=tag,
-                            number=int(number)
-                        )
+            pass
 
         # Save the course instance
         course.save()
