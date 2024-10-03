@@ -1,21 +1,36 @@
-<!-- course_maker/step2.html -->
-{% extends "course_maker/form_wizard.html" %}
-{% load crispy_forms_tags %}
-
 {% block content %}
-<div class="container">
-    <div class="card mt-5">
-        <div class="card-header">
-            <h2>Step 4: Course Title and Description</h2>
-        </div>
-        <div class="card-body">
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                {{ wizard.management_form }}
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="content-listing">
+        <h2>Course Content Listing</h2>
 
-
-            </form>
+        <div id="module-container">
+            {% for content in wizard.form.initial.content_listing %}
+            <div class="module" data-id="{{ content.id }}">
+                <h3>{{ content.title }} ({{ content.content_type }})</h3>
+                <p>{{ content.content }}</p>
+                <button class="move-up">Move Up</button>
+                <button class="move-down">Move Down</button>
+                <button class="regenerate-content">Regenerate</button>
+                <button class="expand">Expand</button>
+                <button class="shrink">Shrink</button>
+                <button class="add-new-item">Add New Item</button>
+                <button class="assign-tag">Assign Tag</button>
+                <button class="remove-tag">Remove Tag</button>
+            </div>
+            {% endfor %}
         </div>
+        <button type="button" id="add-new-module">Add New Module</button>
     </div>
-</div>
+
+    <input type="submit" value="Next Step">
+</form>
+
+<script>
+    document.getElementById('add-new-module').addEventListener('click', function() {
+        // JS to handle adding new modules dynamically
+    });
+
+    // Other JS functions for move up/down, expand, shrink, etc.
+</script>
 {% endblock %}

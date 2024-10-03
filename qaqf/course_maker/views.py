@@ -9,7 +9,7 @@ from formtools.wizard.views import SessionWizardView
 from .course_wizard_forms import *
 from rest_framework import generics
 from rest_framework.response import Response
-from .models import Courses, LearningOutcome
+from .models import Courses, LearningOutcome,Content,ContentListing
 from .serializers import CourseSerializer,LearningOutcomeSerializer
 from .ollama_helper import *
 from rest_framework import status
@@ -86,7 +86,25 @@ class CourseCreationWizard(SessionWizardView):
                 course_description = step2_data.get('course_description')
                 generated_outcomes = generate_learning_outcomes(course_title, course_description)
                 initial['learning_outcomes'] = json.dumps(generated_outcomes)  # Store outcomes in JSON format
+        elif step == 'step4':
+            # Get course details from step 3
+            step3_data = self.get_cleaned_data_for_step('step3')
+            if step3_data:
+                # Assume that course_id is saved in the session or is part of the extra data.
+                course_id = self.storage.extra_data.get('course_id')
+                if course_id:
+                    try:
+                        course = Courses.objects.get(pk=course_id)
+                        # Use the course title and description to generate content from Ollama
+                        generated_content = generate_content_listing(course.course_title, course.course_description)
 
+                        # Initializing the form with generated content
+                        initial['content_listing'] = json.dumps(generated_content)
+                    except Courses.DoesNotExist:
+                        # Handle the case where the course ID is not valid
+                        initial['content_listing'] = "[]"
+            print("initial['content_listing']")
+            print(initial['content_listing'])
         return initial
 
     def process_step(self, form):
@@ -131,33 +149,40 @@ class CourseCreationWizard(SessionWizardView):
             course.course_title = form_data.get('course_title', '')
             course.course_description = form_data.get('course_description', '')
 
-
         elif step == 'step3':
-            print(form_data)
             if form_data:
-
+                # Update required here to make it dynamic
                 number_of_outcomes = 4
-
-
                 for i in range(number_of_outcomes):
                     outcome = {
                         'tag': form_data.get(f'learning_outcome_{i}_tag'),
                         'number': form_data.get(f'learning_outcome_{i}_number'),
                         'outcome': form_data.get(f'learning_outcome_{i}_outcome'),
                         'course_id':course.id,
-                        'sub_items': form_data.get(f'learning_outcome_{i}_sub_items').split('\r\n'),
 
                     }
+                    if (form_data.get(f'learning_outcome_{i}_sub_items')):
+                        outcome['sub_items']= form_data.get(f'learning_outcome_{i}_sub_items').split('\r\n')
+
                     LearningOutcome.objects.create(**outcome)
 
-                else:
-
-                       pass
-
-
-
         elif step=='step4':
-            pass
+            # Save course content
+            content_listing_json = form_data.get('content_listing')
+            if content_listing_json:
+                content_listing = json.loads(content_listing_json)
+                for idx, content_data in enumerate(content_listing):
+                    content = Content.objects.create(
+                        course=course,
+                        tag=content_data.get('tag', ''),
+                        content_type=content_data.get('content_type'),
+                        title=content_data.get('title'),
+                        content=content_data.get('content'),
+                        order=idx,
+                        parent=None  # Can be extended for nested items
+                    )
+                    print("7777")
+                    print(content)
 
         # Save the course instance
         course.save()

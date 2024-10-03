@@ -5,13 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7cf03e74-88c4-4af5-b6c0-cfbca8a72de4" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/qaqf/course_maker/migrations/0004_learningoutcome_sub_items.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qaqf/course_maker/migrations/0005_remove_learningoutcome_sub_items.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/templates/course_maker/step3.html" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/templates/course_maker/step3.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/ollama_helper.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/ollama_helper.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/templates/course_maker/step4.html" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/templates/course_maker/step4.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qaqf/course_maker/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qaqf/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/db.sqlite3" afterDir="false" />
     </list>
@@ -34,13 +30,13 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.Run Server.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "Merging main"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.Run Server.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;Step-4&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="Run Server" type="PythonConfigurationType" factoryName="Python">
       <module name="QAQF" />
