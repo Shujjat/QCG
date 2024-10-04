@@ -97,7 +97,7 @@ class CourseCreationWizard(SessionWizardView):
                         course = Courses.objects.get(pk=course_id)
                         # Use the course title and description to generate content from Ollama
                         generated_content = generate_content_listing(course.course_title, course.course_description)
-
+                        print("recived content from ollama in st")
                         # Initializing the form with generated content
                         initial['content_listing'] = json.dumps(generated_content)
                     except Courses.DoesNotExist:
@@ -168,21 +168,42 @@ class CourseCreationWizard(SessionWizardView):
 
         elif step=='step4':
             # Save course content
-            content_listing_json = form_data.get('content_listing')
-            if content_listing_json:
+            content_listing_text = form_data.get('content_listing')
+
+            if content_listing_text:
+                # Convert the text response to JSON format
+                content_listing_json = ollama_content_to_json(content_listing_text)
+
                 content_listing = json.loads(content_listing_json)
-                for idx, content_data in enumerate(content_listing):
-                    content = Content.objects.create(
+                for module in content_listing.get("modules", []):
+                    module_instance = ContentListing.objects.create(
                         course=course,
-                        tag=content_data.get('tag', ''),
-                        content_type=content_data.get('content_type'),
-                        title=content_data.get('title'),
-                        content=content_data.get('content'),
-                        order=idx,
-                        parent=None  # Can be extended for nested items
+                        title=module["module_name"],
+                        order=content_listing["modules"].index(module)
                     )
-                    print("7777")
-                    print(content)
+
+                    for item_idx, item_data in enumerate(module.get("items", [])):
+                        # Save items within the module
+                        content = Content.objects.create(
+                            module=module_instance,
+                            course=course,
+                            title=item_data.get('item_name'),
+                            content_type=item_data.get('type'),
+                            order=item_idx,
+                            parent=None  # This can be modified to handle nested items, if needed
+                        )
+
+                        for sub_item_idx, sub_item in enumerate(item_data.get("sub_items", [])):
+                            # Save sub-items within the content
+                            sub_content = Content.objects.create(
+                                module=module_instance,
+                                course=course,
+                                title=sub_item,
+                                content_type="sub-item",
+                                order=sub_item_idx,
+                                parent=content
+                            )
+                            print(sub_content)
 
         # Save the course instance
         course.save()
@@ -261,3 +282,54 @@ class CourseLearningOutcomesAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Courses.DoesNotExist:
             return Response({'error': 'Course not found'}, status=status.HTTP_404_NOT_FOUND)
+import re
+
+def ollama_content_to_json(content_text):
+    """
+    Convert Ollama's content text into JSON format.
+    """
+    modules = []
+    current_module = None
+    current_item = None
+
+    module_pattern = re.compile(r"Module (\d+): (.+)")
+    item_pattern = re.compile(r"- Item (\d+\.\d+): (.+) \(Type: (.+)\)")
+    sub_item_pattern = re.compile(r"- Sub-item (\d+\.\d+\.\d+): (.+)")
+
+    for line in content_text.splitlines():
+        module_match = module_pattern.match(line.strip())
+        item_match = item_pattern.match(line.strip())
+        sub_item_match = sub_item_pattern.match(line.strip())
+
+        if module_match:
+            # Start a new module
+            if current_module:
+                modules.append(current_module)
+            current_module = {
+                "module_name": module_match.group(2),
+                "items": []
+            }
+
+        elif item_match and current_module:
+            # Start a new item within the current module
+            if current_item:
+                current_module["items"].append(current_item)
+            current_item = {
+                "item_name": item_match.group(2),
+                "type": item_match.group(3),
+                "sub_items": []
+            }
+
+        elif sub_item_match and current_item:
+            # Add sub-item to the current item
+            sub_item_name = sub_item_match.group(2)
+            current_item["sub_items"].append(sub_item_name)
+
+    # Append the last item and module if any
+    if current_item:
+        current_module["items"].append(current_item)
+    if current_module:
+        modules.append(current_module)
+
+    # Return the JSON structure
+    return json.dumps({"modules": modules}, indent=4)

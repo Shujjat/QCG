@@ -208,9 +208,9 @@ def generate_content_listing(course_title, course_description):
                         "sub_item_number": sub_item_number,
                         "sub_item_title": sub_item_title
                     })
-        print("Ollama Response")
+        print("Ollama Response for generate_content_listing")
         print(generated_text)
-        return content_listing
+        return generated_text
 
     except requests.exceptions.RequestException as e:
         print(f"Error communicating with Ollama API: {e}")
