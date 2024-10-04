@@ -5,21 +5,40 @@
         <h2>Course Content Listing</h2>
 
         <div id="module-container">
-            {% for content in wizard.form.initial.content_listing %}
-            <div class="module" data-id="{{ content.id }}">
-                <h3>{{ content.title }} ({{ content.content_type }})</h3>
-                <p>{{ content.content }}</p>
-                <button class="move-up">Move Up</button>
-                <button class="move-down">Move Down</button>
-                <button class="regenerate-content">Regenerate</button>
-                <button class="expand">Expand</button>
-                <button class="shrink">Shrink</button>
-                <button class="add-new-item">Add New Item</button>
-                <button class="assign-tag">Assign Tag</button>
-                <button class="remove-tag">Remove Tag</button>
+            {% for module in wizard.form.initial.content_listing %}
+            <div class="module" data-id="{{ forloop.counter }}">
+                <h3>Module {{ forloop.counter }}: {{ module.module_name }}</h3>
+
+                {% for item in module.items %}
+                <div class="item" data-id="{{ forloop.parentloop.counter }}.{{ forloop.counter }}">
+                    <h4>Item {{ forloop.parentloop.counter }}.{{ forloop.counter }}: {{ item.item_name }} (Type: {{ item.type }})</h4>
+
+                    {% if item.sub_items %}
+                    <div class="sub-items">
+                        <ul>
+                            {% for sub_item in item.sub_items %}
+                            <li>Sub-item {{ forloop.parentloop.parentloop.counter }}.{{ forloop.parentloop.counter }}.{{ forloop.counter }}: {{ sub_item }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    <button type="button" class="move-up">Move Up</button>
+                    <button type="button" class="move-down">Move Down</button>
+                    <button type="button" class="regenerate-content">Regenerate</button>
+                    <button type="button" class="expand">Expand</button>
+                    <button type="button" class="shrink">Shrink</button>
+                    <button type="button" class="add-new-sub-item">Add New Sub-item</button>
+                    <button type="button" class="assign-tag">Assign Tag</button>
+                    <button type="button" class="remove-tag">Remove Tag</button>
+                </div>
+                {% endfor %}
+
+                <button type="button" class="add-new-item">Add New Item</button>
             </div>
             {% endfor %}
         </div>
+
         <button type="button" id="add-new-module">Add New Module</button>
     </div>
 
@@ -28,9 +47,31 @@
 
 <script>
     document.getElementById('add-new-module').addEventListener('click', function() {
-        // JS to handle adding new modules dynamically
+        // JavaScript to handle adding new modules dynamically
+        alert("Adding new module is not yet implemented.");
     });
 
-    // Other JS functions for move up/down, expand, shrink, etc.
+    document.querySelectorAll('.move-up').forEach(function(button) {
+        button.addEventListener('click', function() {
+            // JavaScript to move the module/item up
+            alert("Move up is not yet implemented.");
+        });
+    });
+
+    document.querySelectorAll('.move-down').forEach(function(button) {
+        button.addEventListener('click', function() {
+            // JavaScript to move the module/item down
+            alert("Move down is not yet implemented.");
+        });
+    });
+
+    document.querySelectorAll('.regenerate-content').forEach(function(button) {
+        button.addEventListener('click', function() {
+            // JavaScript to regenerate content
+            alert("Regenerate content is not yet implemented.");
+        });
+    });
+
+    // Other JS functions for expand, shrink, add item/sub-item, assign/remove tag, etc.
 </script>
 {% endblock %}

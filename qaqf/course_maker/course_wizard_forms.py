@@ -66,8 +66,8 @@ class Step3Form(forms.Form):
 
 # Step 4: Account Information
 class Step4Form(forms.Form):
-    username = forms.CharField(max_length=100)
-    password = forms.CharField(widget=forms.PasswordInput)
+    content_listing = forms.CharField(widget=forms.Textarea, required=False)
+
 
 # Step 5: Preferences
 class Step5Form(forms.Form):

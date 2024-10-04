@@ -69,7 +69,7 @@ class CourseCreationWizard(SessionWizardView):
         Populate initial data for forms.
         """
         initial = {}
-
+        print("get_form_initial step"+str(step))
         # For step 2, set initial values for 'course_title' and 'generated_course_description'
         if step == 'step2':
             step1_data = self.get_cleaned_data_for_step('step1')
@@ -89,6 +89,7 @@ class CourseCreationWizard(SessionWizardView):
         elif step == 'step4':
             # Get course details from step 3
             step3_data = self.get_cleaned_data_for_step('step3')
+            print("step3_data")
             if step3_data:
                 # Assume that course_id is saved in the session or is part of the extra data.
                 course_id = self.storage.extra_data.get('course_id')
@@ -97,14 +98,15 @@ class CourseCreationWizard(SessionWizardView):
                         course = Courses.objects.get(pk=course_id)
                         # Use the course title and description to generate content from Ollama
                         generated_content = generate_content_listing(course.course_title, course.course_description)
-                        print("recived content from ollama in st")
-                        # Initializing the form with generated content
-                        initial['content_listing'] = json.dumps(generated_content)
+
+
+
+                        initial["content_listing"] = ollama_content_to_json(generated_content)
+                        print(initial['content_listing'])
                     except Courses.DoesNotExist:
                         # Handle the case where the course ID is not valid
                         initial['content_listing'] = "[]"
-            print("initial['content_listing']")
-            print(initial['content_listing'])
+
         return initial
 
     def process_step(self, form):
@@ -169,10 +171,12 @@ class CourseCreationWizard(SessionWizardView):
         elif step=='step4':
             # Save course content
             content_listing_text = form_data.get('content_listing')
-
+            print("*******************************")
+            print(content_listing_text)
             if content_listing_text:
                 # Convert the text response to JSON format
                 content_listing_json = ollama_content_to_json(content_listing_text)
+
 
                 content_listing = json.loads(content_listing_json)
                 for module in content_listing.get("modules", []):
@@ -282,7 +286,6 @@ class CourseLearningOutcomesAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Courses.DoesNotExist:
             return Response({'error': 'Course not found'}, status=status.HTTP_404_NOT_FOUND)
-import re
 
 def ollama_content_to_json(content_text):
     """
@@ -292,7 +295,8 @@ def ollama_content_to_json(content_text):
     current_module = None
     current_item = None
 
-    module_pattern = re.compile(r"Module (\d+): (.+)")
+    # Updated regular expressions for matching modules, items, and sub-items
+    module_pattern = re.compile(r"\*\*Module (\d+): (.+)\*\*")
     item_pattern = re.compile(r"- Item (\d+\.\d+): (.+) \(Type: (.+)\)")
     sub_item_pattern = re.compile(r"- Sub-item (\d+\.\d+\.\d+): (.+)")
 
@@ -304,9 +308,12 @@ def ollama_content_to_json(content_text):
         if module_match:
             # Start a new module
             if current_module:
+                if current_item:
+                    current_module["items"].append(current_item)
+                    current_item = None
                 modules.append(current_module)
             current_module = {
-                "module_name": module_match.group(2),
+                "module_name": module_match.group(2).strip(),
                 "items": []
             }
 
@@ -315,14 +322,14 @@ def ollama_content_to_json(content_text):
             if current_item:
                 current_module["items"].append(current_item)
             current_item = {
-                "item_name": item_match.group(2),
-                "type": item_match.group(3),
+                "item_name": item_match.group(2).strip(),
+                "type": item_match.group(3).strip(),
                 "sub_items": []
             }
 
         elif sub_item_match and current_item:
             # Add sub-item to the current item
-            sub_item_name = sub_item_match.group(2)
+            sub_item_name = sub_item_match.group(2).strip()
             current_item["sub_items"].append(sub_item_name)
 
     # Append the last item and module if any
