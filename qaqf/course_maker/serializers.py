@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Courses, LearningOutcome
+from .models import Courses, LearningOutcome,Content,ContentListing
 
 class LearningOutcomeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -19,3 +19,17 @@ class CourseSerializer(serializers.ModelSerializer):
             'long_course_support', 'knowledge_level', 'duration', 'practice',
             'learning_outcomes'
         ]
+
+
+class ContentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Content
+        fields = '__all__'
+
+
+class ContentListingSerializer(serializers.ModelSerializer):
+    contents = ContentSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = ContentListing
+        fields = '__all__'

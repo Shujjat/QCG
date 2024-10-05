@@ -4,13 +4,13 @@ from rest_framework.views import APIView
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from formtools.wizard.views import SessionWizardView
 from .course_wizard_forms import *
 from rest_framework import generics
 from rest_framework.response import Response
 from .models import Courses, LearningOutcome,Content,ContentListing
-from .serializers import CourseSerializer,LearningOutcomeSerializer
+from .serializers import CourseSerializer, LearningOutcomeSerializer, ContentSerializer, ContentListingSerializer
 from .ollama_helper import *
 from rest_framework import status
 
@@ -100,6 +100,7 @@ class CourseCreationWizard(SessionWizardView):
                         generated_content = generate_content_listing(course.course_title, course.course_description)
 
                         initial["content_listing"] = ollama_content_to_json(generated_content)
+                        print("Json things")
                         print(initial['content_listing'])
                     except Courses.DoesNotExist:
                         # Handle the case where the course ID is not valid
@@ -167,46 +168,45 @@ class CourseCreationWizard(SessionWizardView):
                     LearningOutcome.objects.create(**outcome)
 
         elif step=='step4':
-            # Save course content
-            content_listing_text = form_data.get('content_listing')
-            print("*******************************")
-            print(content_listing_text)
-            if content_listing_text:
+            content_listing_json = form_data.get('content_listing')
+            print("json thingies")
+            print(content_listing_json)
+            if content_listing_json:
                 # Convert the text response to JSON format
-                content_listing_json = ollama_content_to_json(content_listing_text)
 
-
+                # Load the JSON structure into a Python dict
                 content_listing = json.loads(content_listing_json)
-                for module in content_listing.get("modules", []):
+
+                # Iterate through each module and save it into the database
+                for module_idx, module in enumerate(content_listing.get("modules", [])):
+                    # Create a new ContentListing instance for each module
                     module_instance = ContentListing.objects.create(
                         course=course,
-                        title=module["module_name"],
-                        order=content_listing["modules"].index(module)
+                        content_item=module["module_name"],
+                        serial_number=f"module_{module_idx + 1}"
                     )
 
+                    # Iterate through the contents in the module
                     for item_idx, item_data in enumerate(module.get("items", [])):
-                        # Save items within the module
+                        # Save each content item within the module
                         content = Content.objects.create(
-                            module=module_instance,
-                            course=course,
-                            title=item_data.get('item_name'),
-                            content_type=item_data.get('type'),
-                            order=item_idx,
-                            parent=None  # This can be modified to handle nested items, if needed
+                            content_listing=module_instance,
+                            type=item_data.get('type'),
+                            duration=item_data.get('duration'),  # Handle duration
+                            key_points=item_data.get('key_points'),  # Handle key points
+                            script=item_data.get('script'),  # Handle script
+                            material=None,  # Assuming material is uploaded separately, keep this blank
                         )
 
+                        # Iterate through the sub-items in the item and save them as related content
                         for sub_item_idx, sub_item in enumerate(item_data.get("sub_items", [])):
-                            # Save sub-items within the content
-                            sub_content = Content.objects.create(
-                                module=module_instance,
-                                course=course,
-                                title=sub_item,
-                                content_type="sub-item",
-                                order=sub_item_idx,
-                                parent=content
+                            Content.objects.create(
+                                content_listing=module_instance,
+                                type="sub-item",  # Assign sub-item type
+                                key_points=sub_item,  # You can use sub-item name or description for key_points
+                                script="",  # No script field for sub-items, can be adjusted if needed
+                                material=None,  # Assuming no material for sub-items
                             )
-                            print(sub_content)
-
         # Save the course instance
         course.save()
 
@@ -285,11 +285,6 @@ class CourseLearningOutcomesAPIView(APIView):
         except Courses.DoesNotExist:
             return Response({'error': 'Course not found'}, status=status.HTTP_404_NOT_FOUND)
 
-
-import re
-import json
-
-
 def ollama_content_to_json(content_text):
     """
     Convert Ollama's content text into JSON format.
@@ -329,7 +324,13 @@ def ollama_content_to_json(content_text):
         elif item_match:
             # Start a new item within the current module
             if current_module is None:
-                raise ValueError("Item found without a current module context.")
+                # Handle item without a module context
+                print("Warning: Found content item without a module context. Creating a generic module.")
+                current_module = {
+                    "module_name": "Generic Module",
+                    "items": []
+                }
+                modules.append(current_module)
 
             # Append the current item to the current module if it's not None
             if current_item:
@@ -344,7 +345,9 @@ def ollama_content_to_json(content_text):
         elif sub_item_match:
             # Add sub-item to the current item
             if current_item is None:
-                raise ValueError("Sub-item found without a current item context.")
+                # Handle sub-item without an item context
+                print("Warning: Found sub-item without a content item context. Skipping.")
+                continue
 
             sub_item_name = sub_item_match.group(2).strip()
             current_item["sub_items"].append(sub_item_name)
@@ -360,3 +363,81 @@ def ollama_content_to_json(content_text):
     return json.dumps({"modules": modules}, indent=4)
 
 
+class ContentListingAPIView(APIView):
+    """
+    API view to create and list content listings.
+    """
+    def get(self, request):
+        content_listings = ContentListing.objects.all()
+        serializer = ContentListingSerializer(content_listings, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = ContentListingSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ContentListingDetailAPIView(APIView):
+    """
+    API view to get, update, or delete a specific content listing.
+    """
+    def get(self, request, pk):
+        content_listing = get_object_or_404(ContentListing, pk=pk)
+        serializer = ContentListingSerializer(content_listing)
+        return Response(serializer.data)
+
+    def put(self, request, pk):
+        content_listing = get_object_or_404(ContentListing, pk=pk)
+        serializer = ContentListingSerializer(content_listing, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        content_listing = get_object_or_404(ContentListing, pk=pk)
+        content_listing.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ContentAPIView(APIView):
+    """
+    API view to create and list content items.
+    """
+    def get(self, request):
+        contents = Content.objects.all()
+        serializer = ContentSerializer(contents, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = ContentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ContentDetailAPIView(APIView):
+    """
+    API view to get, update, or delete a specific content item.
+    """
+    def get(self, request, pk):
+        content = get_object_or_404(Content, pk=pk)
+        serializer = ContentSerializer(content)
+        return Response(serializer.data)
+
+    def put(self, request, pk):
+        content = get_object_or_404(Content, pk=pk)
+        serializer = ContentSerializer(content, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        content = get_object_or_404(Content, pk=pk)
+        content.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
