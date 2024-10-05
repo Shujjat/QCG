@@ -88,8 +88,8 @@ class Content(models.Model):
     type = models.CharField(max_length=7, choices=TYPE_CHOICES)
     material = models.FileField(upload_to='content_materials/', null=True, blank=True)
     duration = models.IntegerField("Duration (in minutes)", null=True, blank=True)
-    key_points = models.TextField("Key Points", blank=True)
-    script = models.TextField("Script", blank=True)
+    key_points = models.TextField(null=True, blank=True)  # Allow null values for key_points
+    script = models.TextField("Script", null=True, blank=True)
 
 
 class Quiz(models.Model):
