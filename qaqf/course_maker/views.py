@@ -4,10 +4,10 @@ from rest_framework.views import APIView
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.http import JsonResponse
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 from formtools.wizard.views import SessionWizardView
 from .course_wizard_forms import *
-from rest_framework import generics
+from rest_framework import generics, viewsets
 from rest_framework.response import Response
 from .models import Courses, LearningOutcome,Content,ContentListing
 from .serializers import CourseSerializer, LearningOutcomeSerializer, ContentSerializer, ContentListingSerializer
@@ -362,82 +362,11 @@ def ollama_content_to_json(content_text):
     # Return the JSON structure
     return json.dumps({"modules": modules}, indent=4)
 
-
-class ContentListingAPIView(APIView):
-    """
-    API view to create and list content listings.
-    """
-    def get(self, request):
-        content_listings = ContentListing.objects.all()
-        serializer = ContentListingSerializer(content_listings, many=True)
-        return Response(serializer.data)
-
-    def post(self, request):
-        serializer = ContentListingSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class ContentListingViewSet(viewsets.ModelViewSet):
+    queryset = ContentListing.objects.all()
+    serializer_class = ContentListingSerializer
 
 
-class ContentListingDetailAPIView(APIView):
-    """
-    API view to get, update, or delete a specific content listing.
-    """
-    def get(self, request, pk):
-        content_listing = get_object_or_404(ContentListing, pk=pk)
-        serializer = ContentListingSerializer(content_listing)
-        return Response(serializer.data)
-
-    def put(self, request, pk):
-        content_listing = get_object_or_404(ContentListing, pk=pk)
-        serializer = ContentListingSerializer(content_listing, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk):
-        content_listing = get_object_or_404(ContentListing, pk=pk)
-        content_listing.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class ContentAPIView(APIView):
-    """
-    API view to create and list content items.
-    """
-    def get(self, request):
-        contents = Content.objects.all()
-        serializer = ContentSerializer(contents, many=True)
-        return Response(serializer.data)
-
-    def post(self, request):
-        serializer = ContentSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class ContentDetailAPIView(APIView):
-    """
-    API view to get, update, or delete a specific content item.
-    """
-    def get(self, request, pk):
-        content = get_object_or_404(Content, pk=pk)
-        serializer = ContentSerializer(content)
-        return Response(serializer.data)
-
-    def put(self, request, pk):
-        content = get_object_or_404(Content, pk=pk)
-        serializer = ContentSerializer(content, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk):
-        content = get_object_or_404(Content, pk=pk)
-        content.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+class ContentViewSet(viewsets.ModelViewSet):
+    queryset = Content.objects.all()
+    serializer_class = ContentSerializer

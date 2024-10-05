@@ -1,6 +1,13 @@
 from django.urls import path
+from django.urls import path, include
+from rest_framework import routers
+from .views import ContentListingViewSet, ContentViewSet
+
 from .views import *
 
+router = routers.DefaultRouter()
+router.register(r'api/content-listings', ContentListingViewSet)
+router.register(r'api/contents', ContentViewSet)
 
 urlpatterns = [
     path('api/courses/', CourseListAPIView.as_view(), name='course-list'),
@@ -10,10 +17,6 @@ urlpatterns = [
     path('api/regenerate_learning_outcome/', regenerate_learning_outcome, name='regenerate_learning_outcome'),
     path('api/course/<int:course_id>/learning_outcomes/', CourseLearningOutcomesAPIView.as_view(),
          name='course-learning-outcomes'),
-    path('api/content-listings/', ContentListingAPIView.as_view(), name='content-listing-list'),
-    path('api/content-listings/<int:pk>/', ContentListingDetailAPIView.as_view(), name='content-listing-detail'),
-    # Content endpoints
-    path('api/contents/', ContentAPIView.as_view(), name='content-list'),
-    path('api/contents/<int:pk>/', ContentDetailAPIView.as_view(), name='content-detail'),
+    path('', include(router.urls)),
 
 ]
