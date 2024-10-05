@@ -126,3 +126,122 @@ def generate_learning_outcomes(course_title, course_description):
     except requests.exceptions.RequestException as e:
         print(f"Error communicating with Ollama API: {e}")
         return []
+
+
+def generate_content_listing(course_title, course_description):
+    """
+    Generates a structured content listing based on course title and description using LLM3 of Ollama.
+    The content is categorized into modules, which include items and sub-items.
+    The structure is adjusted to fit the ContentListing and Content models.
+    """
+    # Define the prompt based on the course title and description
+    prompt = f"""
+    You are a course content developer. Based on the given course title and description, generate a detailed content structure.
+    The content should be organized into modules, with each module containing content items.
+    Each content item should contain the following attributes: Content Item, Type, Duration, Key Points, and Script.
+
+    - Content Item: This is the title of the content item.
+    - Type: It should be either 'Video' or 'Reading'.
+    - Duration: Duration in minutes for videos, optional for readings.
+    - Key Points: Highlight important takeaways for each content item.
+    - Script: Provide a brief script, if applicable.
+
+    Course Title: {course_title}
+    Course Description: {course_description}
+
+    Provide the content in the following structured format:
+
+    Module 1: [Module Title]
+      - Content Item 1.1: [Title]
+        Type: [Video/Reading]
+        Duration: [Duration in minutes, if applicable]
+        Key Points: [List key points, if any]
+        Script: [Provide a script, if any]
+
+      - Content Item 1.2: [Title]
+        Type: [Video/Reading]
+        Duration: [Duration in minutes, if applicable]
+        Key Points: [List key points, if any]
+        Script: [Provide a script, if any]
+
+    Module 2: [Module Title]
+      - Content Item 2.1: [Title]
+        Type: [Video/Reading]
+        Duration: [Duration in minutes, if applicable]
+        Key Points: [List key points, if any]
+        Script: [Provide a script, if any]
+
+    Only return the list of modules, items, and their attributes in this structured format.
+    """
+    print("prompt \n" + str(prompt))
+
+    try:
+        # Generate response using Ollama locally
+        response = ollama.generate(model='llama3', prompt=prompt)
+
+        # Extract the generated text from the response dictionary
+        generated_text = response.get('response', "")
+
+        # Extract content listing using regex
+        content_listing = []
+        current_module = None
+
+        module_pattern = r"Module (\d+):\s*(.+)"
+        content_item_pattern = r"- Content Item (\d+\.\d+):\s*(.+)"
+        type_pattern = r"Type:\s*(.+)"
+        duration_pattern = r"Duration:\s*(\d+)"
+        key_points_pattern = r"Key Points:\s*\[(.*?)\]"
+        script_pattern = r"Script:\s*(.+)"
+
+        for line in generated_text.splitlines():
+            module_match = re.match(module_pattern, line.strip())
+            content_item_match = re.match(content_item_pattern, line.strip())
+            type_match = re.match(type_pattern, line.strip())
+            duration_match = re.match(duration_pattern, line.strip())
+            key_points_match = re.match(key_points_pattern, line.strip())
+            script_match = re.match(script_pattern, line.strip())
+
+            if module_match:
+                # New module
+                module_number = module_match.group(1)
+                module_title = module_match.group(2)
+                current_module = {
+                    "module_number": module_number,
+                    "module_title": module_title,
+                    "contents": []
+                }
+                content_listing.append(current_module)
+
+            elif content_item_match and current_module:
+                # New content item within the current module
+                item_number = content_item_match.group(1)
+                item_title = content_item_match.group(2)
+                current_content = {
+                    "item_number": item_number,
+                    "item_title": item_title,
+                    "type": "",
+                    "duration": None,
+                    "key_points": "",
+                    "script": ""
+                }
+                current_module["contents"].append(current_content)
+
+            elif type_match and current_module and current_module["contents"]:
+                current_module["contents"][-1]["type"] = type_match.group(1)
+
+            elif duration_match and current_module and current_module["contents"]:
+                current_module["contents"][-1]["duration"] = int(duration_match.group(1))
+
+            elif key_points_match and current_module and current_module["contents"]:
+                current_module["contents"][-1]["key_points"] = key_points_match.group(1)
+
+            elif script_match and current_module and current_module["contents"]:
+                current_module["contents"][-1]["script"] = script_match.group(1)
+
+        print("Ollama Response for generate_content_listing")
+        print(generated_text)
+        return generated_text
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error communicating with Ollama API: {e}")
+        return []

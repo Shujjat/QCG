@@ -1,21 +1,14 @@
-<!-- course_maker/step2.html -->
 {% extends "course_maker/form_wizard.html" %}
-{% load crispy_forms_tags %}
 
 {% block content %}
-<div class="container">
-    <div class="card mt-5">
-        <div class="card-header">
-            <h2>Step 4: Course Title and Description</h2>
-        </div>
-        <div class="card-body">
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                {{ wizard.management_form }}
+<h2>Step 4: Generate Contents</h2>
+<form method="POST" class="form-horizontal">
 
 
-            </form>
-        </div>
+    <div class="text-right">
+        <input type="submit" value="Next" class="btn btn-success">
     </div>
-</div>
+</form>
+
+
 {% endblock %}

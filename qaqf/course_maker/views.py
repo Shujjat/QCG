@@ -7,10 +7,10 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from formtools.wizard.views import SessionWizardView
 from .course_wizard_forms import *
-from rest_framework import generics
+from rest_framework import generics, viewsets
 from rest_framework.response import Response
-from .models import Courses, LearningOutcome
-from .serializers import CourseSerializer,LearningOutcomeSerializer
+from .models import Courses, LearningOutcome,Content,ContentListing
+from .serializers import CourseSerializer, LearningOutcomeSerializer, ContentSerializer, ContentListingSerializer
 from .ollama_helper import *
 from rest_framework import status
 
@@ -69,7 +69,7 @@ class CourseCreationWizard(SessionWizardView):
         Populate initial data for forms.
         """
         initial = {}
-
+        print("get_form_initial step"+str(step))
         # For step 2, set initial values for 'course_title' and 'generated_course_description'
         if step == 'step2':
             step1_data = self.get_cleaned_data_for_step('step1')
@@ -86,6 +86,25 @@ class CourseCreationWizard(SessionWizardView):
                 course_description = step2_data.get('course_description')
                 generated_outcomes = generate_learning_outcomes(course_title, course_description)
                 initial['learning_outcomes'] = json.dumps(generated_outcomes)  # Store outcomes in JSON format
+        elif step == 'step4':
+            # Get course details from step 3
+            step3_data = self.get_cleaned_data_for_step('step3')
+            print("step3_data")
+            if step3_data:
+                # Assume that course_id is saved in the session or is part of the extra data.
+                course_id = self.storage.extra_data.get('course_id')
+                if course_id:
+                    try:
+                        course = Courses.objects.get(pk=course_id)
+                        # Use the course title and description to generate content from Ollama
+                        generated_content = generate_content_listing(course.course_title, course.course_description)
+
+                        initial["content_listing"] = ollama_content_to_json(generated_content)
+                        print("Json things")
+                        print(initial['content_listing'])
+                    except Courses.DoesNotExist:
+                        # Handle the case where the course ID is not valid
+                        initial['content_listing'] = "[]"
 
         return initial
 
@@ -131,34 +150,63 @@ class CourseCreationWizard(SessionWizardView):
             course.course_title = form_data.get('course_title', '')
             course.course_description = form_data.get('course_description', '')
 
-
         elif step == 'step3':
-            print(form_data)
             if form_data:
-
+                # Update required here to make it dynamic
                 number_of_outcomes = 4
-
-
                 for i in range(number_of_outcomes):
                     outcome = {
                         'tag': form_data.get(f'learning_outcome_{i}_tag'),
                         'number': form_data.get(f'learning_outcome_{i}_number'),
                         'outcome': form_data.get(f'learning_outcome_{i}_outcome'),
                         'course_id':course.id,
-                        'sub_items': form_data.get(f'learning_outcome_{i}_sub_items').split('\r\n'),
 
                     }
+                    if (form_data.get(f'learning_outcome_{i}_sub_items')):
+                        outcome['sub_items']= form_data.get(f'learning_outcome_{i}_sub_items').split('\r\n')
+
                     LearningOutcome.objects.create(**outcome)
 
-                else:
-
-                       pass
-
-
-
         elif step=='step4':
-            pass
+            content_listing_json = form_data.get('content_listing')
+            print("json thingies")
+            print(content_listing_json)
+            if content_listing_json:
+                # Convert the text response to JSON format
 
+                # Load the JSON structure into a Python dict
+                content_listing = json.loads(content_listing_json)
+
+                # Iterate through each module and save it into the database
+                for module_idx, module in enumerate(content_listing.get("modules", [])):
+                    # Create a new ContentListing instance for each module
+                    module_instance = ContentListing.objects.create(
+                        course=course,
+                        content_item=module["module_name"],
+                        serial_number=f"module_{module_idx + 1}"
+                    )
+
+                    # Iterate through the contents in the module
+                    for item_idx, item_data in enumerate(module.get("items", [])):
+                        # Save each content item within the module
+                        content = Content.objects.create(
+                            content_listing=module_instance,
+                            type=item_data.get('type'),
+                            duration=item_data.get('duration'),  # Handle duration
+                            key_points=item_data.get('key_points'),  # Handle key points
+                            script=item_data.get('script'),  # Handle script
+                            material=None,  # Assuming material is uploaded separately, keep this blank
+                        )
+
+                        # Iterate through the sub-items in the item and save them as related content
+                        for sub_item_idx, sub_item in enumerate(item_data.get("sub_items", [])):
+                            Content.objects.create(
+                                content_listing=module_instance,
+                                type="sub-item",  # Assign sub-item type
+                                key_points=sub_item,  # You can use sub-item name or description for key_points
+                                script="",  # No script field for sub-items, can be adjusted if needed
+                                material=None,  # Assuming no material for sub-items
+                            )
         # Save the course instance
         course.save()
 
@@ -236,3 +284,89 @@ class CourseLearningOutcomesAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Courses.DoesNotExist:
             return Response({'error': 'Course not found'}, status=status.HTTP_404_NOT_FOUND)
+
+def ollama_content_to_json(content_text):
+    """
+    Convert Ollama's content text into JSON format.
+    """
+
+    modules = []
+    current_module = None
+    current_item = None
+
+    # Regular expressions for matching modules, items, and sub-items
+    module_pattern = re.compile(r"\*\*Module (\d+): (.+)\*\*")
+    item_pattern = re.compile(r"- Item (\d+\.\d+): (.+) \(Type: (.+)\)")
+    sub_item_pattern = re.compile(r"- Sub-item (\d+\.\d+\.\d+): (.+)")
+
+    for line in content_text.splitlines():
+        line = line.strip()  # Strip leading/trailing whitespace
+
+        module_match = module_pattern.match(line)
+        item_match = item_pattern.match(line)
+        sub_item_match = sub_item_pattern.match(line)
+
+        if module_match:
+            # Start a new module
+            if current_module:
+                # Append the current item to the current module if it's not None
+                if current_item:
+                    current_module["items"].append(current_item)
+                    current_item = None
+                # Append the current module to the list of modules
+                modules.append(current_module)
+
+            current_module = {
+                "module_name": module_match.group(2).strip(),
+                "items": []
+            }
+
+        elif item_match:
+            # Start a new item within the current module
+            if current_module is None:
+                # Handle item without a module context
+                print("Warning: Found content item without a module context. Creating a generic module.")
+                current_module = {
+                    "module_name": "Generic Module",
+                    "items": []
+                }
+                modules.append(current_module)
+
+            # Append the current item to the current module if it's not None
+            if current_item:
+                current_module["items"].append(current_item)
+
+            current_item = {
+                "item_name": item_match.group(2).strip(),
+                "type": item_match.group(3).strip(),
+                "sub_items": []
+            }
+
+        elif sub_item_match:
+            # Add sub-item to the current item
+            if current_item is None:
+                # Handle sub-item without an item context
+                print("Warning: Found sub-item without a content item context. Skipping.")
+                continue
+
+            sub_item_name = sub_item_match.group(2).strip()
+            current_item["sub_items"].append(sub_item_name)
+
+    # Append the last item and module if any
+    if current_item and current_module:
+        current_module["items"].append(current_item)
+
+    if current_module:
+        modules.append(current_module)
+
+    # Return the JSON structure
+    return json.dumps({"modules": modules}, indent=4)
+
+class ContentListingViewSet(viewsets.ModelViewSet):
+    queryset = ContentListing.objects.all()
+    serializer_class = ContentListingSerializer
+
+
+class ContentViewSet(viewsets.ModelViewSet):
+    queryset = Content.objects.all()
+    serializer_class = ContentSerializer
