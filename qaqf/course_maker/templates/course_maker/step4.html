@@ -1,65 +1,177 @@
-<!-- course_maker/step4.html -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Course Creation Wizard:QCG</title>
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KE6tbwr25q5Fv7uME6BU6h2HhtXb1wFTnxJVZb8VSKq0kTgyXXpVqvBgKjeWCqH3" crossorigin="anonymous">
+    <title>Editable Course Content</title>
+    <style>
+        .module {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+        }
+        .item {
+            margin-left: 20px;
+            padding: 5px;
+            border-left: 2px solid #007bff;
+            background-color: #e9ecef;
+        }
+        .sub-item {
+            margin-left: 40px;
+            padding: 5px;
+            border-left: 2px solid #28a745;
+        }
+        input {
+            margin: 5px;
+            padding: 5px;
+        }
+        button {
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h2>Step 4: Generated Course Content</h2>
 
-        <div class="content-listing">
-            {% content_listing.modules %}
-            {% if content_listing.modules %}
-                {% for module in content_listing.modules %}
-                    <div class="module">
-                        <h3>{{ module.module_name }}</h3>
-                        {% if module.items %}
-                            <ul>
-                                {% for item in module.items %}
-                                    <li>
-                                        <strong>{{ item.item_name }}</strong> (Type: {{ item.type }})
-                                        {% if item.sub_items %}
-                                            <ul>
-                                                {% for sub_item in item.sub_items %}
-                                                    <li>{{ sub_item }}</li>
-                                                {% endfor %}
-                                            </ul>
-                                        {% endif %}
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        {% else %}
-                            <p>No items found in this module.</p>
-                        {% endif %}
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p>No modules found.</p>
-            {% endif %}
-        </div>
+    <div id="content"></div>
 
-        <form method="post">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="id_content_listing">Edit Content Listing:</label>
-                <textarea id="id_content_listing" name="content_listing" rows="15" class="form-control">{{ content_listing|json_script:"content_listing_json" }}</textarea>
-                <small class="form-text text-muted">Edit the content listing if needed before proceeding.</small>
-            </div>
+    <button onclick="saveContent()">Save Changes</button>
 
-            <div class="form-navigation">
-                <button type="submit" name="wizard_goto_step" value="step3" class="btn btn-secondary">Previous</button>
-                <button type="submit" class="btn btn-primary">Next</button>
-            </div>
-        </form>
-    </div>
+    <script>
+        const jsonData = {
+            "modules": [
+                {
+                    "module_name": "Introduction to Commodity Markets",
+                    "items": [
+                        {
+                            "item_name": "Overview of Commodity Markets",
+                            "type": "Reading",
+                            "sub_items": [
+                                "Definition and Importance of Commodity Markets",
+                                "Types of Commodities and their Characteristics"
+                            ]
+                        },
+                        {
+                            "item_name": "Historical Context and Evolution of Commodity Markets",
+                            "type": "Note",
+                            "sub_items": []
+                        }
+                    ]
+                },
+                {
+                    "module_name": "Commodity Market Dynamics",
+                    "items": [
+                        {
+                            "item_name": "Supply and Demand Fundamentals",
+                            "type": "Video",
+                            "sub_items": [
+                                "Understanding the Interplay between Supply and Demand",
+                                "Analyzing the Impact of Global Events on Supply and Demand"
+                            ]
+                        },
+                        {
+                            "item_name": "Pricing Mechanisms in Commodity Markets",
+                            "type": "Quiz",
+                            "sub_items": []
+                        }
+                    ]
+                },
+                // Additional modules here...
+            ]
+        };
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2zNkS7hVDPHJo6mgkJmV6EZG8rryUCu1pM5rV3cjjIUqfRxXPG5QK7tmYp" crossorigin="anonymous"></script>
+        function createEditableContent(data) {
+            const contentDiv = document.getElementById('content');
+            contentDiv.innerHTML = '';
+
+            data.modules.forEach((module, moduleIndex) => {
+                const moduleDiv = document.createElement('div');
+                moduleDiv.classList.add('module');
+
+                // Module Name
+                const moduleNameInput = document.createElement('input');
+                moduleNameInput.type = 'text';
+                moduleNameInput.value = module.module_name;
+                moduleNameInput.setAttribute('data-module-index', moduleIndex);
+                moduleNameInput.setAttribute('data-type', 'module_name');
+                moduleDiv.appendChild(moduleNameInput);
+
+                // Items
+                module.items.forEach((item, itemIndex) => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.classList.add('item');
+
+                    // Item Name
+                    const itemNameInput = document.createElement('input');
+                    itemNameInput.type = 'text';
+                    itemNameInput.value = item.item_name;
+                    itemNameInput.setAttribute('data-module-index', moduleIndex);
+                    itemNameInput.setAttribute('data-item-index', itemIndex);
+                    itemNameInput.setAttribute('data-type', 'item_name');
+                    itemDiv.appendChild(itemNameInput);
+
+                    // Item Type
+                    const itemTypeInput = document.createElement('input');
+                    itemTypeInput.type = 'text';
+                    itemTypeInput.value = item.type;
+                    itemTypeInput.setAttribute('data-module-index', moduleIndex);
+                    itemTypeInput.setAttribute('data-item-index', itemIndex);
+                    itemTypeInput.setAttribute('data-type', 'type');
+                    itemDiv.appendChild(itemTypeInput);
+
+                    // Sub-items
+                    item.sub_items.forEach((subItem, subItemIndex) => {
+                        const subItemDiv = document.createElement('div');
+                        subItemDiv.classList.add('sub-item');
+
+                        const subItemInput = document.createElement('input');
+                        subItemInput.type = 'text';
+                        subItemInput.value = subItem;
+                        subItemInput.setAttribute('data-module-index', moduleIndex);
+                        subItemInput.setAttribute('data-item-index', itemIndex);
+                        subItemInput.setAttribute('data-sub-item-index', subItemIndex);
+                        subItemInput.setAttribute('data-type', 'sub_item');
+                        subItemDiv.appendChild(subItemInput);
+
+                        itemDiv.appendChild(subItemDiv);
+                    });
+
+                    moduleDiv.appendChild(itemDiv);
+                });
+
+                contentDiv.appendChild(moduleDiv);
+            });
+        }
+
+        function saveContent() {
+            // Collect data from input fields
+            const contentDiv = document.getElementById('content');
+            const inputs = contentDiv.querySelectorAll('input');
+
+            inputs.forEach(input => {
+                const moduleIndex = input.getAttribute('data-module-index');
+                const itemIndex = input.getAttribute('data-item-index');
+                const subItemIndex = input.getAttribute('data-sub-item-index');
+                const type = input.getAttribute('data-type');
+                const value = input.value;
+
+                if (type === 'module_name') {
+                    jsonData.modules[moduleIndex].module_name = value;
+                } else if (type === 'item_name') {
+                    jsonData.modules[moduleIndex].items[itemIndex].item_name = value;
+                } else if (type === 'type') {
+                    jsonData.modules[moduleIndex].items[itemIndex].type = value;
+                } else if (type === 'sub_item') {
+                    jsonData.modules[moduleIndex].items[itemIndex].sub_items[subItemIndex] = value;
+                }
+            });
+
+            console.log('Updated JSON:', JSON.stringify(jsonData, null, 4));
+            alert("Changes saved successfully!");
+        }
+
+        // Initial render
+        createEditableContent(jsonData);
+    </script>
 </body>
 </html>

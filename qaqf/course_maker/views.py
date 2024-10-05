@@ -99,8 +99,6 @@ class CourseCreationWizard(SessionWizardView):
                         # Use the course title and description to generate content from Ollama
                         generated_content = generate_content_listing(course.course_title, course.course_description)
 
-
-
                         initial["content_listing"] = ollama_content_to_json(generated_content)
                         print(initial['content_listing'])
                     except Courses.DoesNotExist:
@@ -287,56 +285,78 @@ class CourseLearningOutcomesAPIView(APIView):
         except Courses.DoesNotExist:
             return Response({'error': 'Course not found'}, status=status.HTTP_404_NOT_FOUND)
 
+
+import re
+import json
+
+
 def ollama_content_to_json(content_text):
     """
     Convert Ollama's content text into JSON format.
     """
+
     modules = []
     current_module = None
     current_item = None
 
-    # Updated regular expressions for matching modules, items, and sub-items
+    # Regular expressions for matching modules, items, and sub-items
     module_pattern = re.compile(r"\*\*Module (\d+): (.+)\*\*")
     item_pattern = re.compile(r"- Item (\d+\.\d+): (.+) \(Type: (.+)\)")
     sub_item_pattern = re.compile(r"- Sub-item (\d+\.\d+\.\d+): (.+)")
 
     for line in content_text.splitlines():
-        module_match = module_pattern.match(line.strip())
-        item_match = item_pattern.match(line.strip())
-        sub_item_match = sub_item_pattern.match(line.strip())
+        line = line.strip()  # Strip leading/trailing whitespace
+
+        module_match = module_pattern.match(line)
+        item_match = item_pattern.match(line)
+        sub_item_match = sub_item_pattern.match(line)
 
         if module_match:
             # Start a new module
             if current_module:
+                # Append the current item to the current module if it's not None
                 if current_item:
                     current_module["items"].append(current_item)
                     current_item = None
+                # Append the current module to the list of modules
                 modules.append(current_module)
+
             current_module = {
                 "module_name": module_match.group(2).strip(),
                 "items": []
             }
 
-        elif item_match and current_module:
+        elif item_match:
             # Start a new item within the current module
+            if current_module is None:
+                raise ValueError("Item found without a current module context.")
+
+            # Append the current item to the current module if it's not None
             if current_item:
                 current_module["items"].append(current_item)
+
             current_item = {
                 "item_name": item_match.group(2).strip(),
                 "type": item_match.group(3).strip(),
                 "sub_items": []
             }
 
-        elif sub_item_match and current_item:
+        elif sub_item_match:
             # Add sub-item to the current item
+            if current_item is None:
+                raise ValueError("Sub-item found without a current item context.")
+
             sub_item_name = sub_item_match.group(2).strip()
             current_item["sub_items"].append(sub_item_name)
 
     # Append the last item and module if any
-    if current_item:
+    if current_item and current_module:
         current_module["items"].append(current_item)
+
     if current_module:
         modules.append(current_module)
 
     # Return the JSON structure
     return json.dumps({"modules": modules}, indent=4)
+
+

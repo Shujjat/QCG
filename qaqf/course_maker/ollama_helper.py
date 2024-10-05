@@ -128,6 +128,7 @@ def generate_learning_outcomes(course_title, course_description):
         return []
 
 def generate_content_listing(course_title, course_description):
+
     """
     Generates a structured content listing based on course title and description using LLM3 of Ollama.
     The content is categorized into modules, which include items and sub-items.
