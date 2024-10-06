@@ -1,21 +1,23 @@
 import requests
 import ollama
 import re
+from .utils.pdf_utils import read_pdf
 
 def generate_course_title_and_description(step1_data):
     """
     Generates a course title and description based on Step 1 data using LLM3 of Ollama.
     """
     # Define the prompt based on Step 1 data
+    available_material=read_pdf(step1_data.get('available_material', 'None'))
     prompt = f"""
     Given the following course information, generate a course title and a detailed description:
+    About Course: {step1_data.get('course_description',None)}
     Course Type: {step1_data.get('course_type', 'General')}
-    Prerequisite Knowledge: {step1_data.get('prerequisite_knowledge', 'None')}
-    Participants Info: {step1_data.get('participants_info', 'General')}
-    Available Material: {step1_data.get('available_material', 'None')}
-    Duration: {step1_data.get('duration', 'Undefined')}
-    Knowledge Level: {step1_data.get('knowledge_level', 'Beginner')}
-
+    Previous educational level: {step1_data.get('prerequisite_knowledge', 'None')}
+    Learners Details: {step1_data.get('participants_info', 'General')}
+    Available Study Material: {available_material}
+    Duration of Course: {step1_data.get('duration', 'Undefined')}
+    Target Knowledge Level to achieve: {step1_data.get('knowledge_level', 'Beginner')}
     Output should be in the following format:
     Title: <Course Title>
     Description: <Course Description>
