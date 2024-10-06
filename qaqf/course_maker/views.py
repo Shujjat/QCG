@@ -69,7 +69,7 @@ class CourseCreationWizard(SessionWizardView):
         Populate initial data for forms.
         """
         initial = {}
-        print("get_form_initial step"+str(step))
+
         # For step 2, set initial values for 'course_title' and 'generated_course_description'
         if step == 'step2':
             step1_data = self.get_cleaned_data_for_step('step1')
@@ -89,7 +89,7 @@ class CourseCreationWizard(SessionWizardView):
         elif step == 'step4':
             # Get course details from step 3
             step3_data = self.get_cleaned_data_for_step('step3')
-            print("step3_data")
+
             if step3_data:
                 # Assume that course_id is saved in the session or is part of the extra data.
                 course_id = self.storage.extra_data.get('course_id')
@@ -100,8 +100,7 @@ class CourseCreationWizard(SessionWizardView):
                         generated_content = generate_content_listing(course.course_title, course.course_description)
 
                         initial["content_listing"] = ollama_content_to_json(generated_content)
-                        print("Json things")
-                        print(initial['content_listing'])
+
                     except Courses.DoesNotExist:
                         # Handle the case where the course ID is not valid
                         initial['content_listing'] = "[]"
@@ -114,7 +113,7 @@ class CourseCreationWizard(SessionWizardView):
         Override the process_step method to save data to the database.
         """
         step = self.steps.current
-        print('step:'+str(step))
+
         form_data = form.cleaned_data
 
         # Fetch or create a course object from the extra data in storage
@@ -136,6 +135,7 @@ class CourseCreationWizard(SessionWizardView):
                 course.participants_info = form_data.get('participants_info', '')
                 course.prerequisite_knowledge = form_data.get('prerequisite_knowledge', '')
                 course.available_material = form_data.get('available_material', '')
+
                 course.content_lang = form_data.get('content_lang', '')
                 course.course_type = form_data.get('course_type', '')
                 course.optimized_for_mooc = form_data.get('optimized_for_mooc', False)
@@ -169,8 +169,7 @@ class CourseCreationWizard(SessionWizardView):
 
         elif step=='step4':
             content_listing_json = form_data.get('content_listing')
-            print("json thingies")
-            print(content_listing_json)
+
             if content_listing_json:
                 # Convert the text response to JSON format
 
