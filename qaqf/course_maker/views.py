@@ -51,14 +51,14 @@ class CourseCreationWizard(SessionWizardView):
         Provide additional keyword arguments to the form for each step.
         """
         kwargs = super().get_form_kwargs(step)
-        # course_id = self.storage.extra_data.get('course_id')
-        # course = Courses.objects.get(pk=course_id)
-        # if step == 'step3':
-        #     # Get initial data for learning outcomes
-        #     step2_data = self.get_cleaned_data_for_step('step2')
-        #     if step2_data:
-        #         generated_outcomes = generate_learning_outcomes(course_id)
-        #         kwargs['learning_outcomes_data'] = generated_outcomes
+        course_id = self.storage.extra_data.get('course_id')
+        course = Courses.objects.get(pk=course_id)
+        if step == 'step3':
+            # Get initial data for learning outcomes
+            step2_data = self.get_cleaned_data_for_step('step2')
+            if step2_data:
+                generated_outcomes = generate_learning_outcomes(course_id)
+                kwargs['learning_outcomes_data'] = generated_outcomes
 
         return kwargs
     def get_form_initial(self, step,course=None):
@@ -75,6 +75,7 @@ class CourseCreationWizard(SessionWizardView):
             if step2_data:
                 generated_outcomes = generate_learning_outcomes(course_id)
                 initial['learning_outcomes'] = json.dumps(generated_outcomes)  # Store outcomes in JSON format
+                return
         elif step == 'step4':
             # Get course details from step 3
             step3_data = self.get_cleaned_data_for_step('step3')

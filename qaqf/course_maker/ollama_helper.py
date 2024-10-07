@@ -5,7 +5,10 @@ import sys
 from .utils.pdf_utils import read_pdf
 from .models import Courses
 import logging
+logging.basicConfig(level=logging.WARNING)
+
 logger = logging.getLogger(__name__)
+
 
 
 def generate_course_title_and_description(course_id):
@@ -83,8 +86,8 @@ def generate_learning_outcomes(course_id):
     course = Courses.objects.get(pk=course_id)
     # Define the prompt based on the course title and description
     prompt = f"""
-    You are a course designer. Based on the given course title: {course.course_title} 
-    and description: {course.course_description}, generate several learning outcomes 
+    You are a course designer. Based on the given course title: '{course.course_title}' 
+    and description: '{course.course_description}', generate several learning outcomes 
     that should a learner achieve.
     
     There is extensive study material available for this course. Please use it as 
@@ -112,7 +115,7 @@ def generate_learning_outcomes(course_id):
     logger.info("Prompt")
 
     logger.info( str(prompt))
-    sys.exit()
+
     try:
         # Generate response using Ollama locally
         response = ollama.generate(model='llama3', prompt=prompt)
@@ -159,8 +162,8 @@ def generate_learning_outcomes(course_id):
                 "sub_items": outcome["sub_items"]
             })
 
-        print("-------------------")
-        print(simplified_outcomes)
+        logger.info("--------simplified_outcomes-----------")
+        logger.info(simplified_outcomes)
         return simplified_outcomes
 
     except requests.exceptions.RequestException as e:
@@ -288,10 +291,8 @@ def generate_content_listing(course_title, course_description):
         return []
 def generate_summary(text_chunk):
     prompt = f"""
-    You are an expert summarizer. Here is an excerpt from a book:
-    {text_chunk}
-
-    Please summarize the key points of this excerpt in a concise and informative manner.
+    Summarize the key points of the following book excerpt concisely and informatively:
+        {text_chunk}
     """
     response = ollama.generate(model='llama3', prompt=prompt)
     return response.get('response', "")

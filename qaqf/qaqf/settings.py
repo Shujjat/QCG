@@ -70,11 +70,11 @@ LOGGING = {
         },
     },
     'loggers': {
-        'django': {
-            'handlers': ['file', 'console'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
+        # 'django': {
+        #     'handlers': ['file', 'console'],
+        #     'level': 'DEBUG',
+        #     'propagate': True,
+        # },
         'course_maker': {  # You can replace 'myapp' with your app name
             'handlers': ['file', 'console'],
             'level': 'DEBUG',

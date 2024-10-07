@@ -30,7 +30,7 @@ class CourseSerializer(serializers.ModelSerializer):
         model = Courses
         fields = [
             'id', 'course_title', 'course_description', 'participants_info',
-            'prerequisite_knowledge', 'available_material', 'content_lang',
+            'prerequisite_knowledge', 'available_material','available_material_content', 'content_lang',
             'course_type', 'optimized_for_mooc', 'project_based', 'assignment',
             'long_course_support', 'knowledge_level', 'duration', 'practice',
             'learning_outcomes','content_listings'
