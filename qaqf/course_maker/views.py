@@ -64,7 +64,11 @@ class CourseCreationWizard(SessionWizardView):
                 kwargs['learning_outcomes_data'] = generated_outcomes
 
         return kwargs
-    def get_form_initial(self, step):
+    def get_form_initial(self, step,course=None):
+
+        course_id = self.storage.extra_data.get('course_id')
+
+
         """
         Populate initial data for forms.
         """
@@ -74,12 +78,13 @@ class CourseCreationWizard(SessionWizardView):
         if step == 'step2':
             step1_data = self.get_cleaned_data_for_step('step1')
             if step1_data:
-                title, description = generate_course_title_and_description(step1_data)
+                title, description = generate_course_title_and_description(course_id)
                 initial['course_title'] = title
                 initial['course_description'] = description
 
         # For step 3, generate initial learning outcomes if available
         elif step == 'step3':
+
             step2_data = self.get_cleaned_data_for_step('step2')
             if step2_data:
                 course_title = step2_data.get('course_title')
@@ -135,7 +140,6 @@ class CourseCreationWizard(SessionWizardView):
                 course.participants_info = form_data.get('participants_info', '')
                 course.prerequisite_knowledge = form_data.get('prerequisite_knowledge', '')
                 course.available_material = form_data.get('available_material', '')
-
                 course.content_lang = form_data.get('content_lang', '')
                 course.course_type = form_data.get('course_type', '')
                 course.optimized_for_mooc = form_data.get('optimized_for_mooc', False)

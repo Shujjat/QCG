@@ -3,55 +3,82 @@ import ollama
 import re
 import sys
 from .utils.pdf_utils import read_pdf
+from .models import Courses
 
-def generate_course_title_and_description(step1_data):
+def generate_course_title_and_description(course_id):
     """
     Generates a course title and description based on Step 1 data using LLM3 of Ollama.
     """
     # Define the prompt based on Step 1 data
-    available_material=read_pdf(step1_data.get('available_material', 'None'))
-    print('==================available_material==================')
-    print(step1_data.get('available_material', 'None'))
-    print(available_material)
-
-    prompt = f"""
-    Given the following course information, generate a course title and a detailed description:
-    About Course: {step1_data.get('course_description',None)}
-    Course Type: {step1_data.get('course_type', 'General')}
-    Previous educational level: {step1_data.get('prerequisite_knowledge', 'None')}
-    Learners Details: {step1_data.get('participants_info', 'General')}
-    Available Study Material to use: {available_material}
-    Duration of Course: {step1_data.get('duration', 'Undefined')}
-    Target Knowledge Level to achieve: {step1_data.get('knowledge_level', 'Beginner')}
-    Ensure the generated content is engaging, informative, and suitable for the target audience. 
-    
-    Also, output should be in the following format:
-    Title: <Course Title>
-    Description: <Course Description>
-    """
-    print("prompt \n" + str(prompt))
-
     try:
-        response = ollama.generate(model='llama3', prompt=prompt)
+        # Retrieve the course using course_id
+        course = Courses.objects.get(pk=course_id)
 
-        # Extract the generated text from the response dictionary
-        generated_text = response.get('response', "")
-        title, description = "", ""
+        # Check if the available material is a valid file (assuming it's a FileField)
+        if course.available_material:
+            pdf_path = 'http://127.0.0.1:8000' + str(course.available_material.url)
+            pdf= read_pdf(pdf_path)
 
-        # Use regex to extract the title and description
-        title_match = re.search(r"Title:\s*(.+)", generated_text)
-        description_match = re.search(r"Description:\s*(.+)", generated_text)
+            chunks = create_chunks(pdf, chunk_size=len(pdf))  # Split into chunks of 500 words
 
-        if title_match:
-            title = title_match.group(1).strip()
+            available_material = "\n".join([generate_summary(chunk) for chunk in chunks])
 
-        if description_match:
-            description = description_match.group(1).strip()
+            print('==================Prompt==================')
 
-        return title, description
-    except requests.exceptions.RequestException as e:
-        print(f"Error communicating with Ollama API: {e}")
-        return "", ""
+            # print(available_material)
+
+            prompt = f"""
+                Given the following course information, generate a course title and a detailed description:
+                About Course: {course.course_description}
+                Course Type: {course.course_type}
+                Previous educational level: {course.prerequisite_knowledge}
+                Learners Details: {course.participants_info}
+                There is extensive study material available for this course. Please use it as needed to generate a relevant and coherent response:
+
+                [Available Study Material: Start]
+                {available_material}
+                [Available Study Material: End]
+                Duration of Course: {course.duration}
+                Target Knowledge Level to achieve: {course.knowledge_level}
+                Ensure the generated title and description is correct and relevant. 
+
+                Also, output should be in the following format:
+                Title: <Course Title>
+                Description: <Course Description>
+                """
+            print("prompt \n" + str(prompt))
+
+            try:
+                response = ollama.generate(model='llama3', prompt=prompt)
+
+                # Extract the generated text from the response dictionary
+                generated_text = response.get('response', "")
+                title, description = "", ""
+
+                # Use regex to extract the title and description
+                title_match = re.search(r"Title:\s*(.+)", generated_text)
+                description_match = re.search(r"Description:\s*(.+)", generated_text)
+
+                if title_match:
+                    title = title_match.group(1).strip()
+
+                if description_match:
+                    description = description_match.group(1).strip()
+
+                return title, description
+            except requests.exceptions.RequestException as e:
+                print(f"Error communicating with Ollama API: {e}")
+                return "", ""
+
+
+        else:
+            print("No available material for this course.")
+            return None
+
+    except Courses.DoesNotExist:
+        print("Course not found.")
+        return ""
+
 
 
 # course_maker/ollama_helper.py
@@ -254,3 +281,31 @@ def generate_content_listing(course_title, course_description):
     except requests.exceptions.RequestException as e:
         print(f"Error communicating with Ollama API: {e}")
         return []
+def generate_summary(text_chunk):
+    prompt = f"""
+    You are an expert summarizer. Here is an excerpt from a book:
+    {text_chunk}
+
+    Please summarize the key points of this excerpt in a concise and informative manner.
+    """
+    response = ollama.generate(model='llama3', prompt=prompt)
+    return response.get('response', "")
+def create_chunks(text, chunk_size=1000):
+    """
+    Splits a long text into chunks of a specific size.
+
+    Parameters:
+    text (str): The text to be split.
+    chunk_size (int): The number of words per chunk.
+
+    Returns:
+    list: A list of text chunks.
+    """
+    words = text.split()
+    chunks = []
+
+    for i in range(0, len(words), chunk_size):
+        chunks.append(' '.join(words[i:i + chunk_size]))
+
+    return chunks
+
