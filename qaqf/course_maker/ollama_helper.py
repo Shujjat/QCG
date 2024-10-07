@@ -162,16 +162,15 @@ def generate_learning_outcomes(course_id):
                 "sub_items": outcome["sub_items"]
             })
 
-        logger.info("--------simplified_outcomes-----------")
-        logger.info(simplified_outcomes)
+
         return simplified_outcomes
 
     except requests.exceptions.RequestException as e:
-        print(f"Error communicating with Ollama API: {e}")
+        logger.error(f"Error communicating with Ollama API: {e}")
         return []
 
 
-def generate_content_listing(course_title, course_description):
+def generate_content_listing(course_id):
     """
     Generates a structured content listing based on course title and description using LLM3 of Ollama.
     The content is categorized into modules, which include items and sub-items.
@@ -179,19 +178,26 @@ def generate_content_listing(course_title, course_description):
     """
 
     # Define the prompt based on the course title and description
+    course = Courses.objects.get(pk=course_id)
+
     prompt = f"""
-    You are a course content developer. Based on the given course title and description, generate a detailed content structure.
+    You are a course content developer. Based on the given course title:'{course.course_title}'
+    and description:'{course.course_description}', 
+    and study material:
+    [Available Study Material: Start]
+    {course.available_material_content}
+    [Available Study Material: End]
+    
+    generate a detailed content structure.
     The content should be organized into modules, with each module containing content items.
-    Each content item should contain the following attributes: Content Item, Type, Duration, Key Points, and Script.
+    Each content item should contain the following attributes: Content Item, Type, Duration, Key Points,
+    and Script.
 
     - Content Item: This is the title of the content item.
     - Type: It should be either 'Video' or 'Reading'.
     - Duration: Duration in minutes for videos, optional for readings.
     - Key Points: Highlight important takeaways for each content item.
     - Script: Provide a brief script, if applicable.
-
-    Course Title: {course_title}
-    Course Description: {course_description}
 
     Provide the content in the following structured format:
 
@@ -217,7 +223,8 @@ def generate_content_listing(course_title, course_description):
 
     Only return the list of modules, items, and their attributes in this structured format.
     """
-    print("prompt \n" + str(prompt))
+    logger.info("prompt \n" + str(prompt))
+
 
     try:
         # Generate response using Ollama locally
@@ -282,12 +289,12 @@ def generate_content_listing(course_title, course_description):
             elif script_match and current_module and current_module["contents"]:
                 current_module["contents"][-1]["script"] = script_match.group(1)
 
-        print("Ollama Response for generate_content_listing")
-        print(generated_text)
+        logger.info("=====================generated_text==================")
+        logger.info(generated_text)
         return generated_text
 
     except requests.exceptions.RequestException as e:
-        print(f"Error communicating with Ollama API: {e}")
+        logger.error(f"Error communicating with Ollama API: {e}")
         return []
 def generate_summary(text_chunk):
     prompt = f"""

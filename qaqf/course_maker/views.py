@@ -51,10 +51,10 @@ class CourseCreationWizard(SessionWizardView):
         Provide additional keyword arguments to the form for each step.
         """
         kwargs = super().get_form_kwargs(step)
-        course_id = self.storage.extra_data.get('course_id')
-        course = Courses.objects.get(pk=course_id)
+
         if step == 'step3':
             # Get initial data for learning outcomes
+            course_id = self.storage.extra_data.get('course_id')
             step2_data = self.get_cleaned_data_for_step('step2')
             if step2_data:
                 generated_outcomes = generate_learning_outcomes(course_id)
@@ -82,18 +82,10 @@ class CourseCreationWizard(SessionWizardView):
 
             if step3_data:
                 # Assume that course_id is saved in the session or is part of the extra data.
-                course_id = self.storage.extra_data.get('course_id')
-                if course_id:
-                    try:
-                        course = Courses.objects.get(pk=course_id)
-                        # Use the course title and description to generate content from Ollama
-                        generated_content = generate_content_listing(course.course_title, course.course_description)
 
-                        initial["content_listing"] = ollama_content_to_json(generated_content)
+                generated_content = generate_content_listing(course_id)
 
-                    except Courses.DoesNotExist:
-                        # Handle the case where the course ID is not valid
-                        initial['content_listing'] = "[]"
+                initial['content_listing'] = generated_content
 
         return initial
 
