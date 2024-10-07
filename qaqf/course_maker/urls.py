@@ -18,5 +18,6 @@ urlpatterns = [
          name='course-learning-outcomes'),
 
     path('api/ollama_status/', ollama_status, name='ollama_status'),
+    path('api/run-ollama/', run_ollama, name='run_ollama'),
 
 ]

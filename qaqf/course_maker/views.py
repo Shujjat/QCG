@@ -369,3 +369,10 @@ def ollama_status(request):
         status = "error"
 
     return JsonResponse({"status": status})
+
+def run_ollama(request):
+    try:
+        result = subprocess.run(["ollama", "run", "llama3"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        return JsonResponse({"status": "started", "message": result.stdout})
+    except subprocess.CalledProcessError as e:
+        return JsonResponse({"status": "error", "message": e.stderr}, status=500)
