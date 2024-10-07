@@ -3,7 +3,6 @@ import json
 from rest_framework.views import APIView
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
-from django.http import JsonResponse
 from django.shortcuts import render
 from formtools.wizard.views import SessionWizardView
 from .course_wizard_forms import *
@@ -13,8 +12,8 @@ from .models import Courses, LearningOutcome,Content,ContentListing
 from .serializers import CourseSerializer, LearningOutcomeSerializer, ContentSerializer, ContentListingSerializer
 from .ollama_helper import *
 from rest_framework import status
-
-
+from django.http import JsonResponse
+import subprocess
 # Define the forms for each step
 FORMS = [
     ("step1", Step1Form),
@@ -56,55 +55,38 @@ class CourseCreationWizard(SessionWizardView):
 
         if step == 'step3':
             # Get initial data for learning outcomes
+            course_id = self.storage.extra_data.get('course_id')
             step2_data = self.get_cleaned_data_for_step('step2')
             if step2_data:
-                course_title = step2_data.get('course_title')
-                course_description = step2_data.get('course_description')
-                generated_outcomes = generate_learning_outcomes(course_title, course_description)
+                generated_outcomes = generate_learning_outcomes(course_id)
                 kwargs['learning_outcomes_data'] = generated_outcomes
 
         return kwargs
-    def get_form_initial(self, step):
-        """
-        Populate initial data for forms.
-        """
+    def get_form_initial(self, step,course=None):
+        course_id = self.storage.extra_data.get('course_id')
         initial = {}
-        print("get_form_initial step"+str(step))
-        # For step 2, set initial values for 'course_title' and 'generated_course_description'
         if step == 'step2':
             step1_data = self.get_cleaned_data_for_step('step1')
             if step1_data:
-                title, description = generate_course_title_and_description(step1_data)
+                title, description = generate_course_title_and_description(course_id)
                 initial['course_title'] = title
                 initial['course_description'] = description
-
-        # For step 3, generate initial learning outcomes if available
         elif step == 'step3':
             step2_data = self.get_cleaned_data_for_step('step2')
             if step2_data:
-                course_title = step2_data.get('course_title')
-                course_description = step2_data.get('course_description')
-                generated_outcomes = generate_learning_outcomes(course_title, course_description)
+                generated_outcomes = generate_learning_outcomes(course_id)
                 initial['learning_outcomes'] = json.dumps(generated_outcomes)  # Store outcomes in JSON format
+                return
         elif step == 'step4':
             # Get course details from step 3
             step3_data = self.get_cleaned_data_for_step('step3')
-            print("step3_data")
+
             if step3_data:
                 # Assume that course_id is saved in the session or is part of the extra data.
-                course_id = self.storage.extra_data.get('course_id')
-                if course_id:
-                    try:
-                        course = Courses.objects.get(pk=course_id)
-                        # Use the course title and description to generate content from Ollama
-                        generated_content = generate_content_listing(course.course_title, course.course_description)
 
-                        initial["content_listing"] = ollama_content_to_json(generated_content)
-                        print("Json things")
-                        print(initial['content_listing'])
-                    except Courses.DoesNotExist:
-                        # Handle the case where the course ID is not valid
-                        initial['content_listing'] = "[]"
+                generated_content = generate_content_listing(course_id)
+
+                initial['content_listing'] = generated_content
 
         return initial
 
@@ -114,7 +96,7 @@ class CourseCreationWizard(SessionWizardView):
         Override the process_step method to save data to the database.
         """
         step = self.steps.current
-        print('step:'+str(step))
+
         form_data = form.cleaned_data
 
         # Fetch or create a course object from the extra data in storage
@@ -168,14 +150,13 @@ class CourseCreationWizard(SessionWizardView):
                     LearningOutcome.objects.create(**outcome)
 
         elif step=='step4':
-            content_listing_json = form_data.get('content_listing')
-            print("json thingies")
-            print(content_listing_json)
-            if content_listing_json:
+            content_listing = form_data.get('content_listing')
+            course.save()
+            if content_listing:
                 # Convert the text response to JSON format
 
                 # Load the JSON structure into a Python dict
-                content_listing = json.loads(content_listing_json)
+                content_listing = json.loads(modules_listing_to_json(content_listing))
 
                 # Iterate through each module and save it into the database
                 for module_idx, module in enumerate(content_listing.get("modules", [])):
@@ -285,7 +266,7 @@ class CourseLearningOutcomesAPIView(APIView):
         except Courses.DoesNotExist:
             return Response({'error': 'Course not found'}, status=status.HTTP_404_NOT_FOUND)
 
-def ollama_content_to_json(content_text):
+def modules_listing_to_json(content_text):
     """
     Convert Ollama's content text into JSON format.
     """
@@ -370,3 +351,28 @@ class ContentListingViewSet(viewsets.ModelViewSet):
 class ContentViewSet(viewsets.ModelViewSet):
     queryset = Content.objects.all()
     serializer_class = ContentSerializer
+
+
+# views.py
+
+
+
+def ollama_status(request):
+    try:
+        # Check if Ollama is running (you can replace this with your actual logic)
+        process = subprocess.run(["pgrep", "-f", "ollama"], capture_output=True, text=True)
+        if process.returncode == 0:
+            status = "running"
+        else:
+            status = "stopped"
+    except Exception as e:
+        status = "error"
+
+    return JsonResponse({"status": status})
+
+def run_ollama(request):
+    try:
+        result = subprocess.run(["ollama", "run", "llama3"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        return JsonResponse({"status": "started", "message": result.stdout})
+    except subprocess.CalledProcessError as e:
+        return JsonResponse({"status": "error", "message": e.stderr}, status=500)

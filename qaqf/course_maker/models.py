@@ -39,7 +39,8 @@ class Courses(models.Model):
     course_description = models.TextField("Description of course")
     participants_info = models.TextField("Participants and their goals")
     prerequisite_knowledge = models.TextField("Pre-requisite Knowledge")
-    available_material = models.FileField("Available baseline material", upload_to='materials/', null=True, blank=True)
+    available_material = models.FileField("Available baseline material",  null=True, blank=True)
+    available_material_content=models.TextField("Available Material Content",  null=True, blank=True)
 
     # Enum/Choice Fields
     content_lang = models.CharField("Content Language", max_length=2, choices=CONTENT_LANG_CHOICES, default='EN')

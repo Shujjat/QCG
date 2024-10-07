@@ -1,64 +1,105 @@
 import requests
 import ollama
 import re
+import sys
+from .utils.pdf_utils import read_pdf
+from .models import Courses
+import logging
+logging.basicConfig(level=logging.WARNING)
 
-def generate_course_title_and_description(step1_data):
+logger = logging.getLogger(__name__)
+
+
+
+def generate_course_title_and_description(course_id):
     """
     Generates a course title and description based on Step 1 data using LLM3 of Ollama.
     """
     # Define the prompt based on Step 1 data
-    prompt = f"""
-    Given the following course information, generate a course title and a detailed description:
-    Course Type: {step1_data.get('course_type', 'General')}
-    Prerequisite Knowledge: {step1_data.get('prerequisite_knowledge', 'None')}
-    Participants Info: {step1_data.get('participants_info', 'General')}
-    Available Material: {step1_data.get('available_material', 'None')}
-    Duration: {step1_data.get('duration', 'Undefined')}
-    Knowledge Level: {step1_data.get('knowledge_level', 'Beginner')}
-
-    Output should be in the following format:
-    Title: <Course Title>
-    Description: <Course Description>
-    """
-    print("prompt \n" + str(prompt))
-
     try:
-        response = ollama.generate(model='llama3', prompt=prompt)
+        # Retrieve the course using course_id
+        course = Courses.objects.get(pk=course_id)
 
-        # Extract the generated text from the response dictionary
-        generated_text = response.get('response', "")
-        title, description = "", ""
+        # Check if the available material is a valid file (assuming it's a FileField)
+        if course.available_material:
+            pdf_path = 'http://127.0.0.1:8000' + str(course.available_material.url)
+            pdf= read_pdf(pdf_path)
+            chunks = create_chunks(pdf, chunk_size=len(pdf))  # Split into chunks of 500 words
+            available_material = "\n".join([generate_summary(chunk) for chunk in chunks])
+            course.available_material_content=available_material
+            course.save()
+            prompt = f"""
+                Given the following course information, generate a course title and a detailed description:
+                About Course: {course.course_description}
+                Course Type: {course.course_type}
+                Previous educational level: {course.prerequisite_knowledge}
+                Learners Details: {course.participants_info}
+                There is extensive study material available for this course. Please use it as needed to generate a relevant and coherent response:
 
-        # Use regex to extract the title and description
-        title_match = re.search(r"Title:\s*(.+)", generated_text)
-        description_match = re.search(r"Description:\s*(.+)", generated_text)
+                [Available Study Material: Start]
+                {available_material}
+                [Available Study Material: End]
+                Duration of Course: {course.duration}
+                Target Knowledge Level to achieve: {course.knowledge_level}
+                Ensure the generated title and description is correct and relevant. 
 
-        if title_match:
-            title = title_match.group(1).strip()
+                Also, output should be in the following format:
+                Title: <Course Title>
+                Description: <Course Description>
+                """
+            try:
+                response = ollama.generate(model='llama3', prompt=prompt)
 
-        if description_match:
-            description = description_match.group(1).strip()
+                # Extract the generated text from the response dictionary
+                generated_text = response.get('response', "")
+                title, description = "", ""
 
-        return title, description
-    except requests.exceptions.RequestException as e:
-        print(f"Error communicating with Ollama API: {e}")
-        return "", ""
+                # Use regex to extract the title and description
+                title_match = re.search(r"Title:\s*(.+)", generated_text)
+                description_match = re.search(r"Description:\s*(.+)", generated_text)
+
+                if title_match:
+                    title = title_match.group(1).strip()
+
+                if description_match:
+                    description = description_match.group(1).strip()
+
+                return title, description
+            except requests.exceptions.RequestException as e:
+                return "", ""
+
+
+        else:
+            return None
+
+    except Courses.DoesNotExist:
+        return ""
+
 
 
 # course_maker/ollama_helper.py
 
-def generate_learning_outcomes(course_title, course_description):
+def generate_learning_outcomes(course_id):
     """
     Generates learning outcomes and sub-items based on course title and description using LLM3 of Ollama.
     """
+    course = Courses.objects.get(pk=course_id)
     # Define the prompt based on the course title and description
     prompt = f"""
-    You are a course designer. Based on the given course title and description, generate several learning outcomes.
-    Tag each learning outcome with a unique letter starting from 'A', and for each outcome, provide sub-items.
-    Ensure the learning outcomes are practical, understandable, and related to the course content.
+    You are a course designer. Based on the given course title: '{course.course_title}' 
+    and description: '{course.course_description}', generate several learning outcomes 
+    that should a learner achieve.
+    
+    There is extensive study material available for this course. Please use it as 
+    needed to generate a relevant and coherent learning outcomes:
 
-    Course Title: {course_title}
-    Course Description: {course_description}
+    [Available Study Material: Start]
+    {course.available_material_content}
+    [Available Study Material: End]
+    Ensure the learning outcomes are practical, understandable, and related to the Available Study Material.
+    
+    Tag each learning outcome with a unique letter starting from 'A', and for each outcome, provide sub-items.
+    
 
     Please provide the outcomes in the following format:
     - Outcome A: [Main learning outcome for A]
@@ -71,7 +112,9 @@ def generate_learning_outcomes(course_title, course_description):
 
     Only return the list of learning outcomes with tags and sub-items.
     """
-    print("prompt \n" + str(prompt))
+    logger.info("Prompt")
+
+    logger.info( str(prompt))
 
     try:
         # Generate response using Ollama locally
@@ -119,35 +162,42 @@ def generate_learning_outcomes(course_title, course_description):
                 "sub_items": outcome["sub_items"]
             })
 
-        print("-------------------")
-        print(simplified_outcomes)
+
         return simplified_outcomes
 
     except requests.exceptions.RequestException as e:
-        print(f"Error communicating with Ollama API: {e}")
+        logger.error(f"Error communicating with Ollama API: {e}")
         return []
 
 
-def generate_content_listing(course_title, course_description):
+def generate_content_listing(course_id):
     """
     Generates a structured content listing based on course title and description using LLM3 of Ollama.
     The content is categorized into modules, which include items and sub-items.
     The structure is adjusted to fit the ContentListing and Content models.
     """
+
     # Define the prompt based on the course title and description
+    course = Courses.objects.get(pk=course_id)
+
     prompt = f"""
-    You are a course content developer. Based on the given course title and description, generate a detailed content structure.
+    You are a course content developer. Based on the given course title:'{course.course_title}'
+    and description:'{course.course_description}', 
+    and study material:
+    [Available Study Material: Start]
+    {course.available_material_content}
+    [Available Study Material: End]
+    
+    generate a detailed content structure.
     The content should be organized into modules, with each module containing content items.
-    Each content item should contain the following attributes: Content Item, Type, Duration, Key Points, and Script.
+    Each content item should contain the following attributes: Content Item, Type, Duration, Key Points,
+    and Script.
 
     - Content Item: This is the title of the content item.
     - Type: It should be either 'Video' or 'Reading'.
     - Duration: Duration in minutes for videos, optional for readings.
     - Key Points: Highlight important takeaways for each content item.
     - Script: Provide a brief script, if applicable.
-
-    Course Title: {course_title}
-    Course Description: {course_description}
 
     Provide the content in the following structured format:
 
@@ -173,7 +223,8 @@ def generate_content_listing(course_title, course_description):
 
     Only return the list of modules, items, and their attributes in this structured format.
     """
-    print("prompt \n" + str(prompt))
+    logger.info("prompt \n" + str(prompt))
+
 
     try:
         # Generate response using Ollama locally
@@ -238,10 +289,36 @@ def generate_content_listing(course_title, course_description):
             elif script_match and current_module and current_module["contents"]:
                 current_module["contents"][-1]["script"] = script_match.group(1)
 
-        print("Ollama Response for generate_content_listing")
-        print(generated_text)
+        logger.info("=====================generated_text==================")
+        logger.info(generated_text)
         return generated_text
 
     except requests.exceptions.RequestException as e:
-        print(f"Error communicating with Ollama API: {e}")
+        logger.error(f"Error communicating with Ollama API: {e}")
         return []
+def generate_summary(text_chunk):
+    prompt = f"""
+    Summarize the key points of the following book excerpt concisely and informatively:
+        {text_chunk}
+    """
+    response = ollama.generate(model='llama3', prompt=prompt)
+    return response.get('response', "")
+def create_chunks(text, chunk_size=1000):
+    """
+    Splits a long text into chunks of a specific size.
+
+    Parameters:
+    text (str): The text to be split.
+    chunk_size (int): The number of words per chunk.
+
+    Returns:
+    list: A list of text chunks.
+    """
+    words = text.split()
+    chunks = []
+
+    for i in range(0, len(words), chunk_size):
+        chunks.append(' '.join(words[i:i + chunk_size]))
+
+    return chunks
+
