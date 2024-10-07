@@ -4,6 +4,9 @@ import re
 import sys
 from .utils.pdf_utils import read_pdf
 from .models import Courses
+import logging
+logger = logging.getLogger(__name__)
+
 
 def generate_course_title_and_description(course_id):
     """
@@ -18,15 +21,10 @@ def generate_course_title_and_description(course_id):
         if course.available_material:
             pdf_path = 'http://127.0.0.1:8000' + str(course.available_material.url)
             pdf= read_pdf(pdf_path)
-
             chunks = create_chunks(pdf, chunk_size=len(pdf))  # Split into chunks of 500 words
-
             available_material = "\n".join([generate_summary(chunk) for chunk in chunks])
-
-            print('==================Prompt==================')
-
-            # print(available_material)
-
+            course.available_material_content=available_material
+            course.save()
             prompt = f"""
                 Given the following course information, generate a course title and a detailed description:
                 About Course: {course.course_description}
@@ -46,8 +44,6 @@ def generate_course_title_and_description(course_id):
                 Title: <Course Title>
                 Description: <Course Description>
                 """
-            print("prompt \n" + str(prompt))
-
             try:
                 response = ollama.generate(model='llama3', prompt=prompt)
 
@@ -67,34 +63,40 @@ def generate_course_title_and_description(course_id):
 
                 return title, description
             except requests.exceptions.RequestException as e:
-                print(f"Error communicating with Ollama API: {e}")
                 return "", ""
 
 
         else:
-            print("No available material for this course.")
             return None
 
     except Courses.DoesNotExist:
-        print("Course not found.")
         return ""
 
 
 
 # course_maker/ollama_helper.py
 
-def generate_learning_outcomes(course_title, course_description):
+def generate_learning_outcomes(course_id):
     """
     Generates learning outcomes and sub-items based on course title and description using LLM3 of Ollama.
     """
+    course = Courses.objects.get(pk=course_id)
     # Define the prompt based on the course title and description
     prompt = f"""
-    You are a course designer. Based on the given course title and description, generate several learning outcomes.
-    Tag each learning outcome with a unique letter starting from 'A', and for each outcome, provide sub-items.
-    Ensure the learning outcomes are practical, understandable, and related to the course content.
+    You are a course designer. Based on the given course title: {course.course_title} 
+    and description: {course.course_description}, generate several learning outcomes 
+    that should a learner achieve.
+    
+    There is extensive study material available for this course. Please use it as 
+    needed to generate a relevant and coherent learning outcomes:
 
-    Course Title: {course_title}
-    Course Description: {course_description}
+    [Available Study Material: Start]
+    {course.available_material_content}
+    [Available Study Material: End]
+    Ensure the learning outcomes are practical, understandable, and related to the Available Study Material.
+    
+    Tag each learning outcome with a unique letter starting from 'A', and for each outcome, provide sub-items.
+    
 
     Please provide the outcomes in the following format:
     - Outcome A: [Main learning outcome for A]
@@ -107,8 +109,10 @@ def generate_learning_outcomes(course_title, course_description):
 
     Only return the list of learning outcomes with tags and sub-items.
     """
-    print("prompt \n" + str(prompt))
+    logger.info("Prompt")
 
+    logger.info( str(prompt))
+    sys.exit()
     try:
         # Generate response using Ollama locally
         response = ollama.generate(model='llama3', prompt=prompt)
@@ -170,6 +174,7 @@ def generate_content_listing(course_title, course_description):
     The content is categorized into modules, which include items and sub-items.
     The structure is adjusted to fit the ContentListing and Content models.
     """
+
     # Define the prompt based on the course title and description
     prompt = f"""
     You are a course content developer. Based on the given course title and description, generate a detailed content structure.

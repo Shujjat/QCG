@@ -13,8 +13,6 @@ from .models import Courses, LearningOutcome,Content,ContentListing
 from .serializers import CourseSerializer, LearningOutcomeSerializer, ContentSerializer, ContentListingSerializer
 from .ollama_helper import *
 from rest_framework import status
-
-
 # Define the forms for each step
 FORMS = [
     ("step1", Step1Form),
@@ -53,43 +51,29 @@ class CourseCreationWizard(SessionWizardView):
         Provide additional keyword arguments to the form for each step.
         """
         kwargs = super().get_form_kwargs(step)
-
-        if step == 'step3':
-            # Get initial data for learning outcomes
-            step2_data = self.get_cleaned_data_for_step('step2')
-            if step2_data:
-                course_title = step2_data.get('course_title')
-                course_description = step2_data.get('course_description')
-                generated_outcomes = generate_learning_outcomes(course_title, course_description)
-                kwargs['learning_outcomes_data'] = generated_outcomes
+        # course_id = self.storage.extra_data.get('course_id')
+        # course = Courses.objects.get(pk=course_id)
+        # if step == 'step3':
+        #     # Get initial data for learning outcomes
+        #     step2_data = self.get_cleaned_data_for_step('step2')
+        #     if step2_data:
+        #         generated_outcomes = generate_learning_outcomes(course_id)
+        #         kwargs['learning_outcomes_data'] = generated_outcomes
 
         return kwargs
     def get_form_initial(self, step,course=None):
-
         course_id = self.storage.extra_data.get('course_id')
-
-
-        """
-        Populate initial data for forms.
-        """
         initial = {}
-
-        # For step 2, set initial values for 'course_title' and 'generated_course_description'
         if step == 'step2':
             step1_data = self.get_cleaned_data_for_step('step1')
             if step1_data:
                 title, description = generate_course_title_and_description(course_id)
                 initial['course_title'] = title
                 initial['course_description'] = description
-
-        # For step 3, generate initial learning outcomes if available
         elif step == 'step3':
-
             step2_data = self.get_cleaned_data_for_step('step2')
             if step2_data:
-                course_title = step2_data.get('course_title')
-                course_description = step2_data.get('course_description')
-                generated_outcomes = generate_learning_outcomes(course_title, course_description)
+                generated_outcomes = generate_learning_outcomes(course_id)
                 initial['learning_outcomes'] = json.dumps(generated_outcomes)  # Store outcomes in JSON format
         elif step == 'step4':
             # Get course details from step 3

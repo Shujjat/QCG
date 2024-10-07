@@ -6,28 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="7cf03e74-88c4-4af5-b6c0-cfbca8a72de4" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qaqf/course_maker/ollama_helper.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/ollama_helper.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/utils/pdf_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/utils/pdf_utils.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qaqf/course_maker/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qaqf/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/Python Sample Book.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/Python Sample Book_PtvSbse.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/Python Sample Book_kZz8hDs.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/Python Sample Book_nhe3Dbr.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/content_materials/testFile.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/content_materials/testFile_HbKIpXZ.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/content_materials/testFile_T2UUybh.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/content_materials/testFile_k3QgmFi.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/content_materials/testFile_ruXfPL5.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/materials/Python_Sample_Book.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/materials/Python_Sample_Book_5oGwjx4.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/materials/Python_Sample_Book_9kqFqBH.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/materials/Python_Sample_Book_SfF4NE1.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/materials/Python_Sample_Book_duTnS5O.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/materials/testFile.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/qaqf/qaqf/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/qaqf/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/qaqf/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/qaqf/urls.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
