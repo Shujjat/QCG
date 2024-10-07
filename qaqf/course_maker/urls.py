@@ -17,5 +17,6 @@ urlpatterns = [
     path('api/course/<int:course_id>/learning_outcomes/', CourseLearningOutcomesAPIView.as_view(),
          name='course-learning-outcomes'),
 
+    path('api/ollama_status/', ollama_status, name='ollama_status'),
 
 ]
