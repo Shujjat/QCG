@@ -151,12 +151,12 @@ class CourseCreationWizard(SessionWizardView):
 
         elif step=='step4':
             content_listing = form_data.get('content_listing')
-
+            course.save()
             if content_listing:
                 # Convert the text response to JSON format
 
                 # Load the JSON structure into a Python dict
-                content_listing = modules_listing_to_json(json.loads(content_listing))
+                content_listing = json.loads(modules_listing_to_json(content_listing))
 
                 # Iterate through each module and save it into the database
                 for module_idx, module in enumerate(content_listing.get("modules", [])):
