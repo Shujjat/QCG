@@ -16,65 +16,67 @@ def generate_course_title_and_description(course_id):
     Generates a course title and description based on Step 1 data using LLM3 of Ollama.
     """
     # Define the prompt based on Step 1 data
-    try:
-        # Retrieve the course using course_id
-        course = Courses.objects.get(pk=course_id)
 
-        # Check if the available material is a valid file (assuming it's a FileField)
-        if course.available_material:
-            pdf_path = 'http://127.0.0.1:8000' + str(course.available_material.url)
-            pdf= read_pdf(pdf_path)
-            chunks = create_chunks(pdf, chunk_size=len(pdf))  # Split into chunks of 500 words
-            available_material = "\n".join([generate_summary(chunk) for chunk in chunks])
-            course.available_material_content=available_material
-            course.save()
-            prompt = f"""
-                Given the following course information, generate a course title and a detailed description:
-                About Course: {course.course_description}
-                Course Type: {course.course_type}
-                Previous educational level: {course.prerequisite_knowledge}
-                Learners Details: {course.participants_info}
-                There is extensive study material available for this course. Please use it as needed to generate a relevant and coherent response:
+    # Retrieve the course using course_id
+    course = Courses.objects.get(pk=course_id)
 
-                [Available Study Material: Start]
-                {available_material}
-                [Available Study Material: End]
-                Duration of Course: {course.duration}
-                Target Knowledge Level to achieve: {course.knowledge_level}
-                Ensure the generated title and description is correct and relevant. 
+    # Check if the available material is a valid file (assuming it's a FileField)
+    prompt = f"""
+                    Given the following course information, generate a course title and a detailed description:
+                    About Course: {course.course_description}
+                    Course Type: {course.course_type}
+                    Previous educational level: {course.prerequisite_knowledge}
+                    Learners Details: {course.participants_info}
+                    There is extensive study material available for this course. Please use it as needed to generate a relevant and coherent response:
 
-                Also, output should be in the following format:
-                Title: <Course Title>
-                Description: <Course Description>
+                    
+                    """
+    if course.available_material:
+        pdf_path = 'http://127.0.0.1:8000' + str(course.available_material.url)
+        pdf= read_pdf(pdf_path)
+        chunks = create_chunks(pdf, chunk_size=len(pdf))  # Split into chunks of 500 words
+        available_material = "\n".join([generate_summary(chunk) for chunk in chunks])
+        course.available_material_content=available_material
+        course.save()
+        prompt += f"""
+            
+            [Available Study Material: Start]
+            {available_material}
+            [Available Study Material: End]
+               
                 """
-            try:
-                response = ollama.generate(model='llama3', prompt=prompt)
-
-                # Extract the generated text from the response dictionary
-                generated_text = response.get('response', "")
-                title, description = "", ""
-
-                # Use regex to extract the title and description
-                title_match = re.search(r"Title:\s*(.+)", generated_text)
-                description_match = re.search(r"Description:\s*(.+)", generated_text)
-
-                if title_match:
-                    title = title_match.group(1).strip()
-
-                if description_match:
-                    description = description_match.group(1).strip()
-
-                return title, description
-            except requests.exceptions.RequestException as e:
-                return "", ""
 
 
-        else:
-            return None
 
-    except Courses.DoesNotExist:
-        return ""
 
+    prompt+=""" Duration of Course: {course.duration}
+            Target Knowledge Level to achieve: {course.knowledge_level}
+            Ensure the generated title and description is correct and relevant. 
+
+            Also, output should be in the following format:
+            Title: <Course Title>
+            Description: <Course Description>"""
+
+    try:
+        response = ollama.generate(model='llama3', prompt=prompt)
+
+        # Extract the generated text from the response dictionary
+        generated_text = response.get('response', "")
+        title, description = "", ""
+
+        # Use regex to extract the title and description
+        title_match = re.search(r"Title:\s*(.+)", generated_text)
+        description_match = re.search(r"Description:\s*(.+)", generated_text)
+
+        if title_match:
+            title = title_match.group(1).strip()
+
+        if description_match:
+            description = description_match.group(1).strip()
+
+        return title, description
+    except requests.exceptions.RequestException as e:
+        return "", ""
 
 
 # course_maker/ollama_helper.py
