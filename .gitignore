@@ -1,0 +1,10 @@
+# Ignore Python cache files
+*.pyc
+__pycache__/
+
+# Ignore virtual environments
+.venv/
+env/
+
+# Ignore specific cache folder in the project.
+qaqf/course_maker/__pycache__/
