@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'formtools',
-    'course_maker','crispy_forms',
+    'course_maker','llm',
+    'crispy_forms',
+
     'crispy_bootstrap5',
 ]
 

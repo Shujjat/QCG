@@ -2,7 +2,7 @@ import PyPDF2
 import requests
 from io import BytesIO
 def read_pdf(pdf_url=None):
-    print("URL"+str(pdf_url))
+
     if pdf_url:
         try:
             # Get the PDF content from the URL

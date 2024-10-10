@@ -1,5 +1,7 @@
 # course_maker/views.py
 import json
+from sys import platform
+
 from rest_framework.views import APIView
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
@@ -96,7 +98,7 @@ class CourseCreationWizard(SessionWizardView):
         Override the process_step method to save data to the database.
         """
         step = self.steps.current
-
+        logger.info("step: " + step)
         form_data = form.cleaned_data
 
         # Fetch or create a course object from the extra data in storage
@@ -356,9 +358,9 @@ class ContentViewSet(viewsets.ModelViewSet):
 # views.py
 
 
-import subprocess
-import platform
-from django.http import JsonResponse
+class ContentViewSet(viewsets.ModelViewSet):
+    queryset = Content.objects.all()
+    serializer_class = ContentSerializer
 
 def ollama_status(request):
     try:
