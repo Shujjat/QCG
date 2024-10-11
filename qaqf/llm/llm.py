@@ -1,6 +1,9 @@
 # LLM Implementation.py
+import json
+import sys
+
 from django.conf import settings
-import logging
+from datetime import datetime
 import requests
 import ollama
 import re
@@ -19,17 +22,32 @@ class LLM:
 
     # Utility function for logging to DB
     def log_to_db(self, function_name, start_time, end_time=None, status='Started'):
-        duration = None
-        if end_time:
+        # Check if start_time or end_time is None
+        if start_time is None or end_time is None:
+            print("Error: start_time or end_time is None")
+            return
+
+        # If start_time and end_time are floats (representing timestamps), convert them to datetime
+        if isinstance(start_time, float):
+            start_time = datetime.fromtimestamp(start_time)
+        if isinstance(end_time, float):
+            end_time = datetime.fromtimestamp(end_time)
+
+        # Check if both are now datetime objects, and calculate duration
+        if isinstance(start_time, datetime) and isinstance(end_time, datetime):
             duration = (end_time - start_time).total_seconds()
+            print(f"Duration: {duration} seconds")
+            # Log the duration and additional info to the database
+        else:
+            print("Error: start_time and end_time must be valid datetime objects or timestamps.")
 
         log_entry = LoggingEntry(
-            function_name=function_name,
-            start_time=start_time,
-            end_time=end_time,
-            duration=duration,
-            status=status
-        )
+                function_name=function_name,
+                start_time=start_time,
+                end_time=end_time,
+                duration=duration,
+                status=status
+            )
         log_entry.save()
 
     # Decorator to log start, end, and duration
@@ -40,7 +58,7 @@ class LLM:
 
             # Log start of the function
             logger.info(f"Starting {function_name}")
-            log_to_db(function_name=function_name, start_time=start_time, status='Started')
+            self.log_to_db(function_name=function_name, start_time=start_time, status='Started')
 
             try:
                 # Call the function
@@ -50,7 +68,7 @@ class LLM:
 
                 # Log successful completion
                 logger.info(f"Completed {function_name} in {duration} seconds")
-                log_to_db(function_name=function_name, start_time=start_time, end_time=end_time, status='Completed')
+                self.log_to_db(function_name=function_name, start_time=start_time, end_time=end_time, status='Completed')
 
             except Exception as e:
                 end_time = time.time()
@@ -58,7 +76,7 @@ class LLM:
 
                 # Log error and failure
                 logger.error(f"Error in {function_name}: {str(e)}")
-                log_to_db(function_name=function_name, start_time=start_time, end_time=end_time, status='Failed')
+                self.log_to_db(function_name=function_name, start_time=start_time, end_time=end_time, status='Failed')
                 raise e
 
             return result
@@ -102,10 +120,10 @@ class LLM:
             Title: <Course Title>
             Description: <Course Description>
         """
-
+        logger.info(prompt)
         try:
-            response  = self.generate_response(prompt)
-            generated_text = response.get('response', "")
+            generated_text  = self.generate_response(prompt,None)
+
             title, description = "", ""
 
             # Extract the title and description using regex
@@ -152,13 +170,12 @@ class LLM:
                 - B1: [First sub-item]
                 - B2: [Second sub-item]
         """
-
+        logger.info(prompt)
         try:
-            response = self.generate_response(prompt)
-            generated_text = response.get('response', "")
 
+            logger.info(prompt)
             # Parse the learning outcomes and sub-items
-            learning_outcomes = self.extract_learning_outcomes(generated_text)
+            learning_outcomes = self.extract_learning_outcomes(self.generate_response(prompt,None))
 
             return learning_outcomes
         except requests.exceptions.RequestException as e:
@@ -266,9 +283,8 @@ class LLM:
 
         return content_listing
 
-    from django.conf import settings
 
-    def generate_response(prompt, model=None):
+    def generate_response(self,prompt, model=None):
         """
         Generate a response using the Ollama API, selecting the model dynamically from settings.
 
@@ -280,8 +296,38 @@ class LLM:
             dict: The response from the Ollama API.
         """
         # Fetch the model from settings if not provided
+        logger.info("Generating response")
         if not model:
             model = getattr(settings, 'OLLAMA_DEFAULT_MODEL', 'llama3')  # Default to 'llama3' if not set in settings
+        logger.info("Model: " + model)
 
-        response = ollama.generate(model=model, prompt=prompt)
-        return response.get('response', "")
+        try:
+            response = ollama.generate(model=model, prompt=prompt)
+
+            # Check if the response object has a JSON serializable structure
+            if isinstance(response, dict):
+                # It's already a dictionary, so it should be serializable
+                logger.info("Response is already a dict")
+            else:
+                # Try converting to a dict if it's an object
+                try:
+                    response = response.__dict__
+                    logger.info("Converted response to dict using __dict__")
+                except AttributeError:
+                    logger.error("Response object has no __dict__ attribute")
+
+            # Attempt to serialize it to JSON to check if it's valid
+            try:
+                json_response = json.dumps(response)
+                logger.info("Successfully serialized response to JSON")
+                logger.info(json_response)
+            except TypeError as e:
+                logger.error(f"Error serializing response: {e}")
+                raise
+
+            # Return the 'response' part from the generated response
+            return response.get('response', "")
+
+        except Exception as e:
+            logger.error(f"Error in generate_response: {e}")
+            return ""

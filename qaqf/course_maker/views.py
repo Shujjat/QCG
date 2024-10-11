@@ -65,7 +65,7 @@ class CourseCreationWizard(SessionWizardView):
             course_id = self.storage.extra_data.get('course_id')
             step2_data = self.get_cleaned_data_for_step('step2')
             if step2_data:
-                generated_outcomes = llm.ge(course_id)
+                generated_outcomes = llm_instance.generate_learning_outcomes(course_id)
                 kwargs['learning_outcomes_data'] = generated_outcomes
 
         return kwargs
@@ -82,8 +82,10 @@ class CourseCreationWizard(SessionWizardView):
             step2_data = self.get_cleaned_data_for_step('step2')
             if step2_data:
                 generated_outcomes = llm_instance.generate_learning_outcomes(course_id)
+                logger.info("generated_outcomes")
+                logger.info(generated_outcomes)
                 initial['learning_outcomes'] = json.dumps(generated_outcomes)  # Store outcomes in JSON format
-                return
+
         elif step == 'step4':
             # Get course details from step 3
             step3_data = self.get_cleaned_data_for_step('step3')
