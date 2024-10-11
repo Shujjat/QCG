@@ -69,18 +69,22 @@ class Step3Form(forms.Form):
 # Step 4: Account Information
 class Step4Form(forms.Form):
     content_listing = forms.CharField(widget=forms.Textarea, required=False)
-
 class Step5Form(forms.ModelForm):
+    class Meta:
+        model = Content
+        fields = ['type', 'material', 'duration', 'key_points', 'script']
 
-   type = forms.ChoiceField(
-        choices=Content.TYPE_CHOICES,
-        widget=forms.RadioSelect,
-        required=True
-    )
-   material = forms.FileField(required=False)
-   duration = forms.IntegerField(required=False)
-   key_points = forms.CharField(widget=forms.Textarea, required=False)
-   script = forms.CharField(widget=forms.Textarea, required=False)
+    def __init__(self, *args, **kwargs):
+        super(Step5Form, self).__init__(*args, **kwargs)
+
+        # Use RadioSelect for 'type' field with predefined choices from the model
+        self.fields['type'].widget = forms.RadioSelect(choices=Content.TYPE_CHOICES)
+        self.fields['material'] = forms.FileField(required=False)
+        self.fields['duration'] = forms.IntegerField(required=False)
+        self.fields['key_points'] = forms.CharField(widget=forms.Textarea, required=False)
+        self.fields['script'] = forms.CharField(widget=forms.Textarea, required=False)
+
+
 
 
 # Step 6: Confirmation

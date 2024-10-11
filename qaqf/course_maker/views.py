@@ -188,6 +188,9 @@ class CourseCreationWizard(SessionWizardView):
                                 script="",  # No script field for sub-items, can be adjusted if needed
                                 material=None,  # Assuming no material for sub-items
                             )
+        elif step == 'step5':
+            logger.info("step 5 in process")
+
         # Save the course instance
         course.save()
 
