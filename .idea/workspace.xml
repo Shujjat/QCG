@@ -5,12 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7cf03e74-88c4-4af5-b6c0-cfbca8a72de4" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/templates/course_maker/form_wizard.html" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/templates/course_maker/form_wizard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/debug.log" beforeDir="false" afterPath="$PROJECT_DIR$/debug.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/course_wizard_forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/course_wizard_forms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/templates/course_maker/step5.html" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/templates/course_maker/step5.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qaqf/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_Q8A1ZSF.pdf" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,7 +45,7 @@
   &quot;keyToString&quot;: {
     &quot;Python.Run Server.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;Fixing-LLM-Related-Issues-till-Step-4&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;New-Step-5&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;
   }
 }</component>
@@ -77,7 +77,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-98f27166c754-ba05f1cad1b1-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-242.21829.153" />
+        <option value="bundled-python-sdk-babbdf50b680-746f403e7f0c-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-241.15989.155" />
       </set>
     </attachedChunks>
   </component>

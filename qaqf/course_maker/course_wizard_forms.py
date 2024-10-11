@@ -1,7 +1,9 @@
 from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
-from .models import Courses
+from .models import Courses, Content
+
+
 class Step1Form(forms.ModelForm):
     class Meta:
         model = Courses
@@ -68,11 +70,18 @@ class Step3Form(forms.Form):
 class Step4Form(forms.Form):
     content_listing = forms.CharField(widget=forms.Textarea, required=False)
 
+class Step5Form(forms.ModelForm):
 
-# Step 5: Preferences
-class Step5Form(forms.Form):
-    receive_newsletter = forms.BooleanField(required=False)
-    preferred_contact_method = forms.ChoiceField(choices=[('email', 'Email'), ('phone', 'Phone')])
+   type = forms.ChoiceField(
+        choices=Content.TYPE_CHOICES,
+        widget=forms.RadioSelect,
+        required=True
+    )
+   material = forms.FileField(required=False)
+   duration = forms.IntegerField(required=False)
+   key_points = forms.CharField(widget=forms.Textarea, required=False)
+   script = forms.CharField(widget=forms.Textarea, required=False)
+
 
 # Step 6: Confirmation
 class Step6Form(forms.Form):
