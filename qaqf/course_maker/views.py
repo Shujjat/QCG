@@ -6,7 +6,7 @@ from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render
 from formtools.wizard.views import SessionWizardView
 from .course_wizard_forms import *
-from rest_framework import generics, viewsets
+from rest_framework import generics, viewsets, request
 from rest_framework.response import Response
 from .models import Courses, LearningOutcome,Content,ContentListing
 from .serializers import CourseSerializer, LearningOutcomeSerializer, ContentSerializer, ContentListingSerializer
@@ -189,7 +189,23 @@ class CourseCreationWizard(SessionWizardView):
                                 material=None,  # Assuming no material for sub-items
                             )
         elif step == 'step5':
-            logger.info("step 5 in process")
+
+            # Retrieve content_listing_id from extra_data
+            content_listing_id = extra_data.get('content_listing_id')
+            if content_listing_id:
+                try:
+                    content_listing = ContentListing.objects.get(id=content_listing_id)
+                except ContentListing.DoesNotExist:
+                    return JsonResponse({'error': 'Content listing not found'}, status=404)
+
+                # Save the uploaded content
+                form = Step5Form(self.request.POST, self.request.FILES)
+                if form.is_valid():
+                    content = form.save(commit=False)
+                    content.content_listing = content_listing  # Set the foreign key
+                    content.save()
+                else:
+                    form = Step5Form()
 
         # Save the course instance
         course.save()
