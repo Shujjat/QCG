@@ -6,14 +6,15 @@ from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render
 from formtools.wizard.views import SessionWizardView
 from .course_wizard_forms import *
-from rest_framework import generics, viewsets, request
+from rest_framework import generics, viewsets
 from rest_framework.response import Response
-from .models import Courses, LearningOutcome,Content,ContentListing
-from .serializers import CourseSerializer, LearningOutcomeSerializer, ContentSerializer, ContentListingSerializer
+from .models import Courses, LearningOutcome,Content,ContentListing,Quiz
+from .serializers import CourseSerializer, LearningOutcomeSerializer, ContentSerializer, ContentListingSerializer,QuizSerializer
 from .ollama_helper import *
 from rest_framework import status
-from django.http import JsonResponse
 import subprocess
+import platform
+from django.http import JsonResponse
 # Define the forms for each step
 FORMS = [
     ("step1", Step1Form),
@@ -87,6 +88,10 @@ class CourseCreationWizard(SessionWizardView):
                 generated_content = generate_content_listing(course_id)
 
                 initial['content_listing'] = generated_content
+
+
+
+
 
         return initial
 
@@ -371,13 +376,11 @@ class ContentViewSet(viewsets.ModelViewSet):
     queryset = Content.objects.all()
     serializer_class = ContentSerializer
 
+class QuizViewSet(viewsets.ModelViewSet):
+    queryset = Quiz.objects.all()
+    serializer_class = QuizSerializer
 
-# views.py
 
-
-import subprocess
-import platform
-from django.http import JsonResponse
 
 def ollama_status(request):
     try:

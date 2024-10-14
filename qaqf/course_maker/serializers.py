@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Courses, LearningOutcome,Content,ContentListing
+from .models import Courses, LearningOutcome,Content,ContentListing,Quiz
 
 class LearningOutcomeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -35,3 +35,8 @@ class CourseSerializer(serializers.ModelSerializer):
             'long_course_support', 'knowledge_level', 'duration', 'practice',
             'learning_outcomes','content_listings'
         ]
+
+class QuizSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Quiz
+        fields = ['id', 'content', 'question', 'type', 'correct_option', 'option_1', 'option_2', 'option_3', 'option_4']
