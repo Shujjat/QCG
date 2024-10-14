@@ -1,5 +1,7 @@
 # course_maker/views.py
 import json
+import re
+
 from rest_framework.views import APIView
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
@@ -10,11 +12,14 @@ from rest_framework import generics, viewsets
 from rest_framework.response import Response
 from .models import Courses, LearningOutcome,Content,ContentListing,Quiz
 from .serializers import CourseSerializer, LearningOutcomeSerializer, ContentSerializer, ContentListingSerializer,QuizSerializer
-from .ollama_helper import *
+#from .ollama_helper import *
+
+from llm.llm import LLM
 from rest_framework import status
 import subprocess
 import platform
 from django.http import JsonResponse
+llm_instance=LLM()
 # Define the forms for each step
 FORMS = [
     ("step1", Step1Form),
@@ -59,7 +64,7 @@ class CourseCreationWizard(SessionWizardView):
             course_id = self.storage.extra_data.get('course_id')
             step2_data = self.get_cleaned_data_for_step('step2')
             if step2_data:
-                generated_outcomes = generate_learning_outcomes(course_id)
+                generated_outcomes = llm_instance.generate_learning_outcomes(course_id)
                 kwargs['learning_outcomes_data'] = generated_outcomes
 
         return kwargs
@@ -69,13 +74,13 @@ class CourseCreationWizard(SessionWizardView):
         if step == 'step2':
             step1_data = self.get_cleaned_data_for_step('step1')
             if step1_data:
-                title, description = generate_course_title_and_description(course_id)
+                title, description = llm_instance.generate_course_title_and_description(course_id)
                 initial['course_title'] = title
                 initial['course_description'] = description
         elif step == 'step3':
             step2_data = self.get_cleaned_data_for_step('step2')
             if step2_data:
-                generated_outcomes = generate_learning_outcomes(course_id)
+                generated_outcomes = llm_instance.generate_learning_outcomes(course_id)
                 initial['learning_outcomes'] = json.dumps(generated_outcomes)  # Store outcomes in JSON format
                 return
         elif step == 'step4':
@@ -85,7 +90,7 @@ class CourseCreationWizard(SessionWizardView):
             if step3_data:
                 # Assume that course_id is saved in the session or is part of the extra data.
 
-                generated_content = generate_content_listing(course_id)
+                generated_content = llm_instance.generate_content_listing(course_id)
 
                 initial['content_listing'] = generated_content
 
@@ -268,13 +273,13 @@ def regenerate_learning_outcome(request):
             return JsonResponse({'error': 'Course ID not found in session'}, status=400)
 
         # Generate new learning outcomes
-        new_outcomes = generate_learning_outcomes(course_title, course_description)
-
-        # Ensure the index is within range
-        if 0 <= index < len(new_outcomes):
-            new_outcome = new_outcomes[index]['outcome']
-            return JsonResponse({'new_outcome': new_outcome})
-        else:
+        # new_outcomes = generate_learning_outcomes(course_title, course_description)
+        #
+        # # Ensure the index is within range
+        # if 0 <= index < len(new_outcomes):
+        #     new_outcome = new_outcomes[index]['outcome']
+        #     return JsonResponse({'new_outcome': new_outcome})
+        # else:
             return JsonResponse({'error': 'Invalid index'}, status=400)
 
     return JsonResponse({'error': 'Invalid request'}, status=400)

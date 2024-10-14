@@ -6,7 +6,7 @@ from .utils.pdf_utils import read_pdf
 from .models import Courses
 import logging
 logging.basicConfig(level=logging.WARNING)
-
+from django.conf import settings
 logger = logging.getLogger(__name__)
 
 
@@ -32,7 +32,7 @@ def generate_course_title_and_description(course_id):
                     
                     """
     if course.available_material:
-        pdf_path = 'http://127.0.0.1:8000' + str(course.available_material.url)
+        pdf_path = f"{settings.BASE_URL}{course.available_material.url}"
         pdf= read_pdf(pdf_path)
         chunks = create_chunks(pdf, chunk_size=len(pdf))  # Split into chunks of 500 words
         available_material = "\n".join([generate_summary(chunk) for chunk in chunks])
@@ -305,6 +305,7 @@ def generate_summary(text_chunk):
     """
     response = ollama.generate(model='llama3', prompt=prompt)
     return response.get('response', "")
+
 def create_chunks(text, chunk_size=1000):
     """
     Splits a long text into chunks of a specific size.
