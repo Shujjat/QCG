@@ -5,7 +5,8 @@ from .views import *
 
 router = routers.DefaultRouter()
 router.register(r'api/content-listings', ContentListingViewSet)
-router.register(r'api/contents', ContentViewSet)
+router.register(r'api/quizzes', QuizViewSet)
+
 
 urlpatterns = [
     path('', include(router.urls)),
