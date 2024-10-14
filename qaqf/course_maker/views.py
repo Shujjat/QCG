@@ -1,7 +1,6 @@
 # course_maker/views.py
 import json
 import re
-
 from rest_framework.views import APIView
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
@@ -12,8 +11,6 @@ from rest_framework import generics, viewsets
 from rest_framework.response import Response
 from .models import Courses, LearningOutcome,Content,ContentListing,Quiz
 from .serializers import CourseSerializer, LearningOutcomeSerializer, ContentSerializer, ContentListingSerializer,QuizSerializer
-#from .ollama_helper import *
-
 from llm.llm import LLM
 from rest_framework import status
 import subprocess
