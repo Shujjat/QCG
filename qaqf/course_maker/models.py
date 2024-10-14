@@ -79,6 +79,7 @@ class ContentListing(models.Model):
 
 
 class Content(models.Model):
+
     content_listing = models.ForeignKey(ContentListing, on_delete=models.CASCADE, related_name='contents')
 
     TYPE_CHOICES = [
