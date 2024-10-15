@@ -11,6 +11,7 @@ import time
 from course_maker.models import Courses
 from course_maker.utils.pdf_utils import read_pdf
 from .models import LoggingEntry
+from .PromptBuilder import PromptBuilder
 import logging
 logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
@@ -19,6 +20,8 @@ class LLM:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.INFO)
+        self.prompt_builder = PromptBuilder()
+
 
     # Utility function for logging to DB
     def log_to_db(self, function_name, start_time, end_time=None, status='Started'):
@@ -127,7 +130,18 @@ class LLM:
                 Also, output should be in the following format:
                 Title: <Course Title>
                 Description: <Course Description>"""
+        # Define task description and output format
+        task_description = "generate a course title and a detailed description"
+        output_format = """
+               Title: <Course Title>
+               Description: <Course Description>
+               """
 
+        # Build the full prompt using the PromptBuilder
+        prompt_2 = self.prompt_builder.build_full_prompt(task_description, course, output_format)
+        logger.info(prompt)
+        logger.info(prompt_2)
+        sys.exit()
         try:
             generated_text = self.generate_response(model='llama3', prompt=prompt)
 
@@ -486,3 +500,24 @@ class LLM:
         except Exception as e:
             logger.error(f"Error in generate_response: {e}")
             return ""
+    def compare_prompts(self,prompt, prompt_2):
+        import difflib
+
+        logger.info(f"Prompt 1: {prompt}")
+        logger.info(f"Prompt 2: {prompt_2}")
+
+        if prompt == prompt_2:
+            logger.info("The prompts are identical.")
+        else:
+            logger.info("The prompts are different. Here are the differences:")
+
+            diff = difflib.unified_diff(
+                prompt.splitlines(),
+                prompt_2.splitlines(),
+                lineterm="",
+                fromfile='prompt',
+                tofile='prompt_2'
+            )
+
+            for line in diff:
+                logger.info(line)
