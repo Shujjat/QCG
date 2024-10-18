@@ -94,6 +94,7 @@
 
     <!-- Footer -->
     <footer class="footer">
+        <div id="ollama-status">Checking Ollama status...</div>
         <p>&copy; 2024 Course Creation Wizard | All Rights Reserved</p>
     </footer>
 
@@ -104,11 +105,13 @@
     <!-- AdminLTE JS -->
     <script src="{% static 'AdminLTE/js/adminlte.min.js' %}"></script>
 
+
+
+    {% block extra_js %}
+    <script src="{% static './ollama_status.js' %}"></script>
     <script>
         checkOllamaStatus(); // To handle Ollama status check and auto-start
     </script>
-
-    {% block extra_js %}
     <!-- Additional JS for specific pages -->
     {% endblock %}
 
