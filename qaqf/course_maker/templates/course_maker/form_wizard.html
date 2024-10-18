@@ -4,17 +4,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Course Creation Wizard</title>
+    <title>{% block title %}Course Creation Wizard{% endblock %}</title>
     <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
 
+    <!-- AdminLTE CSS -->
+    <link rel="stylesheet" href="{% static 'AdminLTE/css/adminlte.min.css' %}">
 
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KE6tbwr25q5Fv7uME6BU6h2HhtXb1wFTnxJVZb8VSKq0kTgyXXpVqvBgKjeWCqH3" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css">
 
-    <!-- jQuery for AJAX -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="{% static 'AdminLTE/plugins/fontawesome-free/css/all.min.css' %}">
 
+    <!-- Custom CSS -->
     <style>
+        .navbar-custom {
+            background-color: #343a40;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #f39c12 !important;
+        }
+
+        .nav-link {
+            color: white !important;
+        }
+
+        .footer {
+            background-color: #343a40;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+
         #ollama-status {
             position: fixed;
             bottom: 10px;
@@ -26,111 +50,67 @@
             font-weight: bold;
         }
     </style>
+
+    {% block extra_css %}
+    <!-- Add page-specific CSS here -->
+    {% endblock %}
 </head>
-<body>
-    <!-- Ollama Status Indicator -->
-    <div id="ollama-status">Checking Ollama status...</div>
+<body class="hold-transition layout-top-nav">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Course Wizard</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Courses</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">About Us</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contact</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
     <!-- Main Content -->
-    <div class="container mt-5">
-         {% block content %}
-        {% endblock %}
+    <div class="content-wrapper">
+        <div class="container mt-5">
+            {% block content %}
+            <!-- Content will be injected here by child templates -->
+            {% endblock %}
+        </div>
     </div>
 
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ wizard.management_form }}
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2024 Course Creation Wizard | All Rights Reserved</p>
+    </footer>
 
-        <!-- This renders the current step’s form fields -->
-        {{ form.as_p }}
-
-        <div class="wizard-navigation">
-            {% if wizard.steps.prev %}
-                <button type="submit" name="wizard_goto_step" value="{{ wizard.steps.prev }}">Previous</button>
-            {% endif %}
-
-            {% if wizard.steps.current == wizard.steps.last %}
-                <button type="submit">Finish</button>
-            {% else %}
-                <button type="submit">Next</button>
-            {% endif %}
-        </div>
-    </form>
-
+    <!-- jQuery -->
+    <script src="{% static 'AdminLTE/plugins/jquery/jquery.min.js' %}"></script>
     <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2zNkS7hVDPHJo6mgkJmV6EZG8rryUCu1pM5rV3cjjIUqfRxXPG5QK7tmYp" crossorigin="anonymous"></script>
+    <script src="{% static 'AdminLTE/plugins/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <!-- AdminLTE JS -->
+    <script src="{% static 'AdminLTE/js/adminlte.min.js' %}"></script>
 
     <script>
-        function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-    const csrftoken = getCookie('csrftoken');
-    function checkOllamaStatus() {
-        $.ajax({
-            url: "{% url 'ollama_status' %}",
-            method: "GET",
-            success: function(data) {
-                let statusElement = document.getElementById("ollama-status");
-                if (data.status === "running") {
-                    statusElement.textContent = "Ollama is running";
-                    statusElement.style.color = "green";
-                } else if (data.status === "stopped") {
-                    statusElement.textContent = "Ollama is stopped";
-                    statusElement.style.color = "red";
+        checkOllamaStatus(); // To handle Ollama status check and auto-start
+    </script>
 
-                    // Attempt to start Ollama if not running
-                    startOllamaService();
-                } else {
-                    statusElement.textContent = "Error checking Ollama status";
-                    statusElement.style.color = "orange";
-                }
-            },
-            error: function() {
-                let statusElement = document.getElementById("ollama-status");
-                statusElement.textContent = "Failed to connect to Ollama service";
-                statusElement.style.color = "orange";
-            }
-        });
-    }
-
-    function startOllamaService() {
-    $.ajax({
-        url: "{% url 'run_ollama' %}",
-        method: "POST",
-        headers: {
-            'X-CSRFToken': csrftoken
-        },
-        success: function(data) {
-            let statusElement = document.getElementById("ollama-status");
-            if (data.status === "started") {
-                statusElement.textContent = "Ollama started successfully";
-                statusElement.style.color = "green";
-            }
-        },
-        error: function(xhr) {
-            let statusElement = document.getElementById("ollama-status");
-            statusElement.textContent = "Failed to start Ollama: " + xhr.responseJSON.message;
-            statusElement.style.color = "orange";
-        }
-    });
-}
-
-    // Call the function initially and set an interval to check periodically
-    checkOllamaStatus();
-    setInterval(checkOllamaStatus, 5000); // Check every 5 seconds
-
-</script>
+    {% block extra_js %}
+    <!-- Additional JS for specific pages -->
+    {% endblock %}
 
 </body>
 </html>

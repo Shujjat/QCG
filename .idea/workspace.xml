@@ -5,26 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7cf03e74-88c4-4af5-b6c0-cfbca8a72de4" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/qaqf/llm/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qaqf/llm/admin.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qaqf/llm/apps.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qaqf/llm/llm.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qaqf/llm/migrations/0001_initial.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qaqf/llm/migrations/0002_loggingentry.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qaqf/llm/migrations/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qaqf/llm/models.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qaqf/llm/serializers.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qaqf/llm/tests.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qaqf/llm/urls.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qaqf/llm/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/QAQF.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/QAQF.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug.log" beforeDir="false" afterPath="$PROJECT_DIR$/debug.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/ollama_helper.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/ollama_helper.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/templates/course_maker/step3.html" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/templates/course_maker/step3.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/templates/course_maker/step4.html" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/templates/course_maker/step4.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qaqf/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/qaqf/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/qaqf/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/qaqf/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/qaqf/urls.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,9 +25,21 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Shujjat&quot;
+  }
+}</component>
   <component name="GithubDefaultAccount">
     <option name="defaultAccountId" value="10e2a388-0ec1-4de2-bdd8-84847941d247" />
   </component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Shujjat/QCG.git&quot;,
+    &quot;accountId&quot;: &quot;2d217d67-5780-44d1-99ec-f9d007879c97&quot;
+  }
+}</component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
 }</component>
@@ -55,15 +51,15 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.Run Server.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "LLM-App",
-    "last_opened_file_path": "E:/Shujjat.com/Projects/WhatsApp Automation/Advanced-WhatsApp-Sender-main",
-    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.Run Server.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;ImprovingHTMLCSS&quot;,
+    &quot;last_opened_file_path&quot;: &quot;E:/Shujjat.com/Projects/WhatsApp Automation/Advanced-WhatsApp-Sender-main&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="E:\Shujjat.com\Projects\QAQF\qaqf" />
@@ -98,7 +94,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-babbdf50b680-746f403e7f0c-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-241.15989.155" />
+        <option value="bundled-python-sdk-0e3be3396995-c546a90a8094-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-242.23339.19" />
       </set>
     </attachedChunks>
   </component>
