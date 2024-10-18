@@ -12,6 +12,7 @@ from course_maker.models import Courses
 from course_maker.utils.pdf_utils import read_pdf
 from .models import LoggingEntry
 from .PromptBuilder import PromptBuilder
+from .utils import *
 import logging
 logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
@@ -123,13 +124,7 @@ class LLM:
 
                     """
 
-        prompt += """ Duration of Course: {course.duration}
-                Target Knowledge Level to achieve: {course.knowledge_level}
-                Ensure the generated title and description is correct and relevant. 
 
-                Also, output should be in the following format:
-                Title: <Course Title>
-                Description: <Course Description>"""
         # Define task description and output format
         task_description = "generate a course title and a detailed description"
         output_format = """
@@ -138,14 +133,12 @@ class LLM:
                """
 
         # Build the full prompt using the PromptBuilder
-        prompt_2 = self.prompt_builder.build_full_prompt(task_description, course, output_format)
+        prompt = self.prompt_builder.build_full_prompt(task_description, course, output_format)
+
         logger.info(prompt)
-        logger.info(prompt_2)
-        sys.exit()
+
         try:
             generated_text = self.generate_response(model='llama3', prompt=prompt)
-
-
             title, description = "", ""
 
             # Use regex to extract the title and description
@@ -169,7 +162,7 @@ class LLM:
         """
         course = Courses.objects.get(pk=course_id)
         # Define the prompt based on the course title and description
-        prompt = f"""
+        prompt_1 = f"""
         You are a course designer. Based on the given course title: '{course.course_title}' 
         and description: '{course.course_description}', generate several learning outcomes 
         that should a learner achieve.
@@ -197,15 +190,35 @@ class LLM:
         Only return the list of learning outcomes with tags and sub-items.
         """
         logger.info("Prompt")
+        task_description = """
+                            Based on the given course title: '{course.course_title}' 
+                            and description: '{course.course_description}', generate several learning outcomes 
+                            that should a learner achieve.
+        """
+        output_format = """
+                Ensure the learning outcomes are practical, understandable, and related to the Available Study Material.
+                Tag each learning outcome with a unique letter starting from 'A', and for each outcome, provide sub-items.
+                Please provide the outcomes in the following format:
+               - Outcome A: [Main learning outcome for A]
+                   - A1: [First sub-item for A]
+                   - A2: [Second sub-item for A]
+               - Outcome B: [Main learning outcome for B]
+                   - B1: [First sub-item for B]
+                   - B2: [Second sub-item for B]
+                and so on
 
+               Only return the list of learning outcomes with tags and sub-items.
+        """
+
+        prompt = self.prompt_builder.build_full_prompt(task_description, course, output_format)
         logger.info(str(prompt))
 
+
+
+        #sys.exit()
         try:
             # Generate response using Ollama locally
             generated_text = self.generate_response(model='llama3', prompt=prompt)
-
-
-
             # Extract outcomes and sub-items using regex
             learning_outcomes = []
             current_outcome = None
@@ -262,7 +275,7 @@ class LLM:
         # Define the prompt based on the course title and description
         course = Courses.objects.get(pk=course_id)
 
-        prompt = f"""
+        prompt_1 = f"""
         You are a course content developer. Based on the given course title:'{course.course_title}'
         and description:'{course.course_description}', 
         and study material:
@@ -305,7 +318,68 @@ class LLM:
 
         Only return the list of modules, items, and their attributes in this structured format.
         """
-        logger.info("prompt \n" + str(prompt))
+
+
+        task_description = """
+                                    Based on the given course title: '{course.course_title}' 
+                                    and description: '{course.course_description}',  
+                            """
+        output_format="""
+                        generate a detailed content structure.
+                        The content should be organized into modules, with each module containing content items.
+                        Each content item should contain the following attributes: Content Item, Type, Duration, Key Points,
+                        and Script.
+                
+                        - Content Item: This is the title of the content item.
+                        - Type: It should be either 'Video' or 'Reading'.
+                        - Duration: Duration in minutes for videos, optional for readings.
+                        - Key Points: Highlight important takeaways for each content item.
+                        - Script: Provide a brief script, if applicable.
+                
+                        Provide the content in the following structured format:
+                
+                        Module 1: [Module Title]
+                          - Content Item 1.1: [Title]
+                            Type: [Video/Reading]
+                            Duration: [Duration in minutes, if applicable]
+                            Key Points: [List key points, if any]
+                            Script: [Provide a script, if any]
+                
+                          - Content Item 1.2: [Title]
+                            Type: [Video/Reading]
+                            Duration: [Duration in minutes, if applicable]
+                            Key Points: [List key points, if any]
+                            Script: [Provide a script, if any]
+                
+                        Module 2: [Module Title]
+                          - Content Item 2.1: [Title]
+                            Type: [Video/Reading]
+                            Duration: [Duration in minutes, if applicable]
+                            Key Points: [List key points, if any]
+                            Script: [Provide a script, if any]
+                
+                        Only return the list of modules, items, and their attributes in this structured format.
+                        """
+        prompt = self.prompt_builder.build_full_prompt(task_description, course, output_format)
+        logger.info("\n" + "=" * 50)
+        logger.info("         Comparison of Prompts")
+        logger.info("=" * 50 + "\n")
+
+        logger.info(compare_texts(prompt, prompt_1))
+
+        logger.info("\n" + "=" * 50)
+        logger.info("         Original Prompt")
+        logger.info("=" * 50 + "\n")
+
+        logger.info(f"prompt:\n{prompt}\n")
+
+        logger.info("\n" + "=" * 50)
+        logger.info("         Built Prompt")
+        logger.info("=" * 50 + "\n")
+
+        logger.info(f"prompt_1:\n{prompt_1}\n")
+
+        logger.info("=" * 50 + "\n")
 
         try:
             # Generate response using Ollama locally
@@ -500,24 +574,3 @@ class LLM:
         except Exception as e:
             logger.error(f"Error in generate_response: {e}")
             return ""
-    def compare_prompts(self,prompt, prompt_2):
-        import difflib
-
-        logger.info(f"Prompt 1: {prompt}")
-        logger.info(f"Prompt 2: {prompt_2}")
-
-        if prompt == prompt_2:
-            logger.info("The prompts are identical.")
-        else:
-            logger.info("The prompts are different. Here are the differences:")
-
-            diff = difflib.unified_diff(
-                prompt.splitlines(),
-                prompt_2.splitlines(),
-                lineterm="",
-                fromfile='prompt',
-                tofile='prompt_2'
-            )
-
-            for line in diff:
-                logger.info(line)

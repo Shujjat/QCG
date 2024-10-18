@@ -58,3 +58,4 @@ class PromptBuilder:
         epilog = self.build_epilog(output_format)
 
         return prolog + central + epilog
+
