@@ -360,7 +360,7 @@ class LLM:
             logger.error(f"Error communicating with Ollama API: {e}")
             return []
     @log_execution
-    def generate_summary(text_chunk):
+    def generate_summary(self,text_chunk):
         prompt = f"""
         Summarize the key points of the following book excerpt concisely and informatively:
             {text_chunk}
@@ -368,7 +368,7 @@ class LLM:
         response = ollama.generate(model='llama3', prompt=prompt)
         return response.get('response', "")
     @log_execution
-    def create_chunks(text, chunk_size=1000):
+    def create_chunks(self,text, chunk_size=1000):
         """
         Splits a long text into chunks of a specific size.
 

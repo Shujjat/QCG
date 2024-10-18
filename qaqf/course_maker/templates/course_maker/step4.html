@@ -1,14 +1,43 @@
 {% extends "course_maker/form_wizard.html" %}
 
+{% block title %}Step 4: Contents{% endblock %}
+
 {% block content %}
-<h2>Step 4: Generate Contents</h2>
-<form method="POST" class="form-horizontal">
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white text-center">
+                    Step 4: Contents
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ wizard.management_form }}
 
+                        <!-- Render current step’s form fields -->
+                        <div class="mb-3">
+                            {{ form.as_p }}
+                        </div>
 
-    <div class="text-right">
-        <input type="submit" value="Next" class="btn btn-success">
+                        <!-- Wizard navigation -->
+                        <div class="wizard-navigation d-flex justify-content-between">
+                            {% if wizard.steps.prev %}
+                                <button type="submit" name="wizard_goto_step" value="{{ wizard.steps.prev }}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Previous
+                                </button>
+                            {% endif %}
+
+                            {% if wizard.steps.current == wizard.steps.last %}
+                                <button type="submit" class="btn btn-primary">Finish <i class="fas fa-check-circle"></i></button>
+                            {% else %}
+                                <button type="submit" class="btn btn-success">Next <i class="fas fa-arrow-right"></i></button>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-</form>
-
-
+</div>
 {% endblock %}
