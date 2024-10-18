@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="7cf03e74-88c4-4af5-b6c0-cfbca8a72de4" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/templates/course_maker/step5.html" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/templates/course_maker/step5.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qaqf/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/db.sqlite3" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -23,9 +24,21 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Shujjat&quot;
+  }
+}</component>
   <component name="GithubDefaultAccount">
     <option name="defaultAccountId" value="10e2a388-0ec1-4de2-bdd8-84847941d247" />
   </component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Shujjat/QCG.git&quot;,
+    &quot;accountId&quot;: &quot;2d217d67-5780-44d1-99ec-f9d007879c97&quot;
+  }
+}</component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
 }</component>
@@ -41,7 +54,7 @@
   &quot;keyToString&quot;: {
     &quot;Python.Run Server.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;Improving-Prompts&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;ImprovingHTMLCSS&quot;,
     &quot;last_opened_file_path&quot;: &quot;E:/Shujjat.com/Projects/WhatsApp Automation/Advanced-WhatsApp-Sender-main&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;
   }
@@ -80,7 +93,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-babbdf50b680-746f403e7f0c-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-241.15989.155" />
+        <option value="bundled-python-sdk-0e3be3396995-c546a90a8094-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-242.23339.19" />
       </set>
     </attachedChunks>
   </component>
