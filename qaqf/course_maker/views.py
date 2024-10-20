@@ -249,18 +249,18 @@ class CourseViewSet(ViewSet):
     @action(detail=False, methods=['get'], url_path='regenerate-items')
     def regenerate_items(self, request):
 
-        course_id = request.data.get('course_id')
-        item_type = request.data.get('item_type')
-        item_id = request.data.get('item_id')
+        course_id = request.query_params.get('course_id')
+        item_type = request.query_params.get('item_type')
+        item_id = request.query_params.get('item_id')
         missing_fields = []
 
         # Check for missing fields
         if not course_id:
             missing_fields.append('course_id')
-        if not item_type:
-            missing_fields.append('item_type')
-        if not item_id:
-            missing_fields.append('item_id')
+        # if not item_type:
+        #     missing_fields.append('item_type')
+        # if not item_id:
+        #     missing_fields.append('item_id')
 
         # If there are missing fields, return an error response
         if missing_fields:
@@ -278,7 +278,7 @@ class CourseViewSet(ViewSet):
             regenerated_item = llm_instance.generate_content_listing(course_id,item_id)
 
         # Return the regenerated item in a JSON response
-        return JsonResponse({'regenerated_item': regenerated_item}, status=200)
+        return JsonResponse({f'regenerated_item ({item_type}):': regenerated_item}, status=200)
 
 
 # List and Create API view for Courses

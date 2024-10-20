@@ -60,7 +60,7 @@ class PromptBuilder:
             item_to_change = f"""
                                 This Content Listing should be modified and improved: '{learning_outcome}'
                             """
-    def build_full_prompt(self, task_description, course, output_format,item_type,item_id):
+    def build_full_prompt(self, task_description, course, output_format,item_type=None,item_id=None):
 
         """
         Combines the prolog, central, and epilog to create the full prompt.
