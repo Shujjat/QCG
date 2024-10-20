@@ -5,10 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7cf03e74-88c4-4af5-b6c0-cfbca8a72de4" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/qaqf/static/ollama_status.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/templates/course_maker/form_wizard.html" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/templates/course_maker/form_wizard.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qaqf/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/db.sqlite3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/llm/PromptBuilder.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/llm/PromptBuilder.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/llm/llm.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/llm/llm.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/llm/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/llm/utils.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,7 +58,7 @@
   &quot;keyToString&quot;: {
     &quot;Python.Run Server.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;Fixing-Ollama-indicator&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;regeneration-facility&quot;,
     &quot;last_opened_file_path&quot;: &quot;E:/Shujjat.com/Projects/WhatsApp Automation/Advanced-WhatsApp-Sender-main&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;
   }
