@@ -188,7 +188,7 @@ class LLM:
         """
 
         prompt = self.prompt_builder.build_full_prompt(task_description, course, output_format,'learning_outcome', item_id)
-
+        logger.info(prompt)
         try:
             # Generate response using Ollama locally
             generated_text = self.generate_response(model='llama3.2', prompt=prompt)

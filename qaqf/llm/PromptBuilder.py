@@ -55,10 +55,13 @@ class PromptBuilder:
         elif item_type == "description":
             item_to_change = f"This description already exists and must be modified: {course.course_description}"
         elif item_type == "learning_outcome":
-            learning_outcome = LearningOutcome.objects.get(id=item_id)
-            item_to_change = f"""
-                                This Learning outcome should be modified and improved: '{learning_outcome}'
-                            """
+            logger.debug(item_type)
+            logger.debug(item_id)
+            # learning_outcome = LearningOutcome.objects.get(id=item_id)
+            # item_to_change = f"""
+            #                     This Learning outcome should be modified and improved: '{learning_outcome}'
+            #                 """
+            item_to_change=""
         elif item_type == "content_listing":
             learning_outcome = LearningOutcome.objects.get(id=item_id)
             item_to_change = f"""
