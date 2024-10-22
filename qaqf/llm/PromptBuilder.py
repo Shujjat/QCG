@@ -57,11 +57,12 @@ class PromptBuilder:
         elif item_type == "learning_outcome":
             logger.debug(item_type)
             logger.debug(item_id)
-            # learning_outcome = LearningOutcome.objects.get(id=item_id)
-            # item_to_change = f"""
-            #                     This Learning outcome should be modified and improved: '{learning_outcome}'
-            #                 """
-            item_to_change=""
+            learning_outcome = LearningOutcome.objects.get(id=item_id)
+            item_to_change = f"""
+                                This Learning outcome should be modified and improved: '{learning_outcome.outcome }'
+                                with sub items: '{learning_outcome.sub_items}'
+                            """
+
         elif item_type == "content_listing":
             learning_outcome = LearningOutcome.objects.get(id=item_id)
             item_to_change = f"""
