@@ -2,20 +2,25 @@
 import json
 import re
 from rest_framework.views import APIView
+from rest_framework.decorators import action
+from rest_framework import generics, viewsets,status
+from rest_framework.response import Response
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render
 from formtools.wizard.views import SessionWizardView
+from rest_framework.viewsets import ViewSet
 from .course_wizard_forms import *
-from rest_framework import generics, viewsets
-from rest_framework.response import Response
 from .models import Courses, LearningOutcome,Content,ContentListing,Quiz
 from .serializers import CourseSerializer, LearningOutcomeSerializer, ContentSerializer, ContentListingSerializer,QuizSerializer
 from llm.llm import LLM
-from rest_framework import status
 import subprocess
 import platform
 from django.http import JsonResponse
+import logging
+logging.basicConfig(level=logging.WARNING)
+logger = logging.getLogger(__name__)
+
 llm_instance=LLM()
 # Define the forms for each step
 FORMS = [
@@ -241,6 +246,45 @@ class CourseCreationWizard(SessionWizardView):
 
         return render(self.request, 'course_maker/done.html', {'form_data': form_data})
 
+class CourseViewSet(ViewSet):
+
+    @action(detail=False, methods=['get'], url_path='regenerate-items')
+    def regenerate_items(self, request):
+
+        course_id = request.query_params.get('course_id')
+        item_type = request.query_params.get('item_type')
+        item_id = request.query_params.get('item_id')
+        missing_fields = []
+
+        # Check for missing fields
+        if not course_id:
+            missing_fields.append('course_id')
+        # if not item_type:
+        #     missing_fields.append('item_type')
+        # if not item_id:
+        #     missing_fields.append('item_id')
+
+        # If there are missing fields, return an error response
+        if missing_fields:
+            return Response(
+                {'error': f'Missing required fields: {", ".join(missing_fields)}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        # Call the appropriate method from LLM based on item_type
+        if item_type == 'title' or item_type == 'description':
+            regenerated_item = llm_instance.generate_course_title_and_description(course_id,item_type=item_type)
+            logger.info('regenerated_item')
+            logger.info(regenerated_item)
+
+        elif item_type == 'learning_outcome':
+            regenerated_item = llm_instance.generate_learning_outcomes(course_id,item_id)
+        elif item_type == 'content_listing':
+            regenerated_item = llm_instance.generate_content_listing(course_id,item_id)
+
+        # Return the regenerated item in a JSON response
+
+        return Response({f'regenerated_item ({item_type})': regenerated_item}, status=status.HTTP_200_OK)
+
 
 # List and Create API view for Courses
 class CourseListAPIView(generics.ListCreateAPIView):
@@ -253,33 +297,6 @@ class CourseDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CourseSerializer
     lookup_field = 'id'
 
-def regenerate_learning_outcome(request):
-    if request.method == 'POST':
-        index = int(request.POST.get('index', 0))  # Get index as an integer, default to 0 if not provided
-
-        # Retrieve course_title and course_description based on session or database
-        course_id = request.session.get('course_id')  # Assuming course_id is saved in session
-        if course_id:
-            try:
-                course = Courses.objects.get(id=int(course_id))
-                course_title = course.course_title
-                course_description = course.course_description
-            except Courses.DoesNotExist:
-                return JsonResponse({'error': 'Course not found'}, status=404)
-        else:
-            return JsonResponse({'error': 'Course ID not found in session'}, status=400)
-
-        # Generate new learning outcomes
-        # new_outcomes = generate_learning_outcomes(course_title, course_description)
-        #
-        # # Ensure the index is within range
-        # if 0 <= index < len(new_outcomes):
-        #     new_outcome = new_outcomes[index]['outcome']
-        #     return JsonResponse({'new_outcome': new_outcome})
-        # else:
-            return JsonResponse({'error': 'Invalid index'}, status=400)
-
-    return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
 class CourseLearningOutcomesAPIView(APIView):
