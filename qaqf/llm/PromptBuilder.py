@@ -49,8 +49,12 @@ class PromptBuilder:
         {output_format}
         """
         return epilog
-    def build_item_to_change(self,item_type,item_id):
-        if item_type == "learning_outcome":
+    def build_item_to_change(self,course,item_type,item_id=None):
+        if item_type=="title":
+            item_to_change=f"This title already exists and must be modified: {course.course_title}"
+        elif item_type == "description":
+            item_to_change = f"This description already exists and must be modified: {course.course_description}"
+        elif item_type == "learning_outcome":
             learning_outcome = LearningOutcome.objects.get(id=item_id)
             item_to_change = f"""
                                 This Learning outcome should be modified and improved: '{learning_outcome}'
@@ -60,6 +64,9 @@ class PromptBuilder:
             item_to_change = f"""
                                 This Content Listing should be modified and improved: '{learning_outcome}'
                             """
+        else:
+            item_to_change= ""
+        return item_to_change
     def build_full_prompt(self, task_description, course, output_format,item_type=None,item_id=None):
 
         """
@@ -69,9 +76,11 @@ class PromptBuilder:
         prolog = self.build_prolog(task_description)
         central = self.build_central(course)
         epilog = self.build_epilog(output_format)
-        if item_id:
-            item_to_change = self.build_item_to_change(item_type, item_id)
-            return prolog + item_to_change + central + epilog
-        else:
-            return prolog  + central + epilog
+
+        logger.info("8888888888888888888888888888888888888888888888888888888888888888888")
+        item_to_change = self.build_item_to_change(course,item_type, item_id)
+        logger.info("8888888888888888888888888888888888888888888888888888888888888888888")
+
+        return prolog + str(item_to_change) + central + epilog
+
 

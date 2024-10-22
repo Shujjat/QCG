@@ -10,15 +10,17 @@ from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render
 from formtools.wizard.views import SessionWizardView
 from rest_framework.viewsets import ViewSet
-
 from .course_wizard_forms import *
 from .models import Courses, LearningOutcome,Content,ContentListing,Quiz
 from .serializers import CourseSerializer, LearningOutcomeSerializer, ContentSerializer, ContentListingSerializer,QuizSerializer
 from llm.llm import LLM
 import subprocess
 import platform
-from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
+import logging
+logging.basicConfig(level=logging.WARNING)
+logger = logging.getLogger(__name__)
+
 llm_instance=LLM()
 # Define the forms for each step
 FORMS = [
@@ -270,7 +272,9 @@ class CourseViewSet(ViewSet):
             )
         # Call the appropriate method from LLM based on item_type
         if item_type == 'title' or item_type == 'description':
-            regenerated_item = llm_instance.generate_course_title_and_description(course_id)
+            regenerated_item = llm_instance.generate_course_title_and_description(course_id,item_type=item_type)
+            logger.info('regenerated_item')
+            logger.info(regenerated_item)
 
         elif item_type == 'learning_outcome':
             regenerated_item = llm_instance.generate_learning_outcomes(course_id,item_id)
@@ -278,7 +282,8 @@ class CourseViewSet(ViewSet):
             regenerated_item = llm_instance.generate_content_listing(course_id,item_id)
 
         # Return the regenerated item in a JSON response
-        return JsonResponse({f'regenerated_item ({item_type}):': regenerated_item}, status=200)
+
+        return Response({f'regenerated_item ({item_type})': regenerated_item}, status=status.HTTP_200_OK)
 
 
 # List and Create API view for Courses

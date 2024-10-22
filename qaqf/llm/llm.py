@@ -1,7 +1,6 @@
 # LLM Implementation.py
 import json
 import sys
-
 from django.conf import settings
 from datetime import datetime
 import requests
@@ -88,7 +87,7 @@ class LLM:
         return wrapper
 
     @log_execution
-    def generate_course_title_and_description(self,course_id):
+    def generate_course_title_and_description(self,course_id,item_type=None):
         """
         Generates a course title and description based on Step 1 data using LLM3 of Ollama.
         """
@@ -96,18 +95,21 @@ class LLM:
 
         # Retrieve the course using course_id
         course = Courses.objects.get(pk=course_id)
+        # prompt = f"""
+        #                 Given the following course information,
+        #             """
+        # if item_type:
+        #     prompt+=" re"
+        # prompt += f"""generate a course title and a detailed description:
+        #         """
+        # prompt += f"""generate a course title and a detailed description:
+        #                        About Course: {course.course_description}
+        #                        Course Type: {course.course_type}
+        #                        Previous educational level: {course.prerequisite_knowledge}
+        #                        Learners Details: {course.participants_info}
+        #                        There is extensive study material available for this course. Please use it as needed to generate a relevant and coherent response:
+        #                        """
 
-        # Check if the available material is a valid file (assuming it's a FileField)
-        prompt = f"""
-                        Given the following course information, generate a course title and a detailed description:
-                        About Course: {course.course_description}
-                        Course Type: {course.course_type}
-                        Previous educational level: {course.prerequisite_knowledge}
-                        Learners Details: {course.participants_info}
-                        There is extensive study material available for this course. Please use it as needed to generate a relevant and coherent response:
-
-
-                        """
         if course.available_material:
 
             pdf_path = f"{settings.BASE_URL}{course.available_material.url}"
@@ -116,13 +118,13 @@ class LLM:
             available_material = "\n".join([self.generate_summary(chunk) for chunk in chunks])
             course.available_material_content = available_material
             course.save()
-            prompt += f"""
-
-                [Available Study Material: Start]
-                {available_material}
-                [Available Study Material: End]
-
-                    """
+            # prompt += f"""
+            #
+            #     [Available Study Material: Start]
+            #     {available_material}
+            #     [Available Study Material: End]
+            #
+            #         """
 
 
         # Define task description and output format
@@ -133,12 +135,12 @@ class LLM:
                """
 
         # Build the full prompt using the PromptBuilder
-        prompt = self.prompt_builder.build_full_prompt(task_description, course, output_format)
+        prompt = self.prompt_builder.build_full_prompt(task_description, course, output_format,item_type)
 
         logger.info(prompt)
 
         try:
-            generated_text = self.generate_response(model='llama3', prompt=prompt)
+            generated_text = self.generate_response(model='llama3.2', prompt=prompt)
             title, description = "", ""
 
             # Use regex to extract the title and description
@@ -189,7 +191,7 @@ class LLM:
 
         try:
             # Generate response using Ollama locally
-            generated_text = self.generate_response(model='llama3', prompt=prompt)
+            generated_text = self.generate_response(model='llama3.2', prompt=prompt)
             # Extract outcomes and sub-items using regex
             learning_outcomes = []
             current_outcome = None
@@ -291,7 +293,7 @@ class LLM:
 
         try:
             # Generate response using Ollama locally
-            generated_text = self.generate_response(model='llama3', prompt=prompt)
+            generated_text = self.generate_response(model='llama3.2', prompt=prompt)
             # Extract content listing using regex
             content_listing = []
             current_module = None
@@ -449,7 +451,7 @@ class LLM:
         # Fetch the model from settings if not provided
         logger.info("Generating response")
         if not model:
-            model = getattr(settings, 'OLLAMA_DEFAULT_MODEL', 'llama3')  # Default to 'llama3' if not set in settings
+            model = getattr(settings, 'OLLAMA_DEFAULT_MODEL', 'llama3.2')  # Default to 'llama3.2' if not set in settings
         logger.info("Model: " + model)
 
         try:
