@@ -23,6 +23,17 @@ class LLM:
         self.logger.setLevel(logging.INFO)
         self.prompt_builder = PromptBuilder()
 
+        self.llm_list = [
+            'Deepseek-Coder',
+            'Llama2-Uncensored',
+            'Dolphin-Mixtral',
+            'Granite-Code',
+            'Openchat',
+            'Reflection',
+            'CodeLlama',
+            'LLAMA3.2'
+        ]
+
 
     # Utility function for logging to DB
     def log_to_db(self, function_name, start_time, end_time=None, status='Started'):
@@ -138,7 +149,7 @@ class LLM:
         logger.info(prompt)
 
         try:
-            generated_text = self.generate_response(model='llama3', prompt=prompt)
+            generated_text = self.generate_response(prompt=prompt)
             title, description = "", ""
 
             # Use regex to extract the title and description
@@ -218,7 +229,7 @@ class LLM:
         #sys.exit()
         try:
             # Generate response using Ollama locally
-            generated_text = self.generate_response(model='llama3', prompt=prompt)
+            generated_text = self.generate_response( prompt=prompt)
             # Extract outcomes and sub-items using regex
             learning_outcomes = []
             current_outcome = None
@@ -383,7 +394,7 @@ class LLM:
 
         try:
             # Generate response using Ollama locally
-            generated_text = self.generate_response(model='llama3', prompt=prompt)
+            generated_text = self.generate_response( prompt=prompt)
             # Extract content listing using regex
             content_listing = []
             current_module = None
@@ -528,6 +539,9 @@ class LLM:
 
 
     def generate_response(self,prompt, model=None):
+        if not model:
+            model=settings.DEFAULT_LLM
+
         """
         Generate a response using the Ollama API, selecting the model dynamically from settings.
 
