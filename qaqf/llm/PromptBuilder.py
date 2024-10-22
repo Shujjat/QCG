@@ -1,7 +1,9 @@
 import logging
 logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
-from course_maker.models import LearningOutcome
+from course_maker.models import LearningOutcome, ContentListing
+
+
 class PromptBuilder:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
@@ -55,8 +57,6 @@ class PromptBuilder:
         elif item_type == "description":
             item_to_change = f"This description already exists and must be modified: {course.course_description}"
         elif item_type == "learning_outcome":
-            logger.debug(item_type)
-            logger.debug(item_id)
             learning_outcome = LearningOutcome.objects.get(id=item_id)
             item_to_change = f"""
                                 This Learning outcome should be modified and improved: '{learning_outcome.outcome }'
@@ -64,9 +64,10 @@ class PromptBuilder:
                             """
 
         elif item_type == "content_listing":
-            learning_outcome = LearningOutcome.objects.get(id=item_id)
+
+            content_listing = ContentListing.objects.get(id=item_id)
             item_to_change = f"""
-                                This Content Listing should be modified and improved: '{learning_outcome}'
+                                This Content Listing should be modified and improved: '{content_listing.content_item}'
                             """
         else:
             item_to_change= ""
@@ -85,6 +86,6 @@ class PromptBuilder:
         item_to_change = self.build_item_to_change(course,item_type, item_id)
         logger.info("8888888888888888888888888888888888888888888888888888888888888888888")
 
-        return prolog + str(item_to_change) + central + epilog
+        return prolog + item_to_change + central + epilog
 
 

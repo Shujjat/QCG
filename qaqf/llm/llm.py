@@ -290,7 +290,7 @@ class LLM:
                         Only return the list of modules, items, and their attributes in this structured format.
                         """
         prompt = self.prompt_builder.build_full_prompt(task_description, course, output_format,'content_listing', item_id)
-
+        logger.info(prompt)
         try:
             # Generate response using Ollama locally
             generated_text = self.generate_response(model='llama3.2', prompt=prompt)
@@ -350,8 +350,7 @@ class LLM:
                 elif script_match and current_module and current_module["contents"]:
                     current_module["contents"][-1]["script"] = script_match.group(1)
 
-            logger.info("=====================generated_text==================")
-            logger.info(generated_text)
+
             return generated_text
 
         except requests.exceptions.RequestException as e:

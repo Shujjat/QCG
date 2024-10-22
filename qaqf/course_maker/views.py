@@ -278,7 +278,7 @@ class CourseViewSet(ViewSet):
 
         elif item_type == 'learning_outcome':
             regenerated_item = llm_instance.generate_learning_outcomes(course_id,item_id)
-        elif item_type == 'content':
+        elif item_type == 'content_listing':
             regenerated_item = llm_instance.generate_content_listing(course_id,item_id)
 
         # Return the regenerated item in a JSON response
