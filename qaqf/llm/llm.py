@@ -1,13 +1,11 @@
 # LLM Implementation.py
-import json
-import sys
 from django.conf import settings
 from datetime import datetime
 import requests
 import ollama
 import re
 import time
-from course_maker.models import Courses
+from course_maker.models import Courses, LearningOutcome
 from course_maker.utils.pdf_utils import read_pdf
 from .models import LoggingEntry
 from .PromptBuilder import PromptBuilder
@@ -88,7 +86,7 @@ class LLM:
         return wrapper
 
     @log_execution
-    def generate_course_title_and_description(self,course_id):
+    def generate_course_title_and_description(self,course_id,item_type=None):
         """
         Generates a course title and description based on Step 1 data using LLM3 of Ollama.
         """
@@ -97,17 +95,6 @@ class LLM:
         # Retrieve the course using course_id
         course = Courses.objects.get(pk=course_id)
 
-        # Check if the available material is a valid file (assuming it's a FileField)
-        prompt = f"""
-                        Given the following course information, generate a course title and a detailed description:
-                        About Course: {course.course_description}
-                        Course Type: {course.course_type}
-                        Previous educational level: {course.prerequisite_knowledge}
-                        Learners Details: {course.participants_info}
-                        There is extensive study material available for this course. Please use it as needed to generate a relevant and coherent response:
-
-
-                        """
         if course.available_material:
 
             pdf_path = f"{settings.BASE_URL}{course.available_material.url}"
@@ -116,13 +103,6 @@ class LLM:
             available_material = "\n".join([self.generate_summary(chunk) for chunk in chunks])
             course.available_material_content = available_material
             course.save()
-            prompt += f"""
-
-                [Available Study Material: Start]
-                {available_material}
-                [Available Study Material: End]
-
-                    """
 
 
         # Define task description and output format
@@ -133,7 +113,7 @@ class LLM:
                """
 
         # Build the full prompt using the PromptBuilder
-        prompt = self.prompt_builder.build_full_prompt(task_description, course, output_format)
+        prompt = self.prompt_builder.build_full_prompt(task_description, course, output_format,item_type)
 
         logger.info(prompt)
 
@@ -156,40 +136,15 @@ class LLM:
             return "", ""
 
     @log_execution
-    def generate_learning_outcomes(self,course_id):
+    def generate_learning_outcomes(self,course_id,item_id=None):
         """
         Generates learning outcomes and sub-items based on course title and description using LLM3 of Ollama.
         """
         course = Courses.objects.get(pk=course_id)
+
+
         # Define the prompt based on the course title and description
-        prompt_1 = f"""
-        You are a course designer. Based on the given course title: '{course.course_title}' 
-        and description: '{course.course_description}', generate several learning outcomes 
-        that should a learner achieve.
 
-        There is extensive study material available for this course. Please use it as 
-        needed to generate a relevant and coherent learning outcomes:
-
-        [Available Study Material: Start]
-        {course.available_material_content}
-        [Available Study Material: End]
-        Ensure the learning outcomes are practical, understandable, and related to the Available Study Material.
-
-        Tag each learning outcome with a unique letter starting from 'A', and for each outcome, provide sub-items.
-
-
-        Please provide the outcomes in the following format:
-        - Outcome A: [Main learning outcome for A]
-            - A1: [First sub-item for A]
-            - A2: [Second sub-item for A]
-        - Outcome B: [Main learning outcome for B]
-            - B1: [First sub-item for B]
-            - B2: [Second sub-item for B]
-        and so on
-
-        Only return the list of learning outcomes with tags and sub-items.
-        """
-        logger.info("Prompt")
         task_description = """
                             Based on the given course title: '{course.course_title}' 
                             and description: '{course.course_description}', generate several learning outcomes 
@@ -210,12 +165,8 @@ class LLM:
                Only return the list of learning outcomes with tags and sub-items.
         """
 
-        prompt = self.prompt_builder.build_full_prompt(task_description, course, output_format)
-        logger.info(str(prompt))
-
-
-
-        #sys.exit()
+        prompt = self.prompt_builder.build_full_prompt(task_description, course, output_format,'learning_outcome', item_id)
+        logger.info(prompt)
         try:
             # Generate response using Ollama locally
             generated_text = self.generate_response( prompt=prompt)
@@ -265,7 +216,7 @@ class LLM:
             return []
 
     @log_execution
-    def generate_content_listing(self,course_id):
+    def generate_content_listing(self,course_id,item_id=None):
         """
         Generates a structured content listing based on course title and description using LLM3 of Ollama.
         The content is categorized into modules, which include items and sub-items.
@@ -274,50 +225,6 @@ class LLM:
 
         # Define the prompt based on the course title and description
         course = Courses.objects.get(pk=course_id)
-
-        prompt_1 = f"""
-        You are a course content developer. Based on the given course title:'{course.course_title}'
-        and description:'{course.course_description}', 
-        and study material:
-        [Available Study Material: Start]
-        {course.available_material_content}
-        [Available Study Material: End]
-
-        generate a detailed content structure.
-        The content should be organized into modules, with each module containing content items.
-        Each content item should contain the following attributes: Content Item, Type, Duration, Key Points,
-        and Script.
-
-        - Content Item: This is the title of the content item.
-        - Type: It should be either 'Video' or 'Reading'.
-        - Duration: Duration in minutes for videos, optional for readings.
-        - Key Points: Highlight important takeaways for each content item.
-        - Script: Provide a brief script, if applicable.
-
-        Provide the content in the following structured format:
-
-        Module 1: [Module Title]
-          - Content Item 1.1: [Title]
-            Type: [Video/Reading]
-            Duration: [Duration in minutes, if applicable]
-            Key Points: [List key points, if any]
-            Script: [Provide a script, if any]
-
-          - Content Item 1.2: [Title]
-            Type: [Video/Reading]
-            Duration: [Duration in minutes, if applicable]
-            Key Points: [List key points, if any]
-            Script: [Provide a script, if any]
-
-        Module 2: [Module Title]
-          - Content Item 2.1: [Title]
-            Type: [Video/Reading]
-            Duration: [Duration in minutes, if applicable]
-            Key Points: [List key points, if any]
-            Script: [Provide a script, if any]
-
-        Only return the list of modules, items, and their attributes in this structured format.
-        """
 
 
         task_description = """
@@ -360,27 +267,8 @@ class LLM:
                 
                         Only return the list of modules, items, and their attributes in this structured format.
                         """
-        prompt = self.prompt_builder.build_full_prompt(task_description, course, output_format)
-        logger.info("\n" + "=" * 50)
-        logger.info("         Comparison of Prompts")
-        logger.info("=" * 50 + "\n")
-
-        logger.info(compare_texts(prompt, prompt_1))
-
-        logger.info("\n" + "=" * 50)
-        logger.info("         Original Prompt")
-        logger.info("=" * 50 + "\n")
-
-        logger.info(f"prompt:\n{prompt}\n")
-
-        logger.info("\n" + "=" * 50)
-        logger.info("         Built Prompt")
-        logger.info("=" * 50 + "\n")
-
-        logger.info(f"prompt_1:\n{prompt_1}\n")
-
-        logger.info("=" * 50 + "\n")
-
+        prompt = self.prompt_builder.build_full_prompt(task_description, course, output_format,'content_listing', item_id)
+        logger.info(prompt)
         try:
             # Generate response using Ollama locally
             generated_text = self.generate_response( prompt=prompt)
@@ -440,8 +328,7 @@ class LLM:
                 elif script_match and current_module and current_module["contents"]:
                     current_module["contents"][-1]["script"] = script_match.group(1)
 
-            logger.info("=====================generated_text==================")
-            logger.info(generated_text)
+
             return generated_text
 
         except requests.exceptions.RequestException as e:
@@ -544,7 +431,7 @@ class LLM:
         # Fetch the model from settings if not provided
         logger.info("Generating response")
         if not model:
-            model = getattr(settings, 'OLLAMA_DEFAULT_MODEL', 'llama3')  # Default to 'llama3' if not set in settings
+            model = getattr(settings, 'OLLAMA_DEFAULT_MODEL', 'llama3.2')  # Default to 'llama3.2' if not set in settings
         logger.info("Model: " + model)
 
         try:

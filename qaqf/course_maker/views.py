@@ -1,20 +1,25 @@
 # course_maker/views.py
-import json
 import re
 from rest_framework.views import APIView
+from rest_framework.decorators import action
+from rest_framework import generics, viewsets,status
+from rest_framework.response import Response
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render
 from formtools.wizard.views import SessionWizardView
+from rest_framework.viewsets import ViewSet
 from .course_wizard_forms import *
-from rest_framework import generics, viewsets
-from rest_framework.response import Response
 from .models import Courses, LearningOutcome,Content,ContentListing,Quiz
 from .serializers import CourseSerializer, LearningOutcomeSerializer, ContentSerializer, ContentListingSerializer,QuizSerializer
 from llm.llm import LLM
 from llm .utils import *
 from rest_framework import status
 from django.http import JsonResponse
+import logging
+logging.basicConfig(level=logging.WARNING)
+logger = logging.getLogger(__name__)
+
 llm_instance=LLM()
 # Define the forms for each step
 FORMS = [
@@ -82,22 +87,13 @@ class CourseCreationWizard(SessionWizardView):
         elif step == 'step4':
             # Get course details from step 3
             step3_data = self.get_cleaned_data_for_step('step3')
-
             if step3_data:
                 # Assume that course_id is saved in the session or is part of the extra data.
-
                 generated_content = llm_instance.generate_content_listing(course_id)
-
                 initial['content_listing'] = generated_content
-
-
-
-
-
         return initial
 
     def process_step(self, form):
-
         """
         Override the process_step method to save data to the database.
         """
@@ -116,7 +112,6 @@ class CourseCreationWizard(SessionWizardView):
                 course = Courses()
         else:
             course = Courses()
-
         # Process and save data specific to each step
         if step == 'step1':
             if form_data:
@@ -239,6 +234,40 @@ class CourseCreationWizard(SessionWizardView):
         course.save()
 
         return render(self.request, 'course_maker/done.html', {'form_data': form_data})
+
+class CourseViewSet(ViewSet):
+
+    @action(detail=False, methods=['get'], url_path='regenerate-items')
+    def regenerate_items(self, request):
+
+        course_id = request.query_params.get('course_id')
+        item_type = request.query_params.get('item_type')
+        item_id = request.query_params.get('item_id')
+        missing_fields = []
+
+        # Check for missing fields
+        if not course_id:
+            missing_fields.append('course_id')
+
+        if missing_fields:
+            return Response(
+                {'error': f'Missing required fields: {", ".join(missing_fields)}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        # Call the appropriate method from LLM based on item_type
+        if item_type == 'title' or item_type == 'description':
+            regenerated_item = llm_instance.generate_course_title_and_description(course_id,item_type=item_type)
+            logger.info('regenerated_item')
+            logger.info(regenerated_item)
+
+        elif item_type == 'learning_outcome':
+            regenerated_item = llm_instance.generate_learning_outcomes(course_id,item_id)
+        elif item_type == 'content_listing':
+            regenerated_item = llm_instance.generate_content_listing(course_id,item_id)
+
+        # Return the regenerated item in a JSON response
+
+        return Response({f'regenerated_item ({item_type})': regenerated_item}, status=status.HTTP_200_OK)
 
 
 # List and Create API view for Courses

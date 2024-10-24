@@ -1,4 +1,7 @@
 import difflib
+
+from torch.fx.proxy import method
+
 import json
 import subprocess
 import platform
@@ -25,8 +28,6 @@ def compare_texts(text1, text2):
             interpreted_result.append(f"Line {i}: Change Details -> {line[2:]}")
 
     return interpreted_result
-
-
 
 def get_ollama_status():
     try:
@@ -74,3 +75,27 @@ def run_ollama_package(request):
 
     except Exception as e:
         return JsonResponse({"status": "error", "message": str(e)}, status=500)
+
+
+#To Do:
+# Calling the compare method
+# prompt = self.prompt_builder.build_full_prompt(task_description, course, output_format)
+# logger.info("\n" + "=" * 50)
+# logger.info("         Comparison of Prompts")
+# logger.info("=" * 50 + "\n")
+#
+# logger.info(compare_texts(prompt, prompt_1))
+#
+# logger.info("\n" + "=" * 50)
+# logger.info("         Original Prompt")
+# logger.info("=" * 50 + "\n")
+#
+# logger.info(f"prompt:\n{prompt}\n")
+#
+# logger.info("\n" + "=" * 50)
+# logger.info("         Built Prompt")
+# logger.info("=" * 50 + "\n")
+#
+# logger.info(f"prompt_1:\n{prompt_1}\n")
+#
+# logger.info("=" * 50 + "\n")
