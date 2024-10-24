@@ -1,5 +1,4 @@
 # course_maker/views.py
-import json
 import re
 from rest_framework.views import APIView
 from rest_framework.decorators import action
@@ -14,8 +13,8 @@ from .course_wizard_forms import *
 from .models import Courses, LearningOutcome,Content,ContentListing,Quiz
 from .serializers import CourseSerializer, LearningOutcomeSerializer, ContentSerializer, ContentListingSerializer,QuizSerializer
 from llm.llm import LLM
-import subprocess
-import platform
+from llm .utils import *
+from rest_framework import status
 from django.http import JsonResponse
 import logging
 logging.basicConfig(level=logging.WARNING)
@@ -88,22 +87,13 @@ class CourseCreationWizard(SessionWizardView):
         elif step == 'step4':
             # Get course details from step 3
             step3_data = self.get_cleaned_data_for_step('step3')
-
             if step3_data:
                 # Assume that course_id is saved in the session or is part of the extra data.
-
                 generated_content = llm_instance.generate_content_listing(course_id)
-
                 initial['content_listing'] = generated_content
-
-
-
-
-
         return initial
 
     def process_step(self, form):
-
         """
         Override the process_step method to save data to the database.
         """
@@ -122,7 +112,6 @@ class CourseCreationWizard(SessionWizardView):
                 course = Courses()
         else:
             course = Courses()
-
         # Process and save data specific to each step
         if step == 'step1':
             if form_data:
@@ -259,12 +248,7 @@ class CourseViewSet(ViewSet):
         # Check for missing fields
         if not course_id:
             missing_fields.append('course_id')
-        # if not item_type:
-        #     missing_fields.append('item_type')
-        # if not item_id:
-        #     missing_fields.append('item_id')
 
-        # If there are missing fields, return an error response
         if missing_fields:
             return Response(
                 {'error': f'Missing required fields: {", ".join(missing_fields)}'},
@@ -297,6 +281,26 @@ class CourseDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CourseSerializer
     lookup_field = 'id'
 
+def regenerate_learning_outcome(request):
+    if request.method == 'POST':
+        index = int(request.POST.get('index', 0))  # Get index as an integer, default to 0 if not provided
+
+        # Retrieve course_title and course_description based on session or database
+        course_id = request.session.get('course_id')  # Assuming course_id is saved in session
+        if course_id:
+            try:
+                course = Courses.objects.get(id=int(course_id))
+                course_title = course.course_title
+                course_description = course.course_description
+            except Courses.DoesNotExist:
+                return JsonResponse({'error': 'Course not found'}, status=404)
+        else:
+            return JsonResponse({'error': 'Course ID not found in session'}, status=400)
+
+
+            return JsonResponse({'error': 'Invalid index'}, status=400)
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
 class CourseLearningOutcomesAPIView(APIView):
@@ -399,51 +403,10 @@ class QuizViewSet(viewsets.ModelViewSet):
     queryset = Quiz.objects.all()
     serializer_class = QuizSerializer
 
-
-
 def ollama_status(request):
-    try:
-        system = platform.system()
 
-        if system == "Linux" or system == "Darwin":  # For Linux/macOS
-            process = subprocess.run(["pgrep", "-f", "ollama"], capture_output=True, text=True)
-            if process.returncode == 0:
-                status = "running"
-            else:
-                status = "stopped"
-
-        elif system == "Windows":  # For Windows
-            process = subprocess.run(["tasklist", "/FI", "IMAGENAME eq ollama.exe"], capture_output=True, text=True)
-            if "ollama.exe" in process.stdout:
-                status = "running"
-            else:
-                status = "stopped"
-        else:
-            status = "unknown system"
-
-    except Exception as e:
-        status = "error"
-
-    return JsonResponse({"status": status})
+    return JsonResponse({"status": get_ollama_status()})
 
 
 def run_ollama(request):
-    try:
-        system = platform.system()
-
-        # Define the base command
-        if system == "Windows":
-            command = ["ollama.exe", "run", "llama3"]
-        else:
-            command = ["ollama", "run", "llama3"]
-
-        # Run the command
-        result = subprocess.run(command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-
-        return JsonResponse({"status": "started", "message": result.stdout})
-
-    except subprocess.CalledProcessError as e:
-        return JsonResponse({"status": "error", "message": e.stderr}, status=500)
-
-    except Exception as e:
-        return JsonResponse({"status": "error", "message": str(e)}, status=500)
+    run_ollama_package()

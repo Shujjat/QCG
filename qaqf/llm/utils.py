@@ -2,6 +2,10 @@ import difflib
 
 from torch.fx.proxy import method
 
+import json
+import subprocess
+import platform
+from django.http import JsonResponse
 
 def compare_texts(text1, text2):
     # Split the paragraphs into lines
@@ -25,7 +29,55 @@ def compare_texts(text1, text2):
 
     return interpreted_result
 
-#
+def get_ollama_status():
+    try:
+        system = platform.system()
+
+        if system == "Linux" or system == "Darwin":  # For Linux/macOS
+            process = subprocess.run(["pgrep", "-f", "ollama"], capture_output=True, text=True)
+            if process.returncode == 0:
+                status = "running"
+            else:
+                status = "stopped"
+
+        elif system == "Windows":  # For Windows
+            process = subprocess.run(["tasklist", "/FI", "IMAGENAME eq ollama.exe"], capture_output=True, text=True)
+            if "ollama.exe" in process.stdout:
+                status = "running"
+            else:
+                status = "stopped"
+        else:
+            status = "unknown system"
+
+    except Exception as e:
+        status = "error"
+
+    return status
+
+
+def run_ollama_package(request):
+    try:
+        system = platform.system()
+
+        # Define the base command
+        if system == "Windows":
+            command = ["ollama.exe", "run", "llama3"]
+        else:
+            command = ["ollama", "run", "llama3"]
+
+        # Run the command
+        result = subprocess.run(command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+
+        return JsonResponse({"status": "started", "message": result.stdout})
+
+    except subprocess.CalledProcessError as e:
+        return JsonResponse({"status": "error", "message": e.stderr}, status=500)
+
+    except Exception as e:
+        return JsonResponse({"status": "error", "message": str(e)}, status=500)
+
+
+#To Do:
 # Calling the compare method
 # prompt = self.prompt_builder.build_full_prompt(task_description, course, output_format)
 # logger.info("\n" + "=" * 50)

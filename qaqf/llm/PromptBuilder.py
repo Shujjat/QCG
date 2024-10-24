@@ -56,19 +56,23 @@ class PromptBuilder:
             item_to_change=f"This title already exists and must be modified: {course.course_title}"
         elif item_type == "description":
             item_to_change = f"This description already exists and must be modified: {course.course_description}"
-        elif item_type == "learning_outcome":
-            learning_outcome = LearningOutcome.objects.get(id=item_id)
-            item_to_change = f"""
-                                This Learning outcome should be modified and improved: '{learning_outcome.outcome }'
-                                with sub items: '{learning_outcome.sub_items}'
-                            """
+        elif item_id:
+            if item_type == "learning_outcome":
+                learning_outcome = LearningOutcome.objects.get(id=item_id)
+                item_to_change = f"""
+                                    This Learning outcome should be modified and improved: '{learning_outcome.outcome }'
+                                    with sub items: '{learning_outcome.sub_items}'
+                                """
 
-        elif item_type == "content_listing":
+            elif item_type == "content_listing":
 
-            content_listing = ContentListing.objects.get(id=item_id)
-            item_to_change = f"""
-                                This Content Listing should be modified and improved: '{content_listing.content_item}'
-                            """
+                content_listing = ContentListing.objects.get(id=item_id)
+                item_to_change = f"""
+                                    This Content Listing should be modified and improved: '{content_listing.content_item}'
+                                """
+            else:
+                item_to_change= ""
+
         else:
             item_to_change= ""
         return item_to_change
@@ -82,9 +86,11 @@ class PromptBuilder:
         central = self.build_central(course)
         epilog = self.build_epilog(output_format)
 
-        logger.info("8888888888888888888888888888888888888888888888888888888888888888888")
-        item_to_change = self.build_item_to_change(course,item_type, item_id)
-        logger.info("8888888888888888888888888888888888888888888888888888888888888888888")
+
+        if item_type:
+            item_to_change = self.build_item_to_change(course,item_type, item_id)
+        else:
+            item_to_change=""
 
         return prolog + item_to_change + central + epilog
 
