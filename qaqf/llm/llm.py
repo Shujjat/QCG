@@ -1,7 +1,6 @@
 # LLM Implementation.py
 import json
 import sys
-
 from django.conf import settings
 from datetime import datetime
 import requests
@@ -23,17 +22,7 @@ class LLM:
         self.logger.setLevel(logging.INFO)
         self.prompt_builder = PromptBuilder()
 
-        self.llm_list = [
-            'Deepseek-Coder',
-            'Llama2-Uncensored',
-            'Dolphin-Mixtral',
-            'Granite-Code',
-            'Openchat',
-            'Reflection',
-            'CodeLlama',
-            'LLAMA3.2'
-        ]
-
+        self.llm_list = self.list_ollama_models()
 
     # Utility function for logging to DB
     def log_to_db(self, function_name, start_time, end_time=None, status='Started'):
@@ -588,3 +577,18 @@ class LLM:
         except Exception as e:
             logger.error(f"Error in generate_response: {e}")
             return ""
+
+    def list_ollama_models(self):
+        """Check if Ollama is running, and list all models"""
+        if not get_ollama_status():
+            run_ollama_package()
+
+        try:
+            # Run the command to list models and capture output
+            result = subprocess.run(['ollama', 'list'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            # Parse the output (assuming it's in JSON format)
+            models = json.loads(result.stdout)
+            return [model['name'] for model in models]
+        except Exception as e:
+            print(f"Error fetching models from Ollama: {e}")
+            return []

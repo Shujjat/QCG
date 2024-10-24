@@ -12,9 +12,8 @@ from rest_framework.response import Response
 from .models import Courses, LearningOutcome,Content,ContentListing,Quiz
 from .serializers import CourseSerializer, LearningOutcomeSerializer, ContentSerializer, ContentListingSerializer,QuizSerializer
 from llm.llm import LLM
+from llm .utils import *
 from rest_framework import status
-import subprocess
-import platform
 from django.http import JsonResponse
 llm_instance=LLM()
 # Define the forms for each step
@@ -269,14 +268,7 @@ def regenerate_learning_outcome(request):
         else:
             return JsonResponse({'error': 'Course ID not found in session'}, status=400)
 
-        # Generate new learning outcomes
-        # new_outcomes = generate_learning_outcomes(course_title, course_description)
-        #
-        # # Ensure the index is within range
-        # if 0 <= index < len(new_outcomes):
-        #     new_outcome = new_outcomes[index]['outcome']
-        #     return JsonResponse({'new_outcome': new_outcome})
-        # else:
+
             return JsonResponse({'error': 'Invalid index'}, status=400)
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
@@ -382,51 +374,10 @@ class QuizViewSet(viewsets.ModelViewSet):
     queryset = Quiz.objects.all()
     serializer_class = QuizSerializer
 
-
-
 def ollama_status(request):
-    try:
-        system = platform.system()
 
-        if system == "Linux" or system == "Darwin":  # For Linux/macOS
-            process = subprocess.run(["pgrep", "-f", "ollama"], capture_output=True, text=True)
-            if process.returncode == 0:
-                status = "running"
-            else:
-                status = "stopped"
-
-        elif system == "Windows":  # For Windows
-            process = subprocess.run(["tasklist", "/FI", "IMAGENAME eq ollama.exe"], capture_output=True, text=True)
-            if "ollama.exe" in process.stdout:
-                status = "running"
-            else:
-                status = "stopped"
-        else:
-            status = "unknown system"
-
-    except Exception as e:
-        status = "error"
-
-    return JsonResponse({"status": status})
+    return JsonResponse({"status": get_ollama_status()})
 
 
 def run_ollama(request):
-    try:
-        system = platform.system()
-
-        # Define the base command
-        if system == "Windows":
-            command = ["ollama.exe", "run", "llama3"]
-        else:
-            command = ["ollama", "run", "llama3"]
-
-        # Run the command
-        result = subprocess.run(command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-
-        return JsonResponse({"status": "started", "message": result.stdout})
-
-    except subprocess.CalledProcessError as e:
-        return JsonResponse({"status": "error", "message": e.stderr}, status=500)
-
-    except Exception as e:
-        return JsonResponse({"status": "error", "message": str(e)}, status=500)
+    run_ollama_package()
