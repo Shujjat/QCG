@@ -1,6 +1,4 @@
 # LLM Implementation.py
-import json
-import sys
 from django.conf import settings
 from datetime import datetime
 import requests
@@ -22,6 +20,7 @@ class LLM:
         self.logger.setLevel(logging.INFO)
         self.prompt_builder = PromptBuilder()
 
+        self.llm_list = self.list_ollama_models()
 
     # Utility function for logging to DB
     def log_to_db(self, function_name, start_time, end_time=None, status='Started'):
@@ -95,20 +94,6 @@ class LLM:
 
         # Retrieve the course using course_id
         course = Courses.objects.get(pk=course_id)
-        # prompt = f"""
-        #                 Given the following course information,
-        #             """
-        # if item_type:
-        #     prompt+=" re"
-        # prompt += f"""generate a course title and a detailed description:
-        #         """
-        # prompt += f"""generate a course title and a detailed description:
-        #                        About Course: {course.course_description}
-        #                        Course Type: {course.course_type}
-        #                        Previous educational level: {course.prerequisite_knowledge}
-        #                        Learners Details: {course.participants_info}
-        #                        There is extensive study material available for this course. Please use it as needed to generate a relevant and coherent response:
-        #                        """
 
         if course.available_material:
 
@@ -118,13 +103,6 @@ class LLM:
             available_material = "\n".join([self.generate_summary(chunk) for chunk in chunks])
             course.available_material_content = available_material
             course.save()
-            # prompt += f"""
-            #
-            #     [Available Study Material: Start]
-            #     {available_material}
-            #     [Available Study Material: End]
-            #
-            #         """
 
 
         # Define task description and output format
@@ -140,7 +118,7 @@ class LLM:
         logger.info(prompt)
 
         try:
-            generated_text = self.generate_response(model='llama3.2', prompt=prompt)
+            generated_text = self.generate_response(prompt=prompt)
             title, description = "", ""
 
             # Use regex to extract the title and description
@@ -191,7 +169,7 @@ class LLM:
         logger.info(prompt)
         try:
             # Generate response using Ollama locally
-            generated_text = self.generate_response(model='llama3.2', prompt=prompt)
+            generated_text = self.generate_response( prompt=prompt)
             # Extract outcomes and sub-items using regex
             learning_outcomes = []
             current_outcome = None
@@ -293,7 +271,7 @@ class LLM:
         logger.info(prompt)
         try:
             # Generate response using Ollama locally
-            generated_text = self.generate_response(model='llama3.2', prompt=prompt)
+            generated_text = self.generate_response( prompt=prompt)
             # Extract content listing using regex
             content_listing = []
             current_module = None
@@ -437,6 +415,9 @@ class LLM:
 
 
     def generate_response(self,prompt, model=None):
+        if not model:
+            model=settings.DEFAULT_LLM
+
         """
         Generate a response using the Ollama API, selecting the model dynamically from settings.
 
@@ -483,3 +464,18 @@ class LLM:
         except Exception as e:
             logger.error(f"Error in generate_response: {e}")
             return ""
+
+    def list_ollama_models(self):
+        """Check if Ollama is running, and list all models"""
+        if not get_ollama_status():
+            run_ollama_package()
+
+        try:
+            # Run the command to list models and capture output
+            result = subprocess.run(['ollama', 'list'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            # Parse the output (assuming it's in JSON format)
+            models = json.loads(result.stdout)
+            return [model['name'] for model in models]
+        except Exception as e:
+            print(f"Error fetching models from Ollama: {e}")
+            return []
