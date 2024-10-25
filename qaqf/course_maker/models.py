@@ -31,7 +31,9 @@ class Courses(models.Model):
         ('EN', 'English'),
         ('FR', 'French'),
         ('ES', 'Spanish'),
-        ('DE', 'German')
+        ('DE', 'German'),
+        ('UR', 'Urdu'),
+
         # Add more language options as needed
     ]
 
@@ -58,8 +60,13 @@ class Courses(models.Model):
     course_title = models.CharField(max_length=200)
     course_description = models.TextField()
 
+
     def __str__(self):
         return self.course_title
+
+    def get_full_language_name(self,language_key):
+
+        return dict(self.CONTENT_LANG_CHOICES).get(language_key, 'English')
 
 
 
