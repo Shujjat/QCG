@@ -11,6 +11,7 @@ from course_maker.utils.pdf_utils import read_pdf
 from .models import LoggingEntry
 from .PromptBuilder import PromptBuilder
 from .utils import *
+from .utils import run_ollama_package
 import logging
 logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
@@ -21,7 +22,7 @@ class LLM:
         self.logger.setLevel(logging.INFO)
         self.prompt_builder = PromptBuilder()
 
-        self.llm_list = self.list_ollama_models()
+        #self.llm_list = self.list_ollama_models()
 
     # Utility function for logging to DB
     import logging
@@ -430,11 +431,20 @@ class LLM:
 
 
     def generate_response(self,prompt, model=None):
-        if get_ollama_status() != 'running':
-            run_ollama_package()
-
+        system = platform.system()
+        logger.info(system)
+        logger.info("1")
         if not model:
             model=settings.DEFAULT_LLM
+        logger.info(model)
+        if get_ollama_status() != 'running':
+            logger.info("2")
+            logger.info("222")
+
+            run_ollama_package(model)
+            logger.info("3")
+
+
 
         """
         Generate a response using the Ollama API, selecting the model dynamically from settings.
@@ -448,9 +458,7 @@ class LLM:
         """
         # Fetch the model from settings if not provided
         logger.info("Generating response")
-        if not model:
-            model = getattr(settings, 'OLLAMA_DEFAULT_MODEL', 'llama3.2')  # Default to 'llama3.2' if not set in settings
-        logger.info("Model: " + model)
+
 
         try:
             response = ollama.generate(model=model, prompt=prompt)
@@ -486,8 +494,8 @@ class LLM:
 
     def list_ollama_models(self):
         """Check if Ollama is running, and list all models"""
-        if  get_ollama_status()!='running':
-            run_ollama_package()
+        # if  get_ollama_status()!='running':
+        #     run_ollama_package()
 
         try:
             # Run the command to list models and capture output
