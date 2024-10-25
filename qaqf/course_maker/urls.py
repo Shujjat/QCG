@@ -14,8 +14,7 @@ urlpatterns = [
     path('api/courses/', CourseListAPIView.as_view(), name='course_list'),
     path('api/course/<int:course_id>/learning_outcomes/', CourseLearningOutcomesAPIView.as_view(),
          name='course-learning-outcomes'),
-    #path('api/regenerate',CourseViewSet.as_view(),name="regenerate"),
     path('api/ollama_status/', ollama_status, name='ollama_status'),
-    path('api/run-ollama/', run_ollama, name='run_ollama'),
+    #path('api/run-ollama/', run_ollama, name='run_ollama'),
 
 ]

@@ -1,4 +1,5 @@
 # course_maker/views.py
+import json
 import re
 from rest_framework.views import APIView
 from rest_framework.decorators import action
@@ -409,4 +410,5 @@ def ollama_status(request):
 
 
 def run_ollama(request):
-    run_ollama_package()
+    return ""
+    #run_ollama_package()

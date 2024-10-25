@@ -1,18 +1,20 @@
 # LLM Implementation.py
+import json
 from django.conf import settings
 from datetime import datetime
 import requests
 import ollama
 import re
 import time
-from course_maker.models import Courses, LearningOutcome
+from course_maker.models import Courses
 from course_maker.utils.pdf_utils import read_pdf
 from .models import LoggingEntry
 from .PromptBuilder import PromptBuilder
 from .utils import *
 import logging
-logging.basicConfig(level=logging.WARNING)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 class LLM:
     def __init__(self):
@@ -20,14 +22,10 @@ class LLM:
         self.logger.setLevel(logging.INFO)
         self.prompt_builder = PromptBuilder()
 
-        self.llm_list = self.list_ollama_models()
-
-    # Utility function for logging to DB
-    def log_to_db(self, function_name, start_time, end_time=None, status='Started'):
-        # Check if start_time or end_time is None
-        if start_time is None or end_time is None:
-            print("Error: start_time or end_time is None")
-            return
+    def log_to_db(self, function_name, start_time=None, end_time=None, status='Started'):
+        # Use the current time if start_time or end_time is missing
+        if start_time is None:
+            start_time = datetime.now()
 
         # If start_time and end_time are floats (representing timestamps), convert them to datetime
         if isinstance(start_time, float):
@@ -35,22 +33,30 @@ class LLM:
         if isinstance(end_time, float):
             end_time = datetime.fromtimestamp(end_time)
 
-        # Check if both are now datetime objects, and calculate duration
-        if isinstance(start_time, datetime) and isinstance(end_time, datetime):
-            duration = (end_time - start_time).total_seconds()
-            print(f"Duration: {duration} seconds")
-            # Log the duration and additional info to the database
+        # Check if end_time is provided; otherwise, only log start_time
+        if end_time is not None:
+            # Calculate duration if both start_time and end_time are datetime objects
+            if isinstance(start_time, datetime) and isinstance(end_time, datetime):
+                duration = (end_time - start_time).total_seconds()
+                logger.info(f"Duration: {duration} seconds for function '{function_name}'")
+            else:
+                logger.error("Error: start_time and end_time must be valid datetime objects or timestamps.")
+                duration = None
         else:
-            print("Error: start_time and end_time must be valid datetime objects or timestamps.")
+            logger.warning(f"End time is not provided for function '{function_name}'. Logging start time only.")
+            duration = None  # Duration can't be calculated if end_time is missing
 
+        # Log the entry to the database
         log_entry = LoggingEntry(
-                function_name=function_name,
-                start_time=start_time,
-                end_time=end_time,
-                duration=duration,
-                status=status
-            )
+            function_name=function_name,
+            start_time=start_time,
+            end_time=end_time,
+            duration=duration,
+            status=status
+        )
         log_entry.save()
+
+        logger.info(f"Log entry for function '{function_name}' saved successfully.")
 
     # Decorator to log start, end, and duration
     def log_execution(func):
@@ -417,7 +423,8 @@ class LLM:
     def generate_response(self,prompt, model=None):
         if not model:
             model=settings.DEFAULT_LLM
-
+        if get_ollama_status() != 'running':
+            run_ollama_package(model)
         """
         Generate a response using the Ollama API, selecting the model dynamically from settings.
 
@@ -430,13 +437,12 @@ class LLM:
         """
         # Fetch the model from settings if not provided
         logger.info("Generating response")
-        if not model:
-            model = getattr(settings, 'OLLAMA_DEFAULT_MODEL', 'llama3.2')  # Default to 'llama3.2' if not set in settings
-        logger.info("Model: " + model)
+
 
         try:
             response = ollama.generate(model=model, prompt=prompt)
-
+            #Shutting down Ollama to secure system resources
+            shutdown_ollama()
             # Check if the response object has a JSON serializable structure
             if isinstance(response, dict):
                 # It's already a dictionary, so it should be serializable
@@ -467,8 +473,8 @@ class LLM:
 
     def list_ollama_models(self):
         """Check if Ollama is running, and list all models"""
-        if not get_ollama_status():
-            run_ollama_package()
+        # if  get_ollama_status()!='running':
+        #     run_ollama_package()
 
         try:
             # Run the command to list models and capture output
