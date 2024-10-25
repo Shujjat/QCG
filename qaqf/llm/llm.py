@@ -6,31 +6,21 @@ import requests
 import ollama
 import re
 import time
-from course_maker.models import Courses, LearningOutcome
+from course_maker.models import Courses
 from course_maker.utils.pdf_utils import read_pdf
 from .models import LoggingEntry
 from .PromptBuilder import PromptBuilder
 from .utils import *
-from .utils import run_ollama_package
 import logging
-logging.basicConfig(level=logging.WARNING)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 class LLM:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.INFO)
         self.prompt_builder = PromptBuilder()
-
-        #self.llm_list = self.list_ollama_models()
-
-    # Utility function for logging to DB
-    import logging
-    from datetime import datetime
-
-    # Configure logger (set up as required)
-    logger = logging.getLogger(__name__)
-    logger.setLevel(logging.INFO)  # You can change the level as per your needs
 
     def log_to_db(self, function_name, start_time=None, end_time=None, status='Started'):
         # Use the current time if start_time or end_time is missing
