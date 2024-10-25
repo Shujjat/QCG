@@ -415,6 +415,8 @@ class LLM:
 
 
     def generate_response(self,prompt, model=None):
+        if get_ollama_status():
+            run_ollama_package()
         if not model:
             model=settings.DEFAULT_LLM
 
@@ -436,7 +438,8 @@ class LLM:
 
         try:
             response = ollama.generate(model=model, prompt=prompt)
-
+            #Shutting down Ollama to secure system resources
+            shutdown_ollama()
             # Check if the response object has a JSON serializable structure
             if isinstance(response, dict):
                 # It's already a dictionary, so it should be serializable

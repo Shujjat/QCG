@@ -409,4 +409,5 @@ def ollama_status(request):
 
 
 def run_ollama(request):
-    run_ollama_package()
+    return ""
+    #run_ollama_package()

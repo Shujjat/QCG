@@ -77,6 +77,27 @@ def run_ollama_package(request):
         return JsonResponse({"status": "error", "message": str(e)}, status=500)
 
 
+def shutdown_ollama():
+    # Detect the OS
+    current_os = platform.system().lower()
+
+    # Command to stop the Ollama service based on OS
+    try:
+        if current_os == 'windows':
+            # For Windows, use taskkill to stop the Ollama service
+            subprocess.run(["taskkill", "/F", "/IM", "ollama.exe"], check=True)
+            print("Ollama service shut down on Windows.")
+
+        elif current_os == 'linux' or current_os == 'darwin':
+            # For Linux and macOS (darwin), use pkill to terminate the process
+            subprocess.run(["pkill", "-f", "ollama"], check=True)
+            print(f"Ollama service shut down on {current_os.capitalize()}.")
+
+        else:
+            print(f"Unsupported operating system: {current_os}")
+
+    except subprocess.CalledProcessError as e:
+        print(f"Error occurred while shutting down Ollama: {e}")
 #To Do:
 # Calling the compare method
 # prompt = self.prompt_builder.build_full_prompt(task_description, course, output_format)
