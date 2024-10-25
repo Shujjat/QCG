@@ -1,7 +1,7 @@
 import logging
 logging.basicConfig(level=logging.WARNING)
 logger = logging.getLogger(__name__)
-from course_maker.models import LearningOutcome, ContentListing
+from course_maker.models import LearningOutcome, ContentListing,Courses
 
 
 class PromptBuilder:
@@ -22,12 +22,21 @@ class PromptBuilder:
         """
         Builds the central section of the prompt with course-specific data.
         """
+        if course.long_course_support:
+            duration=6
+        else:
+            duration=course.duration
         central = f"""
         Course Details:
         - About Course: {course.course_description}
         - Course Type: {course.course_type}
         - Prerequisite Knowledge: {course.prerequisite_knowledge}
         - Learners Information: {course.participants_info}
+        - language to use: {course.get_full_language_name(course.content_lang)}
+        - should be optimized for Massive Open Online Course: {course.optimized_for_mooc}
+        - should have a project at the end: {course.project_based}
+        - course duration is: {duration}
+        - practice intensity: {course.practice}
         """
 
         if course.available_material_content:
@@ -42,13 +51,14 @@ class PromptBuilder:
 
         return central
 
-    def build_epilog(self, output_format):
+    def build_epilog(self, output_format,course):
         """
         Builds the epilog section of the prompt, which includes formatting instructions for the response.
         """
         epilog = f"""
         Please ensure the output is structured as follows:
         {output_format}
+        
         """
         return epilog
     def build_item_to_change(self,course,item_type,item_id=None):
@@ -84,7 +94,7 @@ class PromptBuilder:
 
         prolog = self.build_prolog(task_description)
         central = self.build_central(course)
-        epilog = self.build_epilog(output_format)
+        epilog = self.build_epilog(output_format,course)
 
 
         if item_type:
