@@ -6,12 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="7cf03e74-88c4-4af5-b6c0-cfbca8a72de4" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/.env" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/.env" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/db.sqlite3" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qaqf/llm/llm.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/llm/llm.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qaqf/llm/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/llm/utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/qaqf/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/qaqf/settings.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

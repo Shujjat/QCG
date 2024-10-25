@@ -431,21 +431,10 @@ class LLM:
 
 
     def generate_response(self,prompt, model=None):
-        system = platform.system()
-        logger.info(system)
-        logger.info("1")
         if not model:
             model=settings.DEFAULT_LLM
-        logger.info(model)
         if get_ollama_status() != 'running':
-            logger.info("2")
-            logger.info("222")
-
             run_ollama_package(model)
-            logger.info("3")
-
-
-
         """
         Generate a response using the Ollama API, selecting the model dynamically from settings.
 

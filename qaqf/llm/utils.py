@@ -53,41 +53,6 @@ def get_ollama_status():
         status = "error"
 
     return status
-import subprocess
-import platform
-from django.http import JsonResponse
-import logging
-import sys
-import time
-
-# Setup logger
-logger = logging.getLogger('my_logger')
-logger.setLevel(logging.INFO)
-
-console_handler = logging.StreamHandler(sys.stdout)
-console_handler.setLevel(logging.INFO)
-
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-console_handler.setFormatter(formatter)
-logger.addHandler(console_handler)
-
-import subprocess
-import platform
-from django.http import JsonResponse
-import logging
-import sys
-import time
-
-# Setup logger
-logger = logging.getLogger('ollama_logger')
-logger.setLevel(logging.INFO)
-
-console_handler = logging.StreamHandler(sys.stdout)
-console_handler.setLevel(logging.INFO)
-
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-console_handler.setFormatter(formatter)
-logger.addHandler(console_handler)
 
 def run_ollama_package(model, timeout=300):
     logger.info("Starting ollama package run...")
@@ -108,43 +73,9 @@ def run_ollama_package(model, timeout=300):
         logger.info(f"Running command: {' '.join(command)}")
 
         # Run the command asynchronously and capture stdout/stderr in real time
-        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        _ = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         logger.info(f"After Running command: {' '.join(command)}")
-        # start_time = time.time()
-        # while True:
-        #     # Read from stdout and stderr simultaneously
-        #     stdout_line = process.stdout.readline()
-        #     stderr_line = process.stderr.readline()
-        #
-        #     # Log any output from stdout
-        #     if stdout_line:
-        #         logger.info(f"Ollama stdout: {stdout_line.strip()}")
-        #         sys.stdout.flush()
-        #
-        #     # Log any error output from stderr
-        #     if stderr_line:
-        #         logger.error(f"Ollama stderr: {stderr_line.strip()}")
-        #         sys.stdout.flush()
-        #
-        #     # Check if the process has finished
-        #     return_code = process.poll()
-        #     if return_code is not None:
-        #         logger.info(f"Ollama process exited with return code: {return_code}")
-        #         break
-        #
-        #     # Handle the timeout scenario
-        #     if time.time() - start_time > timeout:
-        #         logger.error(f"Ollama process timed out after {timeout} seconds.")
-        #         process.terminate()  # Forcefully terminate the process
-        #         return JsonResponse({"status": "error", "message": "Ollama process timed out"}, status=500)
-        #
-        # # If the process completes successfully
-        # if return_code == 0:
-        #     logger.info("Ollama package completed successfully.")
-        #     return JsonResponse({"status": "started", "message": "Ollama run completed."})
-        # else:
-        #     logger.error(f"Ollama failed with return code: {return_code}")
-        #     return JsonResponse({"status": "error", "message": f"Ollama failed with code {return_code}"}, status=500)
+
 
     except subprocess.CalledProcessError as e:
         logger.error(f"Error running ollama package: {e}")
@@ -154,7 +85,6 @@ def run_ollama_package(model, timeout=300):
     except Exception as e:
         logger.error(f"Unexpected error: {str(e)}")
         return JsonResponse({"status": "error", "message": str(e)}, status=500)
-
 
 
 def shutdown_ollama():
