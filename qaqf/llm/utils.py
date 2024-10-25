@@ -1,11 +1,11 @@
 import difflib
-
-from torch.fx.proxy import method
-
-import json
 import subprocess
 import platform
 from django.http import JsonResponse
+import logging
+logging.basicConfig(level=logging.WARNING)
+logger = logging.getLogger(__name__)
+
 
 def compare_texts(text1, text2):
     # Split the paragraphs into lines
@@ -55,49 +55,54 @@ def get_ollama_status():
     return status
 
 
-def run_ollama_package(request):
-    try:
-        system = platform.system()
+def run_ollama_package():
+    if get_ollama_status()!='running':
+        try:
+            system = platform.system()
 
-        # Define the base command
-        if system == "Windows":
-            command = ["ollama.exe", "run", "llama3"]
-        else:
-            command = ["ollama", "run", "llama3"]
+            # Define the base command
+            if system == "Windows":
+                command = ["ollama.exe", "run", "llama3"]
+            else:
+                command = ["ollama", "run", "llama3"]
 
-        # Run the command
-        result = subprocess.run(command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            # Run the command
+            logger.info(f"Starting Ollama package on {system} using command: {' '.join(command)}")
 
-        return JsonResponse({"status": "started", "message": result.stdout})
+            result = subprocess.run(command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
-    except subprocess.CalledProcessError as e:
-        return JsonResponse({"status": "error", "message": e.stderr}, status=500)
+            return JsonResponse({"status": "started", "message": result.stdout})
 
-    except Exception as e:
-        return JsonResponse({"status": "error", "message": str(e)}, status=500)
+        except subprocess.CalledProcessError as e:
+            return JsonResponse({"status": "error", "message": e.stderr}, status=500)
+
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
 
 
 def shutdown_ollama():
     # Detect the OS
     current_os = platform.system().lower()
 
-    # Command to stop the Ollama service based on OS
+    # Command to stop all Ollama instances based on the OS
     try:
         if current_os == 'windows':
-            # For Windows, use taskkill to stop the Ollama service
-            subprocess.run(["taskkill", "/F", "/IM", "ollama.exe"], check=True)
-            print("Ollama service shut down on Windows.")
+            # For Windows, use taskkill to stop all Ollama instances
+            subprocess.run(["taskkill", "/F", "/IM", "ollama.exe", "/T"], check=True)
+            logger.info("All Ollama instances shut down on Windows.")
 
         elif current_os == 'linux' or current_os == 'darwin':
-            # For Linux and macOS (darwin), use pkill to terminate the process
+            # For Linux and macOS (darwin), use pkill to terminate all Ollama instances
             subprocess.run(["pkill", "-f", "ollama"], check=True)
-            print(f"Ollama service shut down on {current_os.capitalize()}.")
+            logger.info(f"All Ollama instances shut down on {current_os.capitalize()}.")
 
         else:
-            print(f"Unsupported operating system: {current_os}")
+            logger.info(f"Unsupported operating system: {current_os}")
 
     except subprocess.CalledProcessError as e:
-        print(f"Error occurred while shutting down Ollama: {e}")
+        logger.error(f"Error occurred while shutting down Ollama: {e}")
+
+
 #To Do:
 # Calling the compare method
 # prompt = self.prompt_builder.build_full_prompt(task_description, course, output_format)

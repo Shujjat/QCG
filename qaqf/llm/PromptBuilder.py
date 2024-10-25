@@ -41,7 +41,7 @@ class PromptBuilder:
 
         if course.available_material_content:
             central += f"""
-            - Available Study Material:
+            - Available Study Material to use as textbook :
             [Start of Material]
             {course.available_material_content}
             [End of Material]
