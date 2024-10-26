@@ -1,7 +1,6 @@
-from django.urls import reverse
 from rest_framework.test import APITestCase
 from rest_framework import status
-from .models import Courses
+from course_maker.models import Courses
 class CourseCreationWizardTest(APITestCase):
     def setUp(self):
         try:

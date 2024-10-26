@@ -5,11 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7cf03e74-88c4-4af5-b6c0-cfbca8a72de4" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/runConfigurations/TestLLM.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qaqf/llm/tests/test_ollama.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/qaqf/course_maker/tests/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/qaqf/course_maker/tests/test_learning_outcomes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/runConfigurations/TestLLM.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/tests.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/tests.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/llm/tests.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/llm/tests.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/tests.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/tests/test_courses.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,8 +60,10 @@
     "Python.Run Server 2.executor": "Run",
     "Python.Run Server.executor": "Run",
     "Python.Test LLM.executor": "Run",
+    "Python.TestCourses (1).executor": "Run",
     "Python.TestCourses.executor": "Run",
     "Python.TestLLM.executor": "Run",
+    "Python.TestLearningOutcome.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "unittests-framework",
@@ -80,44 +83,12 @@
       <recent name="E:\Shujjat.com\Projects\QAQF\qaqf\static\images" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\Shujjat.com\Projects\QAQF\qaqf\course_maker\tests" />
       <recent name="E:\Shujjat.com\Projects\QAQF\qaqf\llm" />
       <recent name="E:\Shujjat.com\Projects\QAQF\qaqf\llm\tests" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.TestCourses">
-    <configuration name="Run Server 2" type="PythonConfigurationType" factoryName="Python">
-      <module name="QAQF" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.12 (QAQF)" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="net.ashald.envfile">
-        <option name="IS_ENABLED" value="false" />
-        <option name="IS_SUBST" value="false" />
-        <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
-        <option name="IS_IGNORE_MISSING_FILES" value="false" />
-        <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
-        <ENTRIES>
-          <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
-        </ENTRIES>
-      </EXTENSION>
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qaqf/manage.py" />
-      <option name="PARAMETERS" value="runserver 8081" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
+  <component name="RunManager" selected="Python.TestLearningOutcome">
     <configuration name="Run Server" type="PythonConfigurationType" factoryName="Python">
       <module name="QAQF" />
       <option name="ENV_FILES" value="" />
@@ -151,106 +122,12 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="TestCourses" type="PythonConfigurationType" factoryName="Python">
-      <module name="QAQF" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.12 (QAQF)" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="net.ashald.envfile">
-        <option name="IS_ENABLED" value="false" />
-        <option name="IS_SUBST" value="false" />
-        <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
-        <option name="IS_IGNORE_MISSING_FILES" value="false" />
-        <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
-        <ENTRIES>
-          <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
-        </ENTRIES>
-      </EXTENSION>
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qaqf/manage.py" />
-      <option name="PARAMETERS" value="test course_maker" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestLLM" type="PythonConfigurationType" factoryName="Python">
-      <module name="QAQF" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.12 (QAQF)" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="net.ashald.envfile">
-        <option name="IS_ENABLED" value="false" />
-        <option name="IS_SUBST" value="false" />
-        <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
-        <option name="IS_IGNORE_MISSING_FILES" value="false" />
-        <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
-        <ENTRIES>
-          <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
-        </ENTRIES>
-      </EXTENSION>
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qaqf/manage.py" />
-      <option name="PARAMETERS" value="test llm" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="TestOllama" type="tests" factoryName="Unittests">
-      <module name="QAQF" />
-      <option name="ENV_FILES" value="" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="$PROJECT_DIR$/.venv/Scripts/python.exe" />
-      <option name="SDK_NAME" value="Python 3.12 (QAQF)" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/qaqf" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <EXTENSION ID="net.ashald.envfile">
-        <option name="IS_ENABLED" value="false" />
-        <option name="IS_SUBST" value="false" />
-        <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
-        <option name="IS_IGNORE_MISSING_FILES" value="false" />
-        <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
-        <ENTRIES>
-          <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
-        </ENTRIES>
-      </EXTENSION>
-      <option name="_new_pattern" value="&quot;&quot;" />
-      <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;$PROJECT_DIR$/qaqf/llm/tests/test_ollama.py&quot;" />
-      <option name="_new_targetType" value="&quot;PATH&quot;" />
-      <method v="2" />
-    </configuration>
     <list>
       <item itemvalue="Python.Run Server" />
       <item itemvalue="Python.Run Server 2" />
       <item itemvalue="Python.TestLLM" />
       <item itemvalue="Python.TestCourses" />
-      <item itemvalue="Python tests.TestLLM" />
-      <item itemvalue="Python tests.TestOllama" />
+      <item itemvalue="Python.TestLearningOutcome" />
     </list>
   </component>
   <component name="SharedIndexes">

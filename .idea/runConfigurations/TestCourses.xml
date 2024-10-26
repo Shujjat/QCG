@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="TestLLM" type="PythonConfigurationType" factoryName="Python">
+  <configuration default="false" name="TestCourses" type="PythonConfigurationType" factoryName="Python">
     <module name="QAQF" />
     <option name="ENV_FILES" value="" />
     <option name="INTERPRETER_OPTIONS" value="" />
@@ -24,7 +24,7 @@
       </ENTRIES>
     </EXTENSION>
     <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qaqf/manage.py" />
-    <option name="PARAMETERS" value="test llm" />
+    <option name="PARAMETERS" value="test course_maker.tests.test_courses" />
     <option name="SHOW_COMMAND_LINE" value="false" />
     <option name="EMULATE_TERMINAL" value="false" />
     <option name="MODULE_MODE" value="false" />
