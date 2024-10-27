@@ -281,30 +281,30 @@ class CourseDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Courses.objects.all()
     serializer_class = CourseSerializer
     lookup_field = 'id'
+#
+# def regenerate_learning_outcome(request):
+#     if request.method == 'POST':
+#         index = int(request.POST.get('index', 0))  # Get index as an integer, default to 0 if not provided
+#
+#         # Retrieve course_title and course_description based on session or database
+#         course_id = request.session.get('course_id')  # Assuming course_id is saved in session
+#         if course_id:
+#             try:
+#                 course = Courses.objects.get(id=int(course_id))
+#                 course_title = course.course_title
+#                 course_description = course.course_description
+#             except Courses.DoesNotExist:
+#                 return JsonResponse({'error': 'Course not found'}, status=404)
+#         else:
+#             return JsonResponse({'error': 'Course ID not found in session'}, status=400)
+#
+#
+#             return JsonResponse({'error': 'Invalid index'}, status=400)
+#
+#     return JsonResponse({'error': 'Invalid request'}, status=400)
 
-def regenerate_learning_outcome(request):
-    if request.method == 'POST':
-        index = int(request.POST.get('index', 0))  # Get index as an integer, default to 0 if not provided
 
-        # Retrieve course_title and course_description based on session or database
-        course_id = request.session.get('course_id')  # Assuming course_id is saved in session
-        if course_id:
-            try:
-                course = Courses.objects.get(id=int(course_id))
-                course_title = course.course_title
-                course_description = course.course_description
-            except Courses.DoesNotExist:
-                return JsonResponse({'error': 'Course not found'}, status=404)
-        else:
-            return JsonResponse({'error': 'Course ID not found in session'}, status=400)
-
-
-            return JsonResponse({'error': 'Invalid index'}, status=400)
-
-    return JsonResponse({'error': 'Invalid request'}, status=400)
-
-
-class CourseLearningOutcomesAPIView(APIView):
+class CourseLearningOutcomesAPIView(ViewSet):
     def get(self, request, course_id):
         try:
             course = Courses.objects.get(id=course_id)
@@ -313,6 +313,36 @@ class CourseLearningOutcomesAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Courses.DoesNotExist:
             return Response({'error': 'Course not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+    def patch(self, request, course_id):
+        try:
+            course = Courses.objects.get(id=course_id)
+            learning_outcomes = course.learning_outcomes.all()
+
+            # Loop through the outcomes and update each based on provided data
+            for outcome_data in request.data:
+                outcome_id = outcome_data.get('id')
+                if not outcome_id:
+                    continue
+
+                try:
+                    outcome = LearningOutcome.objects.get(id=outcome_id, course=course)
+                except LearningOutcome.DoesNotExist:
+                    return Response({'error': f'Learning Outcome with id {outcome_id} not found.'},
+                                    status=status.HTTP_404_NOT_FOUND)
+
+                serializer = LearningOutcomeSerializer(outcome, data=outcome_data, partial=True)
+                if serializer.is_valid():
+                    serializer.save()
+                else:
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            return Response({'message': 'Learning outcomes updated successfully'}, status=status.HTTP_200_OK)
+
+        except Courses.DoesNotExist:
+            return Response({'error': 'Course not found'}, status=status.HTTP_404_NOT_FOUND)
+
 
 def modules_listing_to_json(content_text):
     """
