@@ -302,26 +302,36 @@ class CourseDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
 #             return JsonResponse({'error': 'Invalid index'}, status=400)
 #
 #     return JsonResponse({'error': 'Invalid request'}, status=400)
+class CourseLearningOutcomesAPIView(APIView):
 
-
-class CourseLearningOutcomesAPIView(ViewSet):
-    def get(self, request, course_id):
+    # Retrieve a specific learning outcome
+    def get(self, request, course_id, outcome_id=None):
         try:
             course = Courses.objects.get(id=course_id)
-            learning_outcomes = course.learning_outcomes.all()
-            serializer = LearningOutcomeSerializer(learning_outcomes, many=True)
+            if outcome_id:
+                # Retrieve a single outcome if outcome_id is provided
+                learning_outcome = course.learning_outcomes.get(id=outcome_id)
+                serializer = LearningOutcomeSerializer(learning_outcome)
+            else:
+                # Retrieve all learning outcomes if outcome_id is not provided
+                learning_outcomes = course.learning_outcomes.all()
+                serializer = LearningOutcomeSerializer(learning_outcomes, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Courses.DoesNotExist:
             return Response({'error': 'Course not found'}, status=status.HTTP_404_NOT_FOUND)
+        except LearningOutcome.DoesNotExist:
+            return Response({'error': 'Learning outcome not found'}, status=status.HTTP_404_NOT_FOUND)
 
-
+    # Partially update multiple learning outcomes
     def patch(self, request, course_id):
         try:
             course = Courses.objects.get(id=course_id)
-            learning_outcomes = course.learning_outcomes.all()
+            data = request.data
+            if not isinstance(data, list):
+                return Response({'error': 'Expected a list of dictionaries in the request body.'},
+                                status=status.HTTP_400_BAD_REQUEST)
 
-            # Loop through the outcomes and update each based on provided data
-            for outcome_data in request.data:
+            for outcome_data in data:
                 outcome_id = outcome_data.get('id')
                 if not outcome_id:
                     continue
@@ -342,6 +352,30 @@ class CourseLearningOutcomesAPIView(ViewSet):
 
         except Courses.DoesNotExist:
             return Response({'error': 'Course not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    # Create a new learning outcome
+    def post(self, request, course_id):
+        try:
+            course = Courses.objects.get(id=course_id)
+            serializer = LearningOutcomeSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save(course=course)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Courses.DoesNotExist:
+            return Response({'error': 'Course not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    # Delete a specific learning outcome
+    def delete(self, request, course_id, outcome_id):
+        try:
+            course = Courses.objects.get(id=course_id)
+            learning_outcome = course.learning_outcomes.get(id=outcome_id)
+            learning_outcome.delete()
+            return Response({'message': 'Learning outcome deleted'}, status=status.HTTP_204_NO_CONTENT)
+        except Courses.DoesNotExist:
+            return Response({'error': 'Course not found'}, status=status.HTTP_404_NOT_FOUND)
+        except LearningOutcome.DoesNotExist:
+            return Response({'error': 'Learning outcome not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
 def modules_listing_to_json(content_text):

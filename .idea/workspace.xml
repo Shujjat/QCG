@@ -7,6 +7,7 @@
     <list default="true" id="7cf03e74-88c4-4af5-b6c0-cfbca8a72de4" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qaqf/course_maker/tests/test_learning_outcomes.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/tests/test_learning_outcomes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qaqf/course_maker/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/views.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

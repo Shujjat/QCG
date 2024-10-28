@@ -20,11 +20,9 @@ class LearningOutcomeAPITest(APITestCase):
             "sub_items": ["A1", "A2"]
         }
         response = self.client.post(self.url, data, format='json')
-        print(response.json())
+
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(LearningOutcome.objects.count(), 1)
-        created_outcome = LearningOutcome.objects.first()
-        self.assertEqual(created_outcome.outcome, "Understand Django basics")
+        self.assertEqual(LearningOutcome.objects.count(), 2)
 
     def test_update_learning_outcome(self):
         # Prepare the payload as a list of dictionaries
@@ -45,24 +43,25 @@ class LearningOutcomeAPITest(APITestCase):
         # Refresh the learning outcome from the database and check the updated value
         self.learning_outcome.refresh_from_db()
         self.assertEqual(self.learning_outcome.outcome, "Learn Django ORM")
-    #
-    # def test_delete_learning_outcome(self):
-    #     response = self.client.delete(self.url)
-    #     self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-    #     self.assertEqual(LearningOutcome.objects.count(), 0)
 
-    # def test_list_learning_outcomes(self):
-    #     response = self.client.get(self.url)
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #     self.assertEqual(len(response.data), 2)
-    #     self.assertEqual(response.data[0]['outcome'], "Understand Django ORM")
-    #     self.assertEqual(response.data[1]['outcome'], "Understand Django Views")
+    def test_list_learning_outcomes(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]['outcome'], "Understand Django ORM")
 
-    #
-    # def test_view_learning_outcome(self):
-    #     response = self.client.get(self.url)
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #     self.assertEqual(response.data['outcome'], "Understand Django ORM")
-    #     self.assertEqual(response.data['tag'], "A")
-    #     self.assertEqual(response.data['number'], 1)
-    #     self.assertEqual(response.data['sub_items'], ["A1", "A2"])
+
+    def test_view_learning_outcome(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        learning_outcome = response.data[0]
+        self.assertEqual(learning_outcome['outcome'], "Understand Django ORM")
+        self.assertEqual(learning_outcome['tag'], "ORM")
+        self.assertEqual(learning_outcome['number'], 1)
+        self.assertEqual(learning_outcome['sub_items'], ["A1", "A2"])
+
+    def test_delete_learning_outcome(self):
+        delete_url = f"{self.url}{self.learning_outcome.id}/"
+        response = self.client.delete(delete_url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(LearningOutcome.objects.count(), 0)

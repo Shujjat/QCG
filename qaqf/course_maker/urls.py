@@ -13,7 +13,10 @@ urlpatterns = [
     path('api/course_creation_wizard/', CourseCreationWizard.as_view(), name='course_creation_wizard'),
     path('api/courses/', CourseListAPIView.as_view(), name='course_list'),
     path('api/course/<int:course_id>/learning_outcomes/', CourseLearningOutcomesAPIView.as_view(),
-         name='course-learning-outcomes'),
+         name='course-learning-outcomes-list'),  # List all outcomes
+    path('api/course/<int:course_id>/learning_outcomes/<int:outcome_id>/', CourseLearningOutcomesAPIView.as_view(),
+         name='course-learning-outcome-detail'),  # Retrieve, delete specific outcome
+
     path('api/ollama_status/', ollama_status, name='ollama_status'),
     #path('api/run-ollama/', run_ollama, name='run_ollama'),
 
