@@ -14,12 +14,11 @@ from .utils import *
 import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
 
 class LLM:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
-        self.logger.setLevel(logging.INFO)
+        self.logger.setLevel(logging.DEBUG)
         self.prompt_builder = PromptBuilder()
 
     def log_to_db(self, function_name, start_time=None, end_time=None, status='Started'):
