@@ -58,7 +58,6 @@ class Courses(models.Model):
     long_course_support = models.BooleanField("Long Course Support", default=False)
     # New fields for Step 2
     course_title = models.CharField(max_length=200)
-    course_description = models.TextField()
 
 
     def __str__(self):

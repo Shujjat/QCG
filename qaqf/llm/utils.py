@@ -1,6 +1,7 @@
 import difflib
 import subprocess
 import platform
+from django.conf import settings
 from django.http import JsonResponse
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -88,26 +89,27 @@ def run_ollama_package(model, timeout=300):
 
 
 def shutdown_ollama():
-    # Detect the OS
-    current_os = platform.system().lower()
+    if settings.ENVIRONMENT=='DEV-LOCAL':
+        # Detect the OS
+        current_os = platform.system().lower()
 
-    # Command to stop all Ollama instances based on the OS
-    try:
-        if current_os == "Windows" or current_os=="windows":
-            # For Windows, use taskkill to stop all Ollama instances
-            subprocess.run(["taskkill", "/F", "/IM", "ollama.exe", "/T"], check=True)
-            logger.info("All Ollama instances shut down on Windows.")
+        # Command to stop all Ollama instances based on the OS
+        try:
+            if current_os == "Windows" or current_os=="windows":
+                # For Windows, use taskkill to stop all Ollama instances
+                subprocess.run(["taskkill", "/F", "/IM", "ollama.exe", "/T"], check=True)
+                logger.info("All Ollama instances shut down on Windows.")
 
-        elif current_os == 'linux' or current_os == 'darwin':
-            # For Linux and macOS (darwin), use pkill to terminate all Ollama instances
-            subprocess.run(["pkill", "-f", "ollama"], check=True)
-            logger.info(f"All Ollama instances shut down on {current_os.capitalize()}.")
+            elif current_os == 'linux' or current_os == 'darwin':
+                # For Linux and macOS (darwin), use pkill to terminate all Ollama instances
+                subprocess.run(["pkill", "-f", "ollama"], check=True)
+                logger.info(f"All Ollama instances shut down on {current_os.capitalize()}.")
 
-        else:
-            logger.info(f"Unsupported operating system: {current_os}")
+            else:
+                logger.info(f"Unsupported operating system: {current_os}")
 
-    except subprocess.CalledProcessError as e:
-        logger.info(f"Error occurred while shutting down Ollama: {e}")
+        except subprocess.CalledProcessError as e:
+            logger.info(f"Error occurred while shutting down Ollama: {e}")
 
 
 #To Do:

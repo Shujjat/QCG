@@ -25,6 +25,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 # Default LLM is loaded from .env, fallback to 'ollama' if not found
 # The name of LLM is case-sensitive
 DEFAULT_LLM = env('LLM_DEFAULT', default='llama3.2')
+ENVIRONMENT = env('DEV-LOCAL', default='DEV-LOCAL')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
