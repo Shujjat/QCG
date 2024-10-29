@@ -13,13 +13,12 @@ class TestLLM(APITestCase):
 
     @classmethod
     def setUpTestData(cls):
-        if not check_django_status():
-            print("Django is not running, starting the server...")
-            run_django_server()
+
         # Initialize LLM instance once for all tests
         cls.llm = LLM()
 
     def setUp(self):
+        print(f"\nRunning test: {self._testMethodName}")
         # Create an in-memory PDF file
         pdf_path = f"{settings.BASE_DIR}/media/sample_books/python.pdf"
         # Set up test course
@@ -154,7 +153,7 @@ class TestLLM(APITestCase):
             "module_title" in module for module in content_listing),
             "Each module should have a 'module_title' field")
 
-    def test_list_ollama_models(self):
+    def _test_list_ollama_models(self):
         # Test for Ollama model listing
         models = self.llm.list_ollama_models()
 

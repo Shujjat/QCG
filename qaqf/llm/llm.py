@@ -12,8 +12,8 @@ from .models import LoggingEntry
 from .PromptBuilder import PromptBuilder
 from .utils import *
 import logging
-#logging.basicConfig(level=logging.INFO)
-logging.basicConfig(level=logging.CRITICAL)
+logging.basicConfig(level=logging.INFO)
+#logging.basicConfig(level=logging.CRITICAL)
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +21,7 @@ class LLM:
     def __init__(self):
 
         self.prompt_builder = PromptBuilder()
+        # Chunk size in words
         self.default_chunk_size=2000
 
     def log_to_db(self, function_name, start_time=None, end_time=None, status='Started'):
@@ -107,10 +108,14 @@ class LLM:
             pdf_path = f"{settings.BASE_URL}{course.available_material.url}"
 
             pdf = read_pdf(pdf_path)
-            if self.default_chunk_size>len(pdf) or True: # Need to remove this for production
-                chunk_size=len(pdf)
+            if self.default_chunk_size>len(pdf):
+                chunk_size = len(pdf)
             else:
                 chunk_size = self.default_chunk_size
+
+            # ToDo:
+            #  Need to remove this for production
+            chunk_size = len(pdf)
             chunks = self.create_chunks(pdf, chunk_size=chunk_size)  # Split into chunks of 500 words
             available_material = "\n".join([self.generate_summary(chunk) for chunk in chunks])
             course.available_material_content = available_material
