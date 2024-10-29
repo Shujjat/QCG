@@ -12,14 +12,16 @@ from .models import LoggingEntry
 from .PromptBuilder import PromptBuilder
 from .utils import *
 import logging
-logging.basicConfig(level=logging.INFO)
+#logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.CRITICAL)
+
 logger = logging.getLogger(__name__)
 
 class LLM:
     def __init__(self):
-        self.logger = logging.getLogger(__name__)
-        self.logger.setLevel(logging.DEBUG)
+
         self.prompt_builder = PromptBuilder()
+        self.default_chunk_size=2000
 
     def log_to_db(self, function_name, start_time=None, end_time=None, status='Started'):
         # Use the current time if start_time or end_time is missing
@@ -103,8 +105,13 @@ class LLM:
         if course.available_material:
 
             pdf_path = f"{settings.BASE_URL}{course.available_material.url}"
+
             pdf = read_pdf(pdf_path)
-            chunks = self.create_chunks(pdf, chunk_size=len(pdf))  # Split into chunks of 500 words
+            if self.default_chunk_size>len(pdf) or True: # Need to remove this for production
+                chunk_size=len(pdf)
+            else:
+                chunk_size = self.default_chunk_size
+            chunks = self.create_chunks(pdf, chunk_size=chunk_size)  # Split into chunks of 500 words
             available_material = "\n".join([self.generate_summary(chunk) for chunk in chunks])
             course.available_material_content = available_material
             course.save()
@@ -334,7 +341,7 @@ class LLM:
                     current_module["contents"][-1]["script"] = script_match.group(1)
 
 
-            return generated_text
+            return self.extract_content_listing(generated_text)
 
         except requests.exceptions.RequestException as e:
             logger.error(f"Error communicating with Ollama API: {e}")
@@ -345,8 +352,8 @@ class LLM:
         Summarize the key points of the following book excerpt concisely and informatively:
             {text_chunk}
         """
-        response = ollama.generate(model='llama3', prompt=prompt)
-        return response.get('response', "")
+        response = self.generate_response(prompt=prompt)
+        return response
     @log_execution
     def create_chunks(self,text, chunk_size=1000):
         """
@@ -470,17 +477,32 @@ class LLM:
             logger.error(f"Error in generate_response: {e}")
             return ""
 
-    def list_ollama_models(self):
-        """Check if Ollama is running, and list all models"""
-        # if  get_ollama_status()!='running':
-        #     run_ollama_package()
 
+    def list_ollama_models(self):
         try:
             # Run the command to list models and capture output
             result = subprocess.run(['ollama', 'list'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-            # Parse the output (assuming it's in JSON format)
-            models = json.loads(result.stdout)
-            return [model['name'] for model in models]
+            shutdown_ollama()
+            # Check if there is any error in the stderr
+            if result.stderr:
+                logger.info(f"Error in running 'ollama list': {result.stderr}")
+                return []
+
+            # Print stdout for debugging purposes
+            output = result.stdout
+            logger.info(f"Command output: {output}")
+
+            # Parse the output manually since it's not JSON
+            models = []
+            lines = output.splitlines()[1:]  # Skip the header line
+            for line in lines:
+                if line.strip():  # Ignore empty lines
+                    # Split line by whitespace and get the first part (model name)
+                    model_name = line.split()[0]  # Extract the model name (first column)
+                    models.append(model_name)
+
+            return models
+
         except Exception as e:
-            print(f"Error fetching models from Ollama: {e}")
+            logger.info(f"Error fetching models from Ollama: {e}")
             return []
