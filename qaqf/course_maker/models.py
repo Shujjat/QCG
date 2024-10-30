@@ -36,8 +36,20 @@ class Courses(models.Model):
 
         # Add more language options as needed
     ]
+    LEVEL_CHOICES = [
+        (1, 'Level 1 - Basic implementation'),
+        (2, 'Level 2 - Rudimentary implementation'),
+        (3, 'Level 3 - Crucial implementation'),
+        (4, 'Level 4 - Key implementation'),
+        (5, 'Level 5 - Substantial implementation'),
+        (6, 'Level 6 - Critical implementation'),
+        (7, 'Level 7 - Leading implementation'),
+        (8, 'Level 8 - Specialist implementation'),
+        (9, 'Level 9 - Innovative implementation')
+    ]
 
     # Basic Course Details
+    course_title = models.CharField(max_length=200)
     course_description = models.TextField("Description of course")
     participants_info = models.TextField("Participants and their goals")
     prerequisite_knowledge = models.TextField("Pre-requisite Knowledge")
@@ -57,7 +69,9 @@ class Courses(models.Model):
     assignment = models.BooleanField("Assignment Prototypes", default=False)
     long_course_support = models.BooleanField("Long Course Support", default=False)
     # New fields for Step 2
-    course_title = models.CharField(max_length=200)
+
+    course_level = models.PositiveSmallIntegerField("Course Level", choices=LEVEL_CHOICES, default=1, null=True,
+                                                    blank=True)
 
 
     def __str__(self):

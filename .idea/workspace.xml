@@ -6,8 +6,91 @@
   <component name="ChangeListManager">
     <list default="true" id="7cf03e74-88c4-4af5-b6c0-cfbca8a72de4" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/llm/llm.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/llm/llm.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/llm/tests/test_llm.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/llm/tests/test_llm.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/llm/PromptBuilder.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/llm/PromptBuilder.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_0TjhLIX.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_2b5nOY4.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_2rME3f4.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_421Vqcy.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_4HAQtNa.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_4yMpWGc.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_55dGq9T.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_5kKtJg7.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_5lzzKuI.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_6AeUmH0.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_6BLsf0z.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_6HZ6P1A.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_7vvhYnK.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_8RpbHq8.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_9Bchig0.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_AykcW0F.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_CiPyNdP.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_Cr3r4B5.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_DflKBO6.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_FH5ab0L.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_FYNuYr7.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_K1xDJsb.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_KKOw1zg.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_LX4KeyJ.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_LtHZSuA.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_LwGgBOG.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_M5lC2y4.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_MGCgegh.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_NiTqkDM.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_Nk7WomA.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_PxngQTY.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_QLwDq5K.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_RFMu8cl.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_SIDMYCI.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_SXRPATd.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_TqoEhfv.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_UB7ECyI.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_UOR2rta.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_UQJsCq9.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_UwN15UM.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_Wp9lvGK.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_XYXHSEN.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_Xwfb5o5.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_Y6uPYNN.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_ZaGuzFg.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_a7yF0t5.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_cS833RZ.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_dKgvZE5.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_dnuUB1J.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_dqPx1Ie.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_eDBejV1.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_ebDP3RT.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_eg1BIXM.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_gEiJjST.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_hN7euX9.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_ieTZci6.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_jFEn7Pv.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_jUescTV.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_jlygMEx.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_k9SZ6Sb.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_kYy9zpp.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_lNhDHYK.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_mgdhfno.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_nS4svJ4.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_p4ECbjX.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_pmx9Em0.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_qzK1jA0.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_sDIw1u1.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_sWw6r0d.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_sZpq1Ql.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_t1TSMAc.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_tKBmed9.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_uLDfZDy.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_uWzbf0o.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_ujH8yhv.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_v4PkgIx.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_vcnvnRY.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_vnNZzyD.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_wffDLaT.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_yiQEs8L.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_yzSwNkp.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/media/python_z4Tisft.pdf" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,6 +105,11 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="internal-gpt" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
@@ -30,9 +118,6 @@
     &quot;assignee&quot;: &quot;Shujjat&quot;
   }
 }</component>
-  <component name="GithubDefaultAccount">
-    <option name="defaultAccountId" value="10e2a388-0ec1-4de2-bdd8-84847941d247" />
-  </component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/Shujjat/QCG.git&quot;,
@@ -50,30 +135,30 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python tests.TestLLM.executor&quot;: &quot;Debug&quot;,
-    &quot;Python tests.TestOllama.executor&quot;: &quot;Run&quot;,
-    &quot;Python.Run Server 2.executor&quot;: &quot;Run&quot;,
-    &quot;Python.Run Server.executor&quot;: &quot;Run&quot;,
-    &quot;Python.Test LLM.executor&quot;: &quot;Run&quot;,
-    &quot;Python.TestContentListing.executor&quot;: &quot;Run&quot;,
-    &quot;Python.TestCourses (1).executor&quot;: &quot;Run&quot;,
-    &quot;Python.TestCourses.executor&quot;: &quot;Run&quot;,
-    &quot;Python.TestLLM.executor&quot;: &quot;Run&quot;,
-    &quot;Python.TestLearningOutcome.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;Testing-FW&quot;,
-    &quot;last_opened_file_path&quot;: &quot;E:/Shujjat.com/Projects/QAQF/qaqf/llm/tests/sample_books&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python tests.TestLLM.executor": "Debug",
+    "Python tests.TestOllama.executor": "Run",
+    "Python.Run Server 2.executor": "Run",
+    "Python.Run Server.executor": "Run",
+    "Python.Test LLM.executor": "Run",
+    "Python.TestContentListing.executor": "Run",
+    "Python.TestCourses (1).executor": "Run",
+    "Python.TestCourses.executor": "Run",
+    "Python.TestLLM.executor": "Run",
+    "Python.TestLearningOutcome.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "qaqf-framework",
+    "last_opened_file_path": "E:/Shujjat.com/Projects/QAQF/qaqf/llm/tests/sample_books",
+    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;PLAIN_TEXT&quot;
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "PLAIN_TEXT"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="E:\Shujjat.com\Projects\QAQF\qaqf\llm\tests\sample_books" />
