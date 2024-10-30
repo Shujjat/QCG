@@ -1,3 +1,4 @@
+import PyPDF2
 from django.db import models
 
 
@@ -69,6 +70,25 @@ class Courses(models.Model):
     project_based = models.BooleanField("Project Based", default=False)
     assignment = models.BooleanField("Assignment Prototypes", default=False)
     long_course_support = models.BooleanField("Long Course Support", default=False)
+
+    def save(self, *args, **kwargs):
+        if self.available_material and not self.available_material_content:
+            self.extract_pdf_content()
+        super().save(*args, **kwargs)
+
+    def extract_pdf_content(self):
+        # Open and read the PDF file
+        try:
+            pdf_reader = PyPDF2.PdfReader(self.available_material)
+            text = ""
+            for page in pdf_reader.pages:
+                text += page.extract_text()
+
+            # Store the extracted text in available_material_content
+            self.available_material_content = text
+
+        except Exception as e:
+            print(f"Error reading PDF: {e}")
 
     def __str__(self):
         return self.course_title

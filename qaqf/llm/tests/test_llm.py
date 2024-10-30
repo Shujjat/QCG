@@ -1,3 +1,4 @@
+import os
 import subprocess
 import requests
 from datetime import datetime
@@ -7,21 +8,23 @@ from course_maker.models import Courses
 from llm.llm import LLM
 from llm.models import LoggingEntry
 from django.core.files import File
-
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 class TestLLM(APITestCase):
 
     @classmethod
     def setUpTestData(cls):
-
         # Initialize LLM instance once for all tests
         cls.llm = LLM()
 
     def setUp(self):
-        print(f"\nRunning test: {self._testMethodName}")
+        logger.info(f"\nRunning test: {self._testMethodName}")
         # Create an in-memory PDF file
-        pdf_path = f"{settings.BASE_DIR}/media/sample_books/python.pdf"
-        # Set up test course
+        pdf_path = os.path.join(settings.BASE_DIR, 'media/sample_books/python.pdf')
         with open(pdf_path, 'rb') as pdf_file:
+            file = File(pdf_file, name='python.pdf')
+
             self.course = Courses.objects.create(
                 course_title="",
                 course_description="",
@@ -36,7 +39,7 @@ class TestLLM(APITestCase):
                 project_based=True,
                 assignment=True,
                 long_course_support=False,
-                available_material=File(pdf_file, name='python.pdf')  # Add the file here
+                available_material=file # Add the file here
             )
 
     def test_generate_course_title(self):
@@ -45,6 +48,7 @@ class TestLLM(APITestCase):
 
         # Assertions
         self.assertTrue(title, "Title should not be empty")
+        self.
 
     def test_generate_course_description(self):
         # Call the method directly with actual course ID
