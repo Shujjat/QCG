@@ -1,6 +1,6 @@
 import PyPDF2
 from rest_framework import serializers
-from .models import Courses, LearningOutcome,Content,ContentListing,Quiz
+from .models import Courses, LearningOutcome,Content,ContentListing,Quiz,CourseMaterial
 
 class LearningOutcomeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -31,11 +31,15 @@ class CourseSerializer(serializers.ModelSerializer):
         model = Courses
         fields = [
             'id', 'course_title', 'course_description', 'participants_info',
-            'prerequisite_knowledge', 'available_material','available_material_content', 'content_lang',
+            'prerequisite_knowledge', 'content_lang',
             'course_type', 'optimized_for_mooc', 'project_based', 'assignment',
             'long_course_support', 'knowledge_level', 'duration', 'practice',
             'learning_outcomes','content_listings'
         ]
+class CourseMaterialSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CourseMaterial
+        fields = ['id', 'original_filename', 'file_type', 'file_content', 'uploaded_at', 'material_type']
 
 
 class QuizSerializer(serializers.ModelSerializer):

@@ -5,95 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7cf03e74-88c4-4af5-b6c0-cfbca8a72de4" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/qaqf/course_maker/tests/test_course_material.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug.log" beforeDir="false" afterPath="$PROJECT_DIR$/debug.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/course_wizard_forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/course_wizard_forms.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qaqf/course_maker/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qaqf/course_maker/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/tests/test_courses.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/tests/test_courses.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/llm/tests/test_llm.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/llm/tests/test_llm.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_0jIBGpJ.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_1KQd46R.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_1RoDQRd.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_589iv4E.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_5pMCxvW.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_5zXOp87.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_6OFWyfU.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_7gsHcpc.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_85qO35I.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_8F6LgPf.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_8cro92z.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_8yVjBOX.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_9VFatBC.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_9qAdbCj.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_AQIzzCU.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_Abfi92n.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_B85bLnC.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_BKdHxn5.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_BjXGlwJ.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_C6qRAxt.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_ChY40nd.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_CxWa8Gr.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_DRWFAgb.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_Ezy4VDq.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_FnjeTNQ.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_FuTb6Bq.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_G7TqEhn.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_GCgx3rz.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_GZt755h.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_Gw2aGYF.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_HPZO8qJ.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_HPkXtCs.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_IFqGgMT.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_IHqHL1N.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_INyq6RE.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_KSGY7d6.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_KyfuybA.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_Ld5c9zV.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_Mj0h2Es.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_MlqNk0w.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_OQWSRUs.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_PuVVDVz.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_Qa9rV96.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_Qznt0r8.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_SQSJNv4.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_TtEl9qw.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_U48Mp0j.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_VaAjctX.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_XTmotwK.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_XmocBFo.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_YS1LFFC.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_ZTTe8qK.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_cFtlIOS.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_dO4cQMs.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_dOeMZJO.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_f8E7ZoR.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_fqI19Iu.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_guwsaWz.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_hJJvECU.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_hQquauD.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_ismb9Tg.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_kHtETDq.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_krad6ze.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_lAqwG9V.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_llGxrPf.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_nWIVyUW.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_oA2gP5X.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_qQQZnR2.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_qxsXVgV.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_rF5NYrl.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_rz3dage.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_s8bxR6I.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_sK6j1kN.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_vB9G0yN.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_vFQ5SLQ.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_vrR6X7S.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_w9EL6Kk.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_xEThay1.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_yzl5bdO.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_zBKQ3wz.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_zG8C0Ga.pdf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/media/python_zqzjl3a.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/db.sqlite3" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -136,30 +55,31 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Python tests.TestLLM.executor&quot;: &quot;Debug&quot;,
-    &quot;Python tests.TestOllama.executor&quot;: &quot;Run&quot;,
-    &quot;Python.Run Server 2.executor&quot;: &quot;Run&quot;,
-    &quot;Python.Run Server.executor&quot;: &quot;Run&quot;,
-    &quot;Python.Test LLM.executor&quot;: &quot;Run&quot;,
-    &quot;Python.TestContentListing.executor&quot;: &quot;Run&quot;,
-    &quot;Python.TestCourses (1).executor&quot;: &quot;Run&quot;,
-    &quot;Python.TestCourses.executor&quot;: &quot;Run&quot;,
-    &quot;Python.TestLLM.executor&quot;: &quot;Run&quot;,
-    &quot;Python.TestLearningOutcome.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;qaqf-framework&quot;,
-    &quot;last_opened_file_path&quot;: &quot;E:/Shujjat.com/Projects/QAQF/qaqf&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Python tests.TestLLM.executor": "Debug",
+    "Python tests.TestOllama.executor": "Run",
+    "Python.Run Server 2.executor": "Run",
+    "Python.Run Server.executor": "Run",
+    "Python.Test LLM.executor": "Run",
+    "Python.TestContentListing.executor": "Run",
+    "Python.TestCourseMaterial.executor": "Run",
+    "Python.TestCourses (1).executor": "Run",
+    "Python.TestCourses.executor": "Run",
+    "Python.TestLLM.executor": "Run",
+    "Python.TestLearningOutcome.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "qaqf-framework",
+    "last_opened_file_path": "E:/Shujjat.com/Projects/QAQF/qaqf",
+    "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;PLAIN_TEXT&quot;
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "PLAIN_TEXT"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="E:\Shujjat.com\Projects\QAQF\qaqf" />
@@ -175,7 +95,7 @@
       <recent name="E:\Shujjat.com\Projects\QAQF\qaqf\llm" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.TestLLM">
+  <component name="RunManager" selected="Python.TestCourseMaterial">
     <configuration name="Run Server" type="PythonConfigurationType" factoryName="Python">
       <module name="QAQF" />
       <option name="ENV_FILES" value="" />
@@ -242,6 +162,39 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="TestCourseMaterial" type="PythonConfigurationType" factoryName="Python">
+      <module name="QAQF" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="SDK_NAME" value="Python 3.12 (QAQF)" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="net.ashald.envfile">
+        <option name="IS_ENABLED" value="false" />
+        <option name="IS_SUBST" value="false" />
+        <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
+        <option name="IS_IGNORE_MISSING_FILES" value="false" />
+        <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
+        <ENTRIES>
+          <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
+        </ENTRIES>
+      </EXTENSION>
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/qaqf/manage.py" />
+      <option name="PARAMETERS" value="test course_maker.tests.test_course_material" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="TestLLM" type="PythonConfigurationType" factoryName="Python">
       <module name="QAQF" />
       <option name="ENV_FILES" value="" />
@@ -279,6 +232,7 @@
       <item itemvalue="Python.Run Server" />
       <item itemvalue="Python.Run Server 2" />
       <item itemvalue="Python.TestCourses" />
+      <item itemvalue="Python.TestCourseMaterial" />
       <item itemvalue="Python.TestLLM" />
       <item itemvalue="Python.TestLearningOutcome" />
       <item itemvalue="Python.TestContentListing" />

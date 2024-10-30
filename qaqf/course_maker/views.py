@@ -10,11 +10,12 @@ from django.shortcuts import render
 from formtools.wizard.views import SessionWizardView
 from rest_framework.viewsets import ViewSet
 from .course_wizard_forms import *
-from .models import Courses, LearningOutcome,Content,ContentListing,Quiz
-from .serializers import CourseSerializer, LearningOutcomeSerializer, ContentSerializer, ContentListingSerializer,QuizSerializer
+from .models import Courses,CourseMaterial, LearningOutcome,Content,ContentListing,Quiz
+from .serializers import CourseSerializer,CourseMaterialSerializer, LearningOutcomeSerializer, ContentSerializer, ContentListingSerializer,QuizSerializer
+from rest_framework import viewsets, status
+from rest_framework.response import Response
 from llm.llm import LLM
 from llm .utils import *
-from rest_framework import status
 from django.http import JsonResponse
 import logging
 logging.basicConfig(level=logging.WARNING)
@@ -376,6 +377,23 @@ class CourseLearningOutcomesAPIView(APIView):
         except LearningOutcome.DoesNotExist:
             return Response({'error': 'Learning outcome not found'}, status=status.HTTP_404_NOT_FOUND)
 
+class CourseMaterialViewSet(viewsets.ModelViewSet):
+    queryset = CourseMaterial.objects.all()
+    serializer_class = CourseMaterialSerializer
+
+    def create(self, request, *args, **kwargs):
+        course_id = request.data.get('course_id')
+        material_type = request.data.get('material_type')  # Pass 'textbook' or 'helping'
+        course = Courses.objects.get(id=course_id)
+        file = request.FILES.get('file')
+
+        if material_type not in ['textbook', 'helping']:
+            return Response({'error': 'Invalid material type'}, status=status.HTTP_400_BAD_REQUEST)
+
+        material = CourseMaterial(course=course, file=file, material_type=material_type)
+        material.save()
+
+        return Response(CourseMaterialSerializer(material).data, status=status.HTTP_201_CREATED)
 
 def modules_listing_to_json(content_text):
     """

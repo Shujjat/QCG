@@ -7,7 +7,7 @@ from .models import Courses, Content
 class Step1Form(forms.ModelForm):
     class Meta:
         model = Courses
-        fields = ['course_description', 'participants_info', 'prerequisite_knowledge', 'available_material', 'content_lang', 'course_type', 'optimized_for_mooc', 'project_based', 'assignment', 'long_course_support', 'knowledge_level', 'duration', 'practice']
+        fields = ['course_description', 'participants_info', 'prerequisite_knowledge', 'content_lang', 'course_type', 'optimized_for_mooc', 'project_based', 'assignment', 'long_course_support', 'knowledge_level', 'duration', 'practice']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
