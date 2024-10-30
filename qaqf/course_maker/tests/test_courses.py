@@ -1,25 +1,33 @@
+from django.conf import settings
+from django.core.files import File
 from rest_framework.test import APITestCase
 from rest_framework import status
 from course_maker.models import Courses
 class CourseCreationWizardTest(APITestCase):
     def setUp(self):
         try:
-            self.course = Courses.objects.create(
-                course_title="Setup Advanced Django",
-                course_description="An in-depth course on Django.",
-                content_lang="EN",
-                course_type="Pre-Recorded",
-                knowledge_level="Senior",
-                prerequisite_knowledge="prerequisite_knowledge",
-                participants_info="participants_info",
-                duration="2",
-                practice="Intensive",
-                optimized_for_mooc=True,
-                project_based=True,
-                assignment=True,
-                long_course_support=False
-            )
+            pdf_path = f"{settings.BASE_DIR}/media/sample_books/python.pdf"
+            with open(pdf_path, 'rb') as pdf_file:
+                self.course = Courses.objects.create(
+                    course_title="Setup Advanced Django",
+                    course_description="An in-depth course on Django.",
+                    content_lang="EN",
+                    course_type="Pre-Recorded",
+                    knowledge_level="Senior",
+                    prerequisite_knowledge="prerequisite_knowledge",
+                    participants_info="participants_info",
+                    duration="2",
+                    practice="Intensive",
+                    optimized_for_mooc=True,
+                    project_based=True,
+                    assignment=True,
+                    long_course_support=False,
+                    course_level=1,
+                    available_material=File(pdf_file, name='python.pdf')
+                    )
             print("Course created successfully:", self.course)
+            print(self.course.available_material)
+            print(self.course.available_material_content)
         except Exception as e:
             print("Error creating course:", str(e))
 

@@ -1,5 +1,5 @@
 import logging
-logging.basicConfig(level=logging.WARNING)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 from course_maker.models import LearningOutcome, ContentListing,Courses
 
@@ -48,6 +48,7 @@ class PromptBuilder:
             """
         else:
             central += "\n- No additional study material available.\n"
+        central+=self.generate_measurement_level_prompt(course.course_level)
 
         return central
 
@@ -86,6 +87,64 @@ class PromptBuilder:
         else:
             item_to_change= ""
         return item_to_change
+
+    def generate_measurement_level_prompt(self, level):
+        """
+        Generates a prompt based on the QAQF measurement level (1 to 9), integrating the QAQF Level Descriptors.
+        Args:
+            level (int): The level (1 to 9) representing the measurement stage.
+        Returns:
+            str: The generated prompt based on the provided level.
+        """
+        # Validate level
+        if level not in range(1, 10):
+            return ""
+
+        # QAQF Characteristics
+        characteristics = [
+            "Knowledge and understanding",
+            "Practice: Applied knowledge, skills and understanding",
+            "Generic cognitive skills",
+            "Communication and numeracy",
+            "Autonomy, accountability and working with others",
+            "Digitalisation, Artificial Intelligence, Advanced IT application, Robotics",
+            "Reflective, creativity and Innovative skills",
+            "Sustainability, resilience and ecological awareness",
+            "Futuristic skills: futurology, genius, differentology"
+        ]
+
+        # Level Descriptors
+        level_descriptors = {
+            1: "Basic implementation of these characteristics",
+            2: "Rudimentary implementation of these characteristics",
+            3: "Crucial implementation of these characteristics",
+            4: "Key implementation of these characteristics",
+            5: "Substantial implementation of these characteristics",
+            6: "Critical implementation of these characteristics",
+            7: "Leading implementation of these characteristics",
+            8: "Specialist implementation of these characteristics",
+            9: "21st Century innovative and superior implementation of these characteristics"
+        }
+
+        # Guidelines
+        guidelines = (
+            "Level Descriptors provide a broad guide to what learners should be able to demonstrate at a given level. "
+            "They offer a general overview and can assist with comparing qualifications and learning programs. "
+            "The descriptors should be seen as a reference point, but not all characteristics need to be met for each qualification. "
+            "It is important to assess across multiple levels to find the best fit. These descriptors can be used in creating program descriptions, "
+            "learning outcomes, and assessment evidence."
+        )
+
+        # Construct the task description based on the level
+        sub_prompt = (
+
+            f"The assessment must evaluate the following nine characteristics:\n"
+            f"{', '.join(characteristics)}.\n"
+            f"The outcome of the assessment must demonstrate {level_descriptors[level]} to meet QAQF level {level} objectives.\n"
+            f"{guidelines}"
+        )
+
+        return sub_prompt
     def build_full_prompt(self, task_description, course, output_format,item_type=None,item_id=None):
 
         """
@@ -101,7 +160,8 @@ class PromptBuilder:
             item_to_change = self.build_item_to_change(course,item_type, item_id)
         else:
             item_to_change=""
-
-        return prolog + item_to_change + central + epilog
+        prompt=prolog + item_to_change + central + epilog
+        logger.info(prompt)
+        return prompt
 
 

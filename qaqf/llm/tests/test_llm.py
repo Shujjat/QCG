@@ -1,3 +1,5 @@
+import subprocess
+import requests
 from datetime import datetime
 from django.conf import settings
 from rest_framework.test import APITestCase
@@ -5,9 +7,6 @@ from course_maker.models import Courses
 from llm.llm import LLM
 from llm.models import LoggingEntry
 from django.core.files import File
-
-import subprocess
-import requests
 
 class TestLLM(APITestCase):
 
