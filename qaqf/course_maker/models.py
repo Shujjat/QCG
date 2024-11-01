@@ -46,7 +46,6 @@ class Courses(models.Model):
 
         # Add more language options as needed
     ]
-    # Level Descriptors
     LEVEL_CHOICES = [
         (1, 'Level 1 - Basic implementation'),
         (2, 'Level 2 - Rudimentary implementation'),
@@ -58,12 +57,12 @@ class Courses(models.Model):
         (8, 'Level 8 - Specialist implementation'),
         (9, 'Level 9 - Innovative implementation')
     ]
+
     # Basic Course Details
     course_title = models.CharField(max_length=200)
     course_description = models.TextField("Description of course")
     participants_info = models.TextField("Participants and their goals")
     prerequisite_knowledge = models.TextField("Pre-requisite Knowledge")
-    course_level = models.PositiveSmallIntegerField("Course Level", choices=LEVEL_CHOICES, default=1,null=True, blank=True)
 
     # Enum/Choice Fields
     content_lang = models.CharField("Content Language", max_length=2, choices=CONTENT_LANG_CHOICES, default='EN')
@@ -77,6 +76,10 @@ class Courses(models.Model):
     project_based = models.BooleanField("Project Based", default=False)
     assignment = models.BooleanField("Assignment Prototypes", default=False)
     long_course_support = models.BooleanField("Long Course Support", default=False)
+    # New fields for Step 2
+
+    course_level = models.PositiveSmallIntegerField("Course Level", choices=LEVEL_CHOICES, default=1, null=True,
+                                                    blank=True)
 
 
     def __str__(self):

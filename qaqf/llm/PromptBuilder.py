@@ -1,7 +1,8 @@
 import logging
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-from course_maker.models import LearningOutcome, ContentListing,Courses
+from course_maker.models import LearningOutcome, ContentListing, Courses
 
 
 class PromptBuilder:
@@ -23,9 +24,9 @@ class PromptBuilder:
         Builds the central section of the prompt with course-specific data.
         """
         if course.long_course_support:
-            duration=6
+            duration = 6
         else:
-            duration=course.duration
+            duration = course.duration
         central = f"""
         Course Details:
         - About Course: {course.course_description}
@@ -48,30 +49,31 @@ class PromptBuilder:
             """
         else:
             central += "\n- No additional study material available.\n"
-        central+=self.generate_measurement_level_prompt(course.course_level)
+        central += self.generate_measurement_level_prompt(course.course_level)
 
         return central
 
-    def build_epilog(self, output_format,course):
+    def build_epilog(self, output_format, course):
         """
         Builds the epilog section of the prompt, which includes formatting instructions for the response.
         """
         epilog = f"""
         Please ensure the output is structured as follows:
         {output_format}
-        
+
         """
         return epilog
-    def build_item_to_change(self,course,item_type,item_id=None):
-        if item_type=="title":
-            item_to_change=f"This title already exists and must be modified: {course.course_title}"
+
+    def build_item_to_change(self, course, item_type, item_id=None):
+        if item_type == "title":
+            item_to_change = f"This title already exists and must be modified: {course.course_title}"
         elif item_type == "description":
             item_to_change = f"This description already exists and must be modified: {course.course_description}"
         elif item_id:
             if item_type == "learning_outcome":
                 learning_outcome = LearningOutcome.objects.get(id=item_id)
                 item_to_change = f"""
-                                    This Learning outcome should be modified and improved: '{learning_outcome.outcome }'
+                                    This Learning outcome should be modified and improved: '{learning_outcome.outcome}'
                                     with sub items: '{learning_outcome.sub_items}'
                                 """
 
@@ -82,10 +84,10 @@ class PromptBuilder:
                                     This Content Listing should be modified and improved: '{content_listing.content_item}'
                                 """
             else:
-                item_to_change= ""
+                item_to_change = ""
 
         else:
-            item_to_change= ""
+            item_to_change = ""
         return item_to_change
 
     def generate_measurement_level_prompt(self, level):
@@ -145,7 +147,8 @@ class PromptBuilder:
         )
 
         return sub_prompt
-    def build_full_prompt(self, task_description, course, output_format,item_type=None,item_id=None):
+
+    def build_full_prompt(self, task_description, course, output_format, item_type=None, item_id=None):
 
         """
         Combines the prolog, central, and epilog to create the full prompt.
@@ -153,14 +156,13 @@ class PromptBuilder:
 
         prolog = self.build_prolog(task_description)
         central = self.build_central(course)
-        epilog = self.build_epilog(output_format,course)
-
+        epilog = self.build_epilog(output_format, course)
 
         if item_type:
-            item_to_change = self.build_item_to_change(course,item_type, item_id)
+            item_to_change = self.build_item_to_change(course, item_type, item_id)
         else:
-            item_to_change=""
-        prompt=prolog + item_to_change + central + epilog
+            item_to_change = ""
+        prompt = prolog + item_to_change + central + epilog
         logger.info(prompt)
         return prompt
 
