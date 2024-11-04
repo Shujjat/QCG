@@ -55,9 +55,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'formtools',
     'course_maker',
+    'course_material',
     'llm',
     'crispy_forms',
     'crispy_bootstrap5',
+
 ]
 
 LOGGING = {

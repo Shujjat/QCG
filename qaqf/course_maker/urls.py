@@ -1,9 +1,7 @@
 from django.urls import path, include
 from rest_framework import routers
 from .views import *
-
 router = routers.DefaultRouter()
-router.register('api/course-materials', CourseMaterialViewSet)
 router.register(r'api/content-listings', ContentListingViewSet)
 router.register(r'api/quizzes', QuizViewSet)
 router.register(r'api/regenerate', CourseViewSet,basename='api')

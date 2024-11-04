@@ -1,16 +1,4 @@
-import os
-import PyPDF2
-from docx import Document
 from django.db import models
-
-
-
-def upload_to(instance, filename):
-    # Store files in a directory named after the course ID
-    course_id = instance.course.id
-    return f"media/{course_id}/{filename}"
-
-
 class Courses(models.Model):
     COURSE_TYPE_CHOICES = [
         ('Pre-Recorded', 'Pre-Recorded'),
@@ -88,67 +76,6 @@ class Courses(models.Model):
     def get_full_language_name(self,language_key):
 
         return dict(self.CONTENT_LANG_CHOICES).get(language_key, 'English')
-
-
-class CourseMaterial(models.Model):
-    MATERIAL_TYPE_CHOICES = [
-        ('textbook', 'Textbook'),
-        ('helping', 'Helping Material')
-    ]
-
-    course = models.ForeignKey(Courses, related_name='course_materials', on_delete=models.CASCADE)
-    file = models.FileField(upload_to=upload_to)
-    original_filename = models.CharField(max_length=255)
-    file_type = models.CharField(max_length=10, null=True, blank=True)  # E.g., 'pdf', 'txt', 'docx'
-    file_content = models.TextField("Extracted Content", null=True, blank=True)
-    uploaded_at = models.DateTimeField(auto_now_add=True)
-    material_type = models.CharField(max_length=10, choices=MATERIAL_TYPE_CHOICES)
-
-    def save(self, *args, **kwargs):
-        if self.file:
-            self.original_filename = self.file.name
-            self.file_type = self.get_file_type()
-            self.extract_file_content()
-        super().save(*args, **kwargs)
-
-    def get_file_type(self):
-        name, extension = os.path.splitext(self.file.name)
-        return extension.lower().replace('.', '')  # Return the file extension
-
-    def extract_file_content(self):
-        if self.file_type == 'pdf':
-            self.file_content = self.extract_pdf_content()
-        elif self.file_type in ['doc', 'docx']:
-            self.file_content = self.extract_word_content()
-        elif self.file_type == 'txt':
-            self.file_content = self.extract_txt_content()
-
-    def extract_pdf_content(self):
-        try:
-            pdf_reader = PyPDF2.PdfReader(self.file)
-            text = ""
-            for page in pdf_reader.pages:
-                text += page.extract_text()
-            return text
-        except Exception as e:
-            return f"Error reading PDF: {e}"
-
-    def extract_word_content(self):
-        try:
-            doc = Document(self.file)
-            text = '\n'.join([para.text for para in doc.paragraphs])
-            return text
-        except Exception as e:
-            return f"Error reading Word file: {e}"
-
-    def extract_txt_content(self):
-        try:
-            return self.file.read().decode('utf-8')
-        except Exception as e:
-            return f"Error reading TXT file: {e}"
-
-    def __str__(self):
-        return f"{self.material_type.capitalize()} - {self.original_filename}"
 
 
 
