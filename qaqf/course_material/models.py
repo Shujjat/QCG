@@ -11,7 +11,7 @@ class CourseMaterial(models.Model):
 
     MATERIAL_TYPE_CHOICES = [
         ('textbook', 'Textbook'),
-        ('helping', 'Helping Material')
+        ('helpingbook', 'Helping Book')
 
     ]
     FILE_TYPE_CHOICES = [
@@ -23,13 +23,13 @@ class CourseMaterial(models.Model):
     ]
 
     course = models.ForeignKey(Courses, related_name='course_materials', on_delete=models.CASCADE)
-    file = models.FileField(upload_to=upload_to)
-    original_filename = models.CharField(max_length=255)
+    file = models.FileField(upload_to=upload_to,blank=True,null=True)
+    original_filename = models.CharField(max_length=255,null=True, blank=True)
     file_type = models.CharField(max_length=10,choices=FILE_TYPE_CHOICES)  # E.g., 'pdf', 'txt', 'docx'
-    file_content = models.TextField("Extracted Content", null=True, blank=True)
+    file_content = models.TextField("File Content", null=True, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
-    material_type = models.CharField(max_length=10, choices=MATERIAL_TYPE_CHOICES)
+    material_type = models.CharField(max_length=20, choices=MATERIAL_TYPE_CHOICES)
+    audio_book = models.URLField("Audio Book URL", null=True, blank=True)
 
     def __str__(self):
         return f"{self.material_type.capitalize()} - {self.original_filename}"
-

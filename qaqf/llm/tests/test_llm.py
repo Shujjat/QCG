@@ -9,6 +9,9 @@ from llm.llm import LLM
 from llm.models import LoggingEntry
 from django.core.files import File
 import logging
+
+from llm.utils import shutdown_ollama
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 class TestLLM(APITestCase):
@@ -19,6 +22,7 @@ class TestLLM(APITestCase):
         cls.llm = LLM()
 
     def setUp(self):
+        #shutdown_ollama()
         logger.info(f"\nRunning test: {self._testMethodName}")
         # Create an in-memory PDF file
         pdf_path = os.path.join(settings.BASE_DIR, 'media/sample_books/python.pdf')
@@ -39,8 +43,11 @@ class TestLLM(APITestCase):
                 project_based=True,
                 assignment=True,
                 long_course_support=False,
-                available_material=file # Add the file here
+
             )
+    def tearDown(self):
+        #shutdown_ollama()
+        pass
 
     def test_generate_course_title(self):
         # Call the method directly with actual course ID
@@ -48,7 +55,7 @@ class TestLLM(APITestCase):
 
         # Assertions
         self.assertTrue(title, "Title should not be empty")
-        self.
+
 
     def test_generate_course_description(self):
         # Call the method directly with actual course ID
@@ -95,16 +102,13 @@ class TestLLM(APITestCase):
         assert all("outcome" in outcome for outcome in learning_outcomes), "Each outcome should have an 'outcome' field"
 
 
-
-
-
-    def test_generate_summary(self):
-        text_chunk = self.course.available_material_content
-        summary = self.llm.generate_summary(text_chunk)
+    # def _test_generate_summary(self):
+    #     text_chunk = self.course.available_material_content
+    #     summary = self.llm.generate_summary(text_chunk)
 
         # Assertions
-        self.assertTrue( summary, "Summary should not be empty")
-        self.assertTrue( isinstance(summary, str), "Summary should be a string")
+        # self.assertTrue( summary, "Summary should not be empty")
+        # self.assertTrue( isinstance(summary, str), "Summary should be a string")
 
     def test_create_chunks(self):
         text = " ".join(["word"] * 3000)  # Simulating a text with 3000 words

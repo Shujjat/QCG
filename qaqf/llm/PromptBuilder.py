@@ -1,20 +1,24 @@
 import logging
+from course_maker.models import LearningOutcome, ContentListing, Courses
+from course_material.models import CourseMaterial
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-from course_maker.models import LearningOutcome, ContentListing, Courses
+
 
 
 class PromptBuilder:
     def __init__(self):
         self.logger = logging.getLogger(__name__)
 
-    def build_prolog(self, task_description):
+    def build_prolog(self, task_description, course_level):
         """
         Builds the prolog section of the prompt with general instructions.
         """
         prolog = f"""
-        You are a highly skilled assistant to a professor. Your task is to {task_description}.
+        You are a highly skilled professor assigned to a task of course framework and content generation.
+        The course level is SCQF Level {course_level} which means {self.get_scqf_level_info(course_level)}
+        Your task is to {task_description}.
         Please ensure that your response is coherent and relevant.
         """
         return prolog
@@ -23,6 +27,7 @@ class PromptBuilder:
         """
         Builds the central section of the prompt with course-specific data.
         """
+
         if course.long_course_support:
             duration = 6
         else:
@@ -39,17 +44,42 @@ class PromptBuilder:
         - course duration is: {duration}
         - practice intensity: {course.practice}
         """
+        textbooks=CourseMaterial.objects.filter(course_id=course.id, material_type='textbook')
+        helpingbooks=CourseMaterial.objects.filter(course_id=course.id, material_type='helpingbook')
+        texts=""
+        helpingtexts=""
+        if textbooks.count()>0:
+            texts = "Following is the main textbook content:"
+            for textbook in textbooks:
+                texts += "-------------------- Text Book Begins--------------------"
+                texts += str(textbook.file_content)
+                texts += "-------------------- Text Book Ends--------------------"
 
-        if course.available_material_content:
+        if helpingbooks.count()>0:
+            helpingtexts = "Following is the helping content:"
+            for helpingbook in helpingbooks:
+                helpingtexts += "-------------------- Helping Book Begins--------------------"
+                helpingtexts += helpingbook.file_content
+                helpingtexts += "-------------------- Helping Book Ends--------------------"
+
+        if texts or helpingtexts:
             central += f"""
-            - Available Study Material to use as textbook or context :
-            [Start of Material]
-            {course.available_material_content}
-            [End of Material]
-            """
+                        - Available Course Material to use as textbook or context is as under. It comprises textbooks and
+                        helping books.
+                        [Start of Material]
+                        """
+            if texts:
+                central += texts
+
+            if helpingtexts:
+                central += helpingtexts
+
+            central += f"""
+                        [End of Course Material]
+                       """
         else:
-            central += "\n- No additional study material available.\n"
-        central += self.generate_measurement_level_prompt(course.course_level)
+            central=""
+
 
         return central
 
@@ -154,7 +184,7 @@ class PromptBuilder:
         Combines the prolog, central, and epilog to create the full prompt.
         """
 
-        prolog = self.build_prolog(task_description)
+        prolog = self.build_prolog(task_description,course.course_level)
         central = self.build_central(course)
         epilog = self.build_epilog(output_format, course)
 
@@ -166,4 +196,78 @@ class PromptBuilder:
         logger.info(prompt)
         return prompt
 
+    def get_scqf_level_info(self,level):
+        scqf_qaqf_levels = {
+            12: {
+                "SCQF Qualification": "Doctoral Degree, Graduate Apprenticeship",
+                "QAQF Benchmark": "21st Century Doctoral Degree",
+                "Description": "Reflects an advanced capacity for independent research, critical thinking, and innovation."
+            },
+            11: {
+                "SCQF Qualification": "Master's Degree, Integrated Master's Degree, Postgraduate Diploma/Certificate, Professional Apprenticeship",
+                "QAQF Benchmark": "21st Century Master's Degree, Postgraduate Diploma, Graduate Certificate",
+                "Description": "Emphasizes professional and high-level theoretical knowledge."
+            },
+            10: {
+                "SCQF Qualification": "Honours Degree, Graduate Diploma/Certificate, SVQ Qualifications",
+                "QAQF Benchmark": "Innovative Honours Degree, Graduate Certificate",
+                "Description": "Promotes advanced knowledge and innovation within a specific field of study."
+            },
+            9: {
+                "SCQF Qualification": "Professional Development Award, Bachelor's/Ordinary Degree, Graduate Apprenticeship",
+                "QAQF Benchmark": "Creative Bachelor's/Ordinary Degree, Graduate Diploma",
+                "Description": "Reflects a balanced blend of creative and practical skills."
+            },
+            8: {
+                "SCQF Qualification": "Higher National Diploma, Diploma of Higher Education",
+                "QAQF Benchmark": "Professional Diploma of Higher Education",
+                "Description": "Supports a structured path for those entering professional or technical fields."
+            },
+            7: {
+                "SCQF Qualification": "Advanced Higher, Scottish Baccalaureate, Higher National Certificate, Certificate of Higher Education",
+                "QAQF Benchmark": "Resilient Certificate of Higher Education",
+                "Description": "Promotes resilience and professional preparedness."
+            },
+            6: {
+                "SCQF Qualification": "Higher, Skills for Work",
+                "QAQF Benchmark": "Higher Apprenticeship",
+                "Description": "Encourages applied knowledge and work-readiness in technical fields."
+            },
+            5: {
+                "SCQF Qualification": "National 5",
+                "QAQF Benchmark": "Technical Apprenticeship",
+                "Description": "Suitable for those gaining initial exposure to technical work settings."
+            },
+            4: {
+                "SCQF Qualification": "National 4, National Certificates",
+                "QAQF Benchmark": "Basic Professional Qualification",
+                "Description": "Foundational level promoting early skill development."
+            },
+            3: {
+                "SCQF Qualification": "National 3",
+                "QAQF Benchmark": "Basic Professional Qualification",
+                "Description": "Early skill development level, building foundational competencies."
+            },
+            2: {
+                "SCQF Qualification": "National 2",
+                "QAQF Benchmark": "Foundational Learning",
+                "Description": "Basic level for foundational skill-building."
+            },
+            1: {
+                "SCQF Qualification": "National 1",
+                "QAQF Benchmark": "Introductory Learning",
+                "Description": "Introductory level supporting initial learning and skill acquisition."
+            }
+        }
 
+        level_info = scqf_qaqf_levels.get(level)
+
+        if not level_info:
+            return "Level information not found."
+
+        # Format the level information into a humanized paragraph
+        return (
+            f"SCQF Level {level} corresponds to qualifications such as {level_info['SCQF Qualification']}. "
+            f"In terms of the QAQF Benchmark, it aligns with the \"{level_info['QAQF Benchmark']}.\" "
+            f"This level is characterized as {level_info['Description']}"
+        )

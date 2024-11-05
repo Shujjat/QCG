@@ -103,23 +103,23 @@ class LLM:
         # Retrieve the course using course_id
         course = Courses.objects.get(pk=course_id)
 
-        if course.available_material:
-
-            pdf_path = f"{settings.BASE_URL}{course.available_material.url}"
-
-            pdf = read_pdf(pdf_path)
-            if self.default_chunk_size>len(pdf):
-                chunk_size = len(pdf)
-            else:
-                chunk_size = self.default_chunk_size
-
-            # ToDo:
-            #  Need to remove this for production
-            chunk_size = len(pdf)
-            chunks = self.create_chunks(pdf, chunk_size=chunk_size)  # Split into chunks of 500 words
-            available_material = "\n".join([self.generate_summary(chunk) for chunk in chunks])
-            course.available_material_content = available_material
-            course.save()
+        # if course.available_material:
+        #
+        #     pdf_path = f"{settings.BASE_URL}{course.available_material.url}"
+        #
+        #     pdf = read_pdf(pdf_path)
+        #     if self.default_chunk_size>len(pdf):
+        #         chunk_size = len(pdf)
+        #     else:
+        #         chunk_size = self.default_chunk_size
+        #
+        #     # ToDo:
+        #     #  Need to remove this for production
+        #     chunk_size = len(pdf)
+        #     chunks = self.create_chunks(pdf, chunk_size=chunk_size)  # Split into chunks of 500 words
+        #     available_material = "\n".join([self.generate_summary(chunk) for chunk in chunks])
+        #     course.available_material_content = available_material
+        #     course.save()
 
 
         # Define task description and output format
@@ -164,7 +164,8 @@ class LLM:
 
         task_description = """
                             Based on the given course title: '{course.course_title}' 
-                            and description: '{course.course_description}', generate several learning outcomes 
+                            and description: '{course.course_description}', generate 
+                            several learning outcomes 
                             that should a learner achieve.
         """
         output_format = """
@@ -183,10 +184,14 @@ class LLM:
         """
 
         prompt = self.prompt_builder.build_full_prompt(task_description, course, output_format,'learning_outcome', item_id)
+        logger.info("::::::::::::::::::::::::::::::Prompt for Learning Outcome:::::::::::::::::::::::::::::::::::::::::::::::::::::::::")
         logger.info(prompt)
         try:
             # Generate response using Ollama locally
             generated_text = self.generate_response( prompt=prompt)
+            logger.info(
+                "::::::::::::::::::::::::::::::Learning Outcome generated_text:::::::::::::::::::::::::::::::::::::::::::::::::::::::::")
+            logger.info(generated_text)
             # Extract outcomes and sub-items using regex
             learning_outcomes = []
             current_outcome = None
@@ -225,7 +230,9 @@ class LLM:
                     "outcome": outcome["outcome"],
                     "sub_items": outcome["sub_items"]
                 })
-
+            logger.info(
+                "::::::::::::::::::::::::::::::Prompt for Learning Outcome simplified_outcomes:::::::::::::::::::::::::::::::::::::::::::::::::::::::::")
+            logger.info(simplified_outcomes)
             return simplified_outcomes
 
         except requests.exceptions.RequestException as e:

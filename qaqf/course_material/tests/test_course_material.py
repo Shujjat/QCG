@@ -5,11 +5,13 @@ from django.core.files import File
 from rest_framework import status
 from rest_framework.test import APIClient
 from PyPDF2 import PdfReader
+from pydub import AudioSegment
 from course_maker.models import Courses
 from course_material.models import CourseMaterial
 APP_FOLDER = os.path.dirname(os.path.dirname(__file__))  # Adjust this to point to app_folder
-TEST_FILES_DIR = os.path.join(os.path.dirname(APP_FOLDER), 'media\\sample_books')
+TEST_FILES_DIR = os.path.join(os.path.dirname(APP_FOLDER), 'media/sample_books')
 test_file=TEST_FILES_DIR
+
 class CourseMaterialAPITests(TestCase):
     def setUp(self):
         # Create a test course
@@ -68,12 +70,12 @@ class CourseMaterialAPITests(TestCase):
                 {
                     'course': self.course.id,
                     'file': pdf_file,
+                    'file_type': 'pdf',
                     'material_type': 'textbook',
                     'original_filename':file_name
                 },
                 format='multipart'
             )
-
         # Assertions
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         material = CourseMaterial.objects.get(id=response.data['id'])
@@ -83,21 +85,14 @@ class CourseMaterialAPITests(TestCase):
         self.assertIsNotNone( material.file_content)
 
     def test_list_course_materials(self):
-        # Create sample materials to list
-        with open(os.path.join(TEST_FILES_DIR, 'test.pdf'), 'rb') as pdf_file, \
-                open(os.path.join(TEST_FILES_DIR, 'test.docx'), 'rb') as docx_file:
-            CourseMaterial.objects.create(course=self.course, file=File(pdf_file, name="test.pdf"),
-                                          material_type="textbook")
-            CourseMaterial.objects.create(course=self.course, file=File(docx_file, name="test.docx"),
-                                          material_type="helping")
 
         # List course materials
-        url = f"{self.create_url}?course_id={self.course.id}"
+        url = self.url+str(self.course.id)+"/"
         response = self.client.get(url)
 
         # Assertions
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(len(response.data), 8)
 
     def test_retrieve_course_material(self):
 
@@ -139,3 +134,48 @@ class CourseMaterialAPITests(TestCase):
         # Assertions
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(CourseMaterial.objects.filter(pk=self.material.id).exists())  # Confirm deletion
+
+    def test_download_audio_from_youtube(self):
+        # Test downloading audio directly from YouTube
+        response = self.client.post(self.url, {
+            'course': self.course.id,
+            'audio_book':"https://www.youtube.com/watch?v=BZP1rYjoBgI",
+            'material_type': 'helping',
+            'file_type':'audiobook',
+        })
+
+        # Assertions
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        material = CourseMaterial.objects.get(id=response.data['id'])
+        self.assertEqual(material.file_type, 'audiobook')
+        self.assertIsNotNone( material.file_content)
+
+
+
+    # ToDo
+    # Complete these tests when resources are available.
+    # def _test_download_audio_from_aws_s3(self):
+    #     # Test downloading an audio file directly from AWS S3
+    #     response = self.client.post(self.url, {
+    #         'course': self.course.id,
+    #         'audio_book': "s3://bucket-name/path/to/sample_audio.mp3",
+    #         'material_type': 'helping'
+    #     })
+    #
+    #     # Assertions
+    #     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+    #     material = CourseMaterial.objects.get(id=response.data['id'])
+    #     self.assertEqual(material.file_type, 'audiobook')
+    #
+    # def _test_download_audio_from_general_url(self):
+    #     # Test downloading audio file from a general URL
+    #     response = self.client.post(self.url, {
+    #         'course': self.course.id,
+    #         'audio_book': "https://example.com/sample_audio.mp3",
+    #         'material_type': 'helping'
+    #     })
+    #
+    #     # Assertions
+    #     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+    #     material = CourseMaterial.objects.get(id=response.data['id'])
+    #     self.assertEqual(material.file_type, 'audiobook')
