@@ -27,6 +27,8 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 DEFAULT_LLM = env('LLM_DEFAULT', default='llama3.2')
 ENVIRONMENT = env('DEV-LOCAL', default='DEV-LOCAL')
 
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -55,9 +57,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'formtools',
     'course_maker',
+    'course_material',
     'llm',
     'crispy_forms',
     'crispy_bootstrap5',
+
 ]
 
 LOGGING = {

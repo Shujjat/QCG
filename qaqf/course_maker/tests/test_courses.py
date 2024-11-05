@@ -1,32 +1,42 @@
+import os
+from django.conf import settings
+from django.core.files import File
 from rest_framework.test import APITestCase
 from rest_framework import status
 from course_maker.models import Courses
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 class CourseCreationWizardTest(APITestCase):
     def setUp(self):
         try:
+            # pdf_path = os.path.join(settings.BASE_DIR, 'media/sample_books/python.pdf')
+            # with open(pdf_path, 'rb') as pdf_file:
+            #     file = File(pdf_file, name='python.pdf')
+
             self.course = Courses.objects.create(
-                course_title="Setup Advanced Django",
-                course_description="An in-depth course on Django.",
-                content_lang="EN",
-                course_type="Pre-Recorded",
-                knowledge_level="Senior",
-                prerequisite_knowledge="prerequisite_knowledge",
-                participants_info="participants_info",
-                duration="2",
-                practice="Intensive",
-                optimized_for_mooc=True,
-                project_based=True,
-                assignment=True,
-                long_course_support=False
+                course_title = "Setup Advanced Django",
+                course_description = "An in-depth course on Django.",
+                content_lang = "EN",
+                course_type = "Pre-Recorded",
+                knowledge_level = "Senior",
+                prerequisite_knowledge = "prerequisite_knowledge",
+                participants_info = "participants_info",
+                duration = "2",
+                practice = "Intensive",
+                optimized_for_mooc = True,
+                project_based = True,
+                assignment = True,
+                long_course_support = False,
+                course_level = 1,
             )
-            print("Course created successfully:", self.course)
+            
         except Exception as e:
-            print("Error creating course:", str(e))
+            logger.info("Error creating course:", str(e))
 
         self.url = 'http://127.0.0.1:8000/api/courses/'
     def test_update_course(self):
         url = f"{self.url}{self.course.id}/"
-        print(url)
         data = {
             "course_title": "New Title",
             "course_description": "Updated description."
@@ -57,6 +67,7 @@ class CourseCreationWizardTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['course_title'], data['course_title'])
 
+
     def test_get_course_detail(self):
         url = f'{self.url}{self.course.id}/'
         response = self.client.get(url)
@@ -70,7 +81,6 @@ class CourseCreationWizardTest(APITestCase):
         self.assertFalse(Courses.objects.filter(id=self.course.id).exists())
 
     def test_get_all_courses(self):
-
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)

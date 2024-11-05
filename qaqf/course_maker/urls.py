@@ -1,7 +1,6 @@
 from django.urls import path, include
 from rest_framework import routers
 from .views import *
-
 router = routers.DefaultRouter()
 router.register(r'api/content-listings', ContentListingViewSet)
 router.register(r'api/quizzes', QuizViewSet)
@@ -16,8 +15,5 @@ urlpatterns = [
          name='course-learning-outcomes-list'),  # List all outcomes
     path('api/course/<int:course_id>/learning_outcomes/<int:outcome_id>/', CourseLearningOutcomesAPIView.as_view(),
          name='course-learning-outcome-detail'),  # Retrieve, delete specific outcome
-
     path('api/ollama_status/', ollama_status, name='ollama_status'),
-    #path('api/run-ollama/', run_ollama, name='run_ollama'),
-
 ]

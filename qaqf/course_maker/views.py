@@ -5,7 +5,6 @@ from rest_framework.views import APIView
 from rest_framework.decorators import action
 from rest_framework import generics, viewsets,status
 from rest_framework.response import Response
-from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render
 from formtools.wizard.views import SessionWizardView
@@ -13,9 +12,10 @@ from rest_framework.viewsets import ViewSet
 from .course_wizard_forms import *
 from .models import Courses, LearningOutcome,Content,ContentListing,Quiz
 from .serializers import CourseSerializer, LearningOutcomeSerializer, ContentSerializer, ContentListingSerializer,QuizSerializer
+from rest_framework import viewsets, status
+from rest_framework.response import Response
 from llm.llm import LLM
 from llm .utils import *
-from rest_framework import status
 from django.http import JsonResponse
 import logging
 logging.basicConfig(level=logging.WARNING)

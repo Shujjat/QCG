@@ -9,7 +9,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/', auth_views.LoginView.as_view(template_name='course_maker/login.html'), name='login'),
     path('', include('course_maker.urls')),
-    path('', include('llm.urls')),  
+    path('', include('course_material.urls')),
+    path('', include('llm.urls')),
 ]
 
 if settings.DEBUG:
