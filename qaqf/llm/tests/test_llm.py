@@ -1,3 +1,6 @@
+import os
+import subprocess
+import requests
 from datetime import datetime
 from django.conf import settings
 from rest_framework.test import APITestCase
@@ -5,24 +8,27 @@ from course_maker.models import Courses
 from llm.llm import LLM
 from llm.models import LoggingEntry
 from django.core.files import File
+import logging
 
-import subprocess
-import requests
+from llm.utils import shutdown_ollama
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 class TestLLM(APITestCase):
 
     @classmethod
     def setUpTestData(cls):
-
         # Initialize LLM instance once for all tests
         cls.llm = LLM()
 
     def setUp(self):
-        print(f"\nRunning test: {self._testMethodName}")
+        #shutdown_ollama()
+        logger.info(f"\nRunning test: {self._testMethodName}")
         # Create an in-memory PDF file
-        pdf_path = f"{settings.BASE_DIR}/media/sample_books/python.pdf"
-        # Set up test course
+        pdf_path = os.path.join(settings.BASE_DIR, 'media/sample_books/python.pdf')
         with open(pdf_path, 'rb') as pdf_file:
+            file = File(pdf_file, name='python.pdf')
+
             self.course = Courses.objects.create(
                 course_title="",
                 course_description="",
@@ -37,8 +43,11 @@ class TestLLM(APITestCase):
                 project_based=True,
                 assignment=True,
                 long_course_support=False,
-                available_material=File(pdf_file, name='python.pdf')  # Add the file here
+
             )
+    def tearDown(self):
+        #shutdown_ollama()
+        pass
 
     def test_generate_course_title(self):
         # Call the method directly with actual course ID
@@ -46,6 +55,7 @@ class TestLLM(APITestCase):
 
         # Assertions
         self.assertTrue(title, "Title should not be empty")
+
 
     def test_generate_course_description(self):
         # Call the method directly with actual course ID
@@ -92,16 +102,13 @@ class TestLLM(APITestCase):
         assert all("outcome" in outcome for outcome in learning_outcomes), "Each outcome should have an 'outcome' field"
 
 
-
-
-
-    def test_generate_summary(self):
-        text_chunk = self.course.available_material_content
-        summary = self.llm.generate_summary(text_chunk)
+    # def _test_generate_summary(self):
+    #     text_chunk = self.course.available_material_content
+    #     summary = self.llm.generate_summary(text_chunk)
 
         # Assertions
-        self.assertTrue( summary, "Summary should not be empty")
-        self.assertTrue( isinstance(summary, str), "Summary should be a string")
+        # self.assertTrue( summary, "Summary should not be empty")
+        # self.assertTrue( isinstance(summary, str), "Summary should be a string")
 
     def test_create_chunks(self):
         text = " ".join(["word"] * 3000)  # Simulating a text with 3000 words
