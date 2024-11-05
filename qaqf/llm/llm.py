@@ -184,14 +184,10 @@ class LLM:
         """
 
         prompt = self.prompt_builder.build_full_prompt(task_description, course, output_format,'learning_outcome', item_id)
-        logger.info("::::::::::::::::::::::::::::::Prompt for Learning Outcome:::::::::::::::::::::::::::::::::::::::::::::::::::::::::")
-        logger.info(prompt)
         try:
             # Generate response using Ollama locally
             generated_text = self.generate_response( prompt=prompt)
-            logger.info(
-                "::::::::::::::::::::::::::::::Learning Outcome generated_text:::::::::::::::::::::::::::::::::::::::::::::::::::::::::")
-            logger.info(generated_text)
+
             # Extract outcomes and sub-items using regex
             learning_outcomes = []
             current_outcome = None
@@ -230,9 +226,7 @@ class LLM:
                     "outcome": outcome["outcome"],
                     "sub_items": outcome["sub_items"]
                 })
-            logger.info(
-                "::::::::::::::::::::::::::::::Prompt for Learning Outcome simplified_outcomes:::::::::::::::::::::::::::::::::::::::::::::::::::::::::")
-            logger.info(simplified_outcomes)
+
             return simplified_outcomes
 
         except requests.exceptions.RequestException as e:

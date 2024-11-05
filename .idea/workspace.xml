@@ -5,39 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7cf03e74-88c4-4af5-b6c0-cfbca8a72de4" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/runConfigurations/TestCoursesMaterial.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qaqf/course_material/migrations/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qaqf/course_material/models.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qaqf/course_material/serializers.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qaqf/course_material/tests/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qaqf/course_material/tests/test_course_material.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qaqf/course_material/urls.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qaqf/course_material/views.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/qaqf/media/sample_books/python_updated.pdf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/debug.log" beforeDir="false" afterPath="$PROJECT_DIR$/debug.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/migrations/0001_initial.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/migrations/0002_courses_course_title_and_more.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/migrations/0003_remove_courses_generated_course_description_and_more.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/migrations/0004_learningoutcome_sub_items.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/migrations/0005_remove_learningoutcome_sub_items.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/migrations/0006_learningoutcome_sub_items.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/migrations/0007_alter_content_key_points.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/migrations/0008_alter_content_script.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/migrations/0009_alter_courses_available_material.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/migrations/0010_courses_available_material_content.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/migrations/0011_courses_course_level_alter_courses_content_lang_and_more.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/migrations/0012_alter_courses_course_level.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/migrations/0013_remove_courses_available_material_and_more.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/tests/test_course_material.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/tests/test_courses.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/tests/test_courses.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/qaqf/course_maker/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/course_maker/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/course_maker/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/qaqf/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/qaqf/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/qaqf/qaqf/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/qaqf/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/llm/llm.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/llm/llm.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -86,6 +57,7 @@
   "keyToString": {
     "Python tests.TestLLM.executor": "Debug",
     "Python tests.TestOllama.executor": "Run",
+    "Python.PromptBuilder.executor": "Run",
     "Python.Run Server 2.executor": "Run",
     "Python.Run Server.executor": "Run",
     "Python.Test LLM.executor": "Run",
@@ -117,11 +89,11 @@
       <recent name="E:\Shujjat.com\Projects\QAQF\qaqf" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\Shujjat.com\Projects\QAQF\qaqf\media\sample_books" />
       <recent name="E:\Shujjat.com\Projects\QAQF\qaqf\study_material" />
       <recent name="E:\Shujjat.com\Projects\QAQF\qaqf\media" />
       <recent name="E:\Shujjat.com\Projects\QAQF\qaqf\llm\tests" />
       <recent name="E:\Shujjat.com\Projects\QAQF\qaqf\llm\test_llm.py" />
-      <recent name="E:\Shujjat.com\Projects\QAQF\qaqf\course_maker\tests" />
     </key>
   </component>
   <component name="RunManager" selected="Python.Run Server">
