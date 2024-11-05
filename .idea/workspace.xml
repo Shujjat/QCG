@@ -190,12 +190,12 @@
       <method v="2" />
     </configuration>
     <list>
-      <item itemvalue="Python.Run Server" />
       <item itemvalue="Python.Run Server 2" />
       <item itemvalue="Python.TestCourses" />
-      <item itemvalue="Python.TestLLM" />
       <item itemvalue="Python.TestLearningOutcome" />
+      <item itemvalue="Python.Run Server" />
       <item itemvalue="Python.TestContentListing" />
+      <item itemvalue="Python.TestLLM" />
     </list>
   </component>
   <component name="SharedIndexes">
