@@ -1,29 +1,89 @@
 # LLM Implementation.py
 import json
-from django.conf import settings
 from datetime import datetime
 import requests
 import ollama
 import re
 import time
+from django.core.cache import cache
+import uuid
+
+import logging
+############################################
 from course_maker.models import Courses
-from course_maker.utils.pdf_utils import read_pdf
+from course_maker.utils.utils import *
+from course_maker.utils.pdf_utils import *
+from llm.utils import *
 from .models import LoggingEntry
 from .PromptBuilder import PromptBuilder
-from .utils import *
-import logging
+
 logging.basicConfig(level=logging.INFO)
 #logging.basicConfig(level=logging.CRITICAL)
 
 logger = logging.getLogger(__name__)
 
 class LLM:
+    _global_context = None
     def __init__(self):
 
         self.prompt_builder = PromptBuilder()
         # Chunk size in words
         self.default_chunk_size=2000
+        self.session_id = None
+        if not LLM._global_context:
+            LLM._global_context = {}
 
+    def initialize_session(self, session_id=None, course_id=None):
+        """
+        Initializes or loads a session context with cached data.
+        """
+        if not session_id:
+            session_id = str(uuid.uuid4())  # Generate a unique session ID
+
+        self.session_id = session_id
+
+        # Load existing global context or initialize it
+        LLM._global_context = cache.get(self.session_id, {}) or {}
+
+        if course_id and "course_material_summary" not in LLM._global_context:
+            # Initialize course material summary if not already present
+            LLM._global_context["course_material_summary"] = self.process_course_material(course_id)
+
+        logger.info(f"Initialized session ID: {self.session_id} | Context keys: {list(LLM._global_context.keys())}")
+
+    def update_global_context(self, key, value):
+        """
+        Updates the global context dictionary and caches it.
+        """
+        LLM._global_context[key] = value
+        cache.set(self.session_id, LLM._global_context, timeout=None)
+        logger.info(f"Global context updated with key '{key}'.")
+
+    def get_from_context(self, key, default=None):
+        """
+        Retrieve a value from the global context.
+        """
+        return LLM._global_context.get(key, default)
+
+    def process_course_material(self, course_id):
+        """
+        Processes course material to generate a summary for caching.
+        """
+        """
+              Builds the central section of the prompt with course-specific data.
+              """
+        course_material=get_course_material(course_id=course_id)
+
+
+
+        if len(course_material) > self.default_chunk_size:
+            chunks = self.create_chunks(course_material, chunk_size=self.default_chunk_size)
+            summary = "\n".join([self.generate_summary(chunk) for chunk in chunks])
+        else:
+            summary = self.generate_summary(course_material)
+
+        logger.info("Course material summary generated.")
+        return summary
     def log_to_db(self, function_name, start_time=None, end_time=None, status='Started'):
         # Use the current time if start_time or end_time is missing
         if start_time is None:
@@ -101,6 +161,17 @@ class LLM:
         # Define the prompt based on Step 1 data
 
         # Retrieve the course using course_id
+        # Initialize session and load global context
+        self.initialize_session(course_id=course_id)
+
+        # Check if title and description already exist in the context
+        cached_title = self.get_from_context("course_title")
+        cached_description = self.get_from_context("course_description")
+
+        if cached_title and cached_description:
+            logger.info("Title and description fetched from cached context.")
+            return cached_title, cached_description
+
         course = Courses.objects.get(pk=course_id)
 
         # if course.available_material:
@@ -147,9 +218,12 @@ class LLM:
 
             if description_match:
                 description = description_match.group(1).strip()
-
+            # Update the global context with the generated title and description
+            self.update_global_context("course_title", title)
+            self.update_global_context("course_description", description)
             return title, description
         except requests.exceptions.RequestException as e:
+            logger.error(f"Request error during title and description generation: {e}")
             return "", ""
 
     @log_execution
@@ -157,6 +231,10 @@ class LLM:
         """
         Generates learning outcomes and sub-items based on course title and description using LLM3 of Ollama.
         """
+        self.initialize_session(course_id=course_id)
+
+        if "learning_outcomes" in LLM._global_context:
+            return LLM._global_context["learning_outcomes"]
         course = Courses.objects.get(pk=course_id)
 
 
@@ -226,6 +304,7 @@ class LLM:
                     "outcome": outcome["outcome"],
                     "sub_items": outcome["sub_items"]
                 })
+            self.update_global_context("learning_outcomes", simplified_outcomes)
 
             return simplified_outcomes
 
@@ -240,6 +319,10 @@ class LLM:
         The content is categorized into modules, which include items and sub-items.
         The structure is adjusted to fit the ContentListing and Content models.
         """
+        self.initialize_session(course_id=course_id)
+
+        if "content_listing" in LLM._global_context:
+            return LLM._global_context["content_listing"]
 
         # Define the prompt based on the course title and description
         course = Courses.objects.get(pk=course_id)
@@ -345,9 +428,10 @@ class LLM:
 
                 elif script_match and current_module and current_module["contents"]:
                     current_module["contents"][-1]["script"] = script_match.group(1)
+            content_listing=self.extract_content_listing(generated_text)
+            self.update_global_context("content_listing", content_listing)
 
-
-            return self.extract_content_listing(generated_text)
+            return content_listing
 
         except requests.exceptions.RequestException as e:
             logger.error(f"Error communicating with Ollama API: {e}")
@@ -512,7 +596,9 @@ class LLM:
         except Exception as e:
             logger.info(f"Error fetching models from Ollama: {e}")
             return []
-    def ask_question(self,course,question):
+    def ask_question(self,course,question, session_id=None):
+        self.initialize_session(session_id, course_id=course.id)
+        context = self.get_from_context("course_material_summary", "")
         prompt = f"""            
                                            Based on the given course title: '{course.course_title}' 
                                            and description: '{course.course_description}', 
@@ -520,5 +606,7 @@ class LLM:
                                            context:{self.prompt_builder.get_course_material(course)}
                                            question: {question}
                        """
+        response=self.generate_response(prompt=prompt)
+        self.update_global_context("last_question", f"Q: {question}\nA: {response}")
 
-        return  self.generate_response(prompt=prompt)
+        return  self.generate_response(prompt=prompt), self.session_id

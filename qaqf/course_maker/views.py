@@ -9,6 +9,7 @@ from django.core.files.storage import FileSystemStorage
 from django.shortcuts import render
 from formtools.wizard.views import SessionWizardView
 from rest_framework.viewsets import ViewSet
+###################################################
 from .course_wizard_forms import *
 from .models import Courses, LearningOutcome,Content,ContentListing,Quiz
 from .serializers import CourseSerializer, LearningOutcomeSerializer, ContentSerializer, ContentListingSerializer,QuizSerializer
@@ -281,27 +282,7 @@ class CourseDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Courses.objects.all()
     serializer_class = CourseSerializer
     lookup_field = 'id'
-#
-# def regenerate_learning_outcome(request):
-#     if request.method == 'POST':
-#         index = int(request.POST.get('index', 0))  # Get index as an integer, default to 0 if not provided
-#
-#         # Retrieve course_title and course_description based on session or database
-#         course_id = request.session.get('course_id')  # Assuming course_id is saved in session
-#         if course_id:
-#             try:
-#                 course = Courses.objects.get(id=int(course_id))
-#                 course_title = course.course_title
-#                 course_description = course.course_description
-#             except Courses.DoesNotExist:
-#                 return JsonResponse({'error': 'Course not found'}, status=404)
-#         else:
-#             return JsonResponse({'error': 'Course ID not found in session'}, status=400)
-#
-#
-#             return JsonResponse({'error': 'Invalid index'}, status=400)
-#
-#     return JsonResponse({'error': 'Invalid request'}, status=400)
+
 class CourseLearningOutcomesAPIView(APIView):
 
     # Retrieve a specific learning outcome
