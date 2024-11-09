@@ -2,11 +2,12 @@
 
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import LogViewSet
+from .views import LogViewSet,MakiViewSet
 
 router = DefaultRouter()
 router.register(r'logs', LogViewSet)
-
+router.register(r'ask_maki', MakiViewSet, basename='maki')
 urlpatterns = [
-    path('', include(router.urls)),
+    path('api/', include(router.urls)),
+
 ]
