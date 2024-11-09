@@ -1,0 +1,96 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ask Maki</title>
+    <style>
+        /* CSS styles here (same as above) */
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>Ask Maki</h2>
+    <form id="askMakiForm">
+        <div class="form-group">
+            <label for="course_id">Select Course</label>
+            <select id="course_id" required>
+                <!-- Courses will be loaded here dynamically -->
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="user_question">Your Question</label>
+            <textarea id="user_question" rows="4" required>what is a loop?</textarea>
+        </div>
+        <button type="submit">Submit Question</button>
+    </form>
+    <div id="responseContainer" class="response" style="display: none;">
+        <h4>Response from Maki:</h4>
+        <p id="responseText"></p>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const courseSelect = document.getElementById('course_id');
+
+        // Fetch courses from the backend and populate the select dropdown
+
+        fetch("http://127.0.0.1:8000/api/courses/")
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(course => {
+                    const option = document.createElement('option');
+                    option.value = course.id;
+                    option.textContent = course.course_title;
+                    courseSelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error fetching courses:', error));
+
+        // Handle form submission
+        document.getElementById('askMakiForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const course_id = document.getElementById('course_id').value;
+            const user_question = document.getElementById('user_question').value;
+
+
+            fetch("http://127.0.0.1:8000/api/ask_maki/ask_maki/", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                },
+                body: JSON.stringify({ course_id, user_question })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('responseContainer').style.display = 'block';
+                document.getElementById('responseText').textContent = data.response;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        });
+
+        // Utility to get CSRF token
+        function getCsrfToken() {
+            const name = 'csrftoken';
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.startsWith(name + '=')) {
+                    return cookie.substring(name.length + 1);
+                }
+            }
+            return '';
+        }
+    });
+</script>
+
+</body>
+</html>

@@ -162,7 +162,7 @@ class LLM:
 
         # Define the prompt based on the course title and description
 
-        task_description = """
+        task_description = f"""
                             Based on the given course title: '{course.course_title}' 
                             and description: '{course.course_description}', generate 
                             several learning outcomes 
@@ -245,7 +245,7 @@ class LLM:
         course = Courses.objects.get(pk=course_id)
 
 
-        task_description = """
+        task_description = f"""
                                     Based on the given course title: '{course.course_title}' 
                                     and description: '{course.course_description}',  
                             """
@@ -512,3 +512,13 @@ class LLM:
         except Exception as e:
             logger.info(f"Error fetching models from Ollama: {e}")
             return []
+    def ask_question(self,course,question):
+        prompt = f"""            
+                                           Based on the given course title: '{course.course_title}' 
+                                           and description: '{course.course_description}', 
+                                           
+                                           context:{self.prompt_builder.get_course_material(course)}
+                                           question: {question}
+                       """
+
+        return  self.generate_response(prompt=prompt)
