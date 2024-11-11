@@ -5,14 +5,15 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from django.contrib.auth.models import User
 from PyPDF2 import PdfReader
-#############################################
 from course_maker.models import Courses
 from course_material.models import CourseMaterial
 from llm.questions_model import UserQuestionLog
 from llm.llm import LLM
-APP_FOLDER = os.path.dirname(os.path.dirname(__file__))  # Adjust this to point to app_folder
+
+# Constants
+APP_FOLDER = os.path.dirname(os.path.dirname(__file__))
 TEST_FILES_DIR = os.path.join(os.path.dirname(APP_FOLDER), 'media/sample_books')
-test_file=TEST_FILES_DIR
+test_file = TEST_FILES_DIR
 
 
 class MakiViewSetTests(APITestCase):
@@ -24,111 +25,149 @@ class MakiViewSetTests(APITestCase):
     def setUp(self):
         # Set up a dummy user and course
         self.dummy_user = User.objects.create_user(username="dummy_user", password="dummy_password")
+        self.client.login(username="dummy_user", password="dummy_password")
+
+        # Set up the course
         pdf_path = os.path.join(settings.BASE_DIR, 'media/sample_books/python.pdf')
         with open(pdf_path, 'rb') as pdf_file:
             self.course = Courses.objects.create(
                 course_title="Python Programming",
-                course_description="",
+                course_description="Learn the basics of Python programming.",
                 content_lang="EN",
                 course_type="Pre-Recorded",
                 knowledge_level="Senior",
-                prerequisite_knowledge="prerequisite_knowledge",
-                participants_info="participants_info",
+                prerequisite_knowledge="Basic programming",
+                participants_info="For students and professionals",
                 duration="2",
                 practice="Intensive",
                 optimized_for_mooc=True,
                 project_based=True,
                 assignment=True,
                 long_course_support=False,
-
             )
+
+        # Set up course material
         file_path = os.path.join(TEST_FILES_DIR, 'python.pdf')
         file_name = os.path.basename(file_path)
-
         with open(file_path, 'rb') as pdf_file:
             pdf_reader = PdfReader(pdf_file)
+            file_content = "\n".join([page.extract_text() for page in pdf_reader.pages if page.extract_text()])
             self.material = CourseMaterial.objects.create(
                 course=self.course,
                 file=File(pdf_file, file_name),
-                file_type=pdf_file.name.split('.')[-1].lower(),
+                file_type='pdf',
                 material_type="textbook",
                 original_filename=file_name,
-                file_content="\n".join(
-                    [page.extract_text() for page in pdf_reader.pages if page.extract_text()])
+                file_content=file_content
             )
 
-        self.url = f'http://127.0.0.1:8000/api/ask_maki/ask_maki/'
+        # Set up URL for the test
+        self.url = 'http://127.0.0.1:8000/api/ask_maki/ask_maki/'
 
-    def test_ask_maki_get_request(self):
+    def test_ask_maki_text_response(self):
         """
-        Test the GET request to `ask_maki` to ensure it renders HTML form.
+        Test POST request for text-only response.
         """
-
-        response = self.client.get(self.url)
-
-        # Check for a 200 status code and expected content type for an HTML form
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response['Content-Type'], 'text/html; charset=utf-8')
-
-    def test_ask_maki_post_request_success(self):
-        """
-        Test the POST request to `ask_maki` to ensure it processes correctly.
-        """
-
-
-        # Sample question data
         data = {
             'course_id': self.course.id,
-            'user_question': 'What is this course about?'
+            'user_question': 'What is Python?',
+            'as_audio': False
         }
 
-        # Make POST request
         response = self.client.post(self.url, data, format='json')
-
-        # Check that the response status code is 200 OK
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        # Check that the response data contains the course_id, course_title, and response
         self.assertEqual(response.data['course_id'], self.course.id)
         self.assertEqual(response.data['course_title'], self.course.course_title)
         self.assertIn('response', response.data)
 
-        # Check that a UserQuestionLog entry was created
-        self.assertTrue(UserQuestionLog.objects.filter(user_question=data['user_question']).exists())
-
-    def test_ask_maki_post_request_missing_course_id(self):
+    def test_ask_maki_audio_response(self):
         """
-        Test the POST request to `ask_maki` when course_id is missing.
+        Test POST request for audio response.
         """
-
-
-        # Data without course_id
         data = {
-            'user_question': 'What is this course about?'
+            'course_id': self.course.id,
+            'user_question': 'Explain Python basics.',
+            'as_audio': True
         }
 
-        # Make POST request
         response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('response', response.data)
+        self.assertIn('audio_url', response.data)
+        print("Audio URL:", response.data['audio_url'])
 
-        # Check for a 400 Bad Request response
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data['error'], "course_id is required.")
-
-    def test_ask_maki_post_request_invalid_course_id(self):
+    def test_ask_maki_custom_voice_audio(self):
         """
-        Test the POST request to `ask_maki` with an invalid course_id.
+        Test POST request for audio response with custom voice, rate, and volume.
         """
-
-
-        # Data with an invalid course_id
         data = {
-            'course_id': 999,  # Nonexistent course_id
-            'user_question': 'What is this course about?'
+            'course_id': self.course.id,
+            'user_question': 'Tell me about Python data types.',
+            'as_audio': True,
+            'voice_name': 'David',
+            'rate': 150,
+            'volume': 0.8
         }
 
-        # Make POST request
         response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('response', response.data)
+        self.assertIn('audio_url', response.data)
+        print("Custom Voice Audio URL:", response.data['audio_url'])
 
-        # Check for a 404 Not Found response
+    def test_invalid_course_id(self):
+        """
+        Test with invalid course ID.
+        """
+        data = {
+            'course_id': 999,
+            'user_question': 'What is this course about?',
+            'as_audio': False
+        }
+
+        response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data['error'], "Course not found.")
+
+    def test_missing_user_question(self):
+        """
+        Test with missing user question.
+        """
+        data = {
+            'course_id': self.course.id,
+            'as_audio': False
+        }
+
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['error'], "user_question is required.")
+
+    def test_audio_response_with_invalid_voice(self):
+        """
+        Test with invalid voice name for TTS.
+        """
+        data = {
+            'course_id': self.course.id,
+            'user_question': 'What is Python?',
+            'as_audio': True,
+            'voice_name': 'InvalidVoice'
+        }
+
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('error', response.data)
+
+    def test_log_creation(self):
+        """
+        Test if log entry is created successfully.
+        """
+        data = {
+            'course_id': self.course.id,
+            'user_question': 'What is Python?',
+            'as_audio': False
+        }
+
+        response = self.client.post(self.url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        log_exists = UserQuestionLog.objects.filter(user_question=data['user_question']).exists()
+        self.assertTrue(log_exists)
