@@ -65,8 +65,10 @@ class MakiViewSet(viewsets.ModelViewSet):
                 course = Courses.objects.get(id=course_id)
             except Courses.DoesNotExist:
                 return Response({"error": "Course not found."}, status=status.HTTP_404_NOT_FOUND)
-            as_audio = request.data.get('as_audio')
-            as_audio=True
+            as_audio = request.data.get('as_audio', True)
+            voice_name = request.data.get('voice_name', None)  # New field for voice customization
+            rate = int(request.data.get('rate', 200))  # Default rate is 200
+            volume = float(request.data.get('volume', 1.0))  # Default volume is 1.0
 
             response= llm_instance.ask_question(course, user_question)
             # Prepare the response
@@ -88,13 +90,17 @@ class MakiViewSet(viewsets.ModelViewSet):
                 "course_title": course.course_title,
                 "response":response
             }
+
             if as_audio:
-                audio_path = self.generate_audio(response, voice_name=voice_name, rate=rate, volume=volume)
+
+                audio_path = self.generate_audio(file_name=question.id,response_text=response, voice_name=voice_name, rate=rate, volume=volume)
                 if audio_path:
                     audio_url = f"{settings.MEDIA_URL}tts_audio/{os.path.basename(audio_path)}"
                     response_data["audio_url"] = audio_url
 
-    def generate_audio(file_name=None,response_text, voice_name=None, rate=200, volume=1.0):
+            return Response(response_data, status=status.HTTP_200_OK)
+
+    def generate_audio(self,file_name=None,response_text=None, voice_name=None, rate=200, volume=1.0):
         """
         Generates an audio file from text using pyttsx3 with customizable options.
 
@@ -127,8 +133,8 @@ class MakiViewSet(viewsets.ModelViewSet):
                     print(f"Voice '{voice_name}' not found. Using default voice.")
 
             # Generate unique filename
-            filename = f"{uuid.uuid4()}.mp3"
-            audio_dir = os.path.join(settings.MEDIA_ROOT, 'tts_audio')
+            filename = f"{file_name}.mp3"
+            audio_dir = os.path.join(settings.MEDIA_ROOT, 'maki_audio')
             os.makedirs(audio_dir, exist_ok=True)
             file_path = os.path.join(audio_dir, filename)
 
