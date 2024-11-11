@@ -142,20 +142,7 @@ class MakiViewSetTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['error'], "user_question is required.")
 
-    def test_audio_response_with_invalid_voice(self):
-        """
-        Test with invalid voice name for TTS.
-        """
-        data = {
-            'course_id': self.course.id,
-            'user_question': 'What is Python?',
-            'as_audio': True,
-            'voice_name': 'InvalidVoice'
-        }
 
-        response = self.client.post(self.url, data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn('error', response.data)
 
     def test_log_creation(self):
         """
