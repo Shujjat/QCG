@@ -5,7 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7cf03e74-88c4-4af5-b6c0-cfbca8a72de4" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/qaqf/llm/tests/test_maki.py" beforeDir="false" afterPath="$PROJECT_DIR$/qaqf/llm/tests/test_maki.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,7 +70,7 @@
     &quot;Python.TestMaki.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;postgres-integraion&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;Maki-audio&quot;,
     &quot;last_opened_file_path&quot;: &quot;E:/Shujjat.com/Projects/QAQF/qaqf/media/sample_books&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;org.jetbrains.plugins.github.ui.GithubSettingsConfigurable&quot;
   },
@@ -96,7 +96,7 @@
       <recent name="E:\Shujjat.com\Projects\QAQF\qaqf\llm\test_llm.py" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.Run Server">
+  <component name="RunManager" selected="Python.TestMaki">
     <configuration name="Run Server" type="PythonConfigurationType" factoryName="Python">
       <module name="QAQF" />
       <option name="ENV_FILES" value="" />
