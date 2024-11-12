@@ -70,7 +70,7 @@
     "Python.TestMaki.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "postgres-integraion",
     "last_opened_file_path": "E:/Shujjat.com/Projects/QAQF/qaqf/media/sample_books",
     "settings.editor.selected.configurable": "org.jetbrains.plugins.github.ui.GithubSettingsConfigurable"
   },
@@ -96,7 +96,7 @@
       <recent name="E:\Shujjat.com\Projects\QAQF\qaqf\llm\test_llm.py" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.TestMaki">
+  <component name="RunManager" selected="Python.Run Server">
     <configuration name="Run Server" type="PythonConfigurationType" factoryName="Python">
       <module name="QAQF" />
       <option name="ENV_FILES" value="" />
